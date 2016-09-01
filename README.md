@@ -1,4 +1,4 @@
-# Superpower
+# Superpower [![Build status](https://ci.appveyor.com/api/projects/status/366q7k3nv4fiuwuv?svg=true)](https://ci.appveyor.com/project/NicholasBlumhardt/superpower)
 
 A highly-experimental parser combinator library. The code in this repository is not ready for any kind of consumption - I'm currently just sketching some ideas and exploring the feasibility of meeting the following high-level goals:
 
