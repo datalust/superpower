@@ -1,0 +1,31 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "description": "Experimental, work-in-progress parser combinator library",
+  "authors": [ "Nicholas Blumhardt", "Superpower Contributors" ],
+
+  "packOptions": {
+    "tags": [ "superpower", "parser" ],
+    "projectUrl": "https://github.com/nblumhardt/superpower",
+    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0"
+  },
+
+  "buildOptions": {
+    "keyFile": "../../asset/Superpower.snk",
+    "xmlDoc": true,
+    "warningsAsErrors": true
+  },
+
+  "dependencies": {
+    "NETStandard.Library": "1.6.0"
+  },
+
+  "frameworks": {
+    "netstandard1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ]
+    }
+  }
+}
