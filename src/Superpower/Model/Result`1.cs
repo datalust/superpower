@@ -37,7 +37,7 @@ namespace Superpower.Model
 
         public override string ToString()
         {
-            if (Remainder == StringSpan.Empty)
+            if (Remainder == StringSpan.None)
                 return "(empty result)";
 
             if (HasValue)

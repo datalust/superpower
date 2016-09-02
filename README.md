@@ -14,6 +14,4 @@ A highly-experimental parser combinator library. The code in this repository is 
  * [ ] Separate provided parsers, which are grammar/language/locale-specific, from generic combinators
  * [ ] Only high-level API types exposed in the root namespace
 
-If everything comes together nicely this might be proposed as a companion project for Sprache.
-
 _The repository's working title arose out of a talk "Parsing Text: the Programming Superpower You Need at Your Fingertips" given at DDD Brisbane 2015._

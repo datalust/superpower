@@ -8,9 +8,7 @@
     "BenchmarkDotNet": "0.9.9",
     "Sprache": "2.1.0"
   },
-  "buildOptions": {
-    "keyFile": "../../asset/Superpower.snk"
-  },
+
   "frameworks": {
     "net4.6": { },
     "netcoreapp1.0": { 

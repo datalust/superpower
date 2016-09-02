@@ -7,9 +7,9 @@ namespace Sample
 {
     class SExpressionTokenizer : Tokenizer<SExpressionToken>
     {
-        public override IEnumerable<Token<SExpressionToken>> Tokenize(StringSpan span)
+        protected override IEnumerable<Token<SExpressionToken>> Tokenize(StringSpan span)
         {
-            var next = EatWhitespace(span);
+            var next = SkipWhiteSpace(span);
             if (!next.HasValue)
                 yield break;
 
@@ -27,11 +27,8 @@ namespace Sample
                 }
                 else if (char.IsDigit(next.Value))
                 {
-                    var beginNumber = next.Location;
-                    while (next.HasValue && char.IsDigit(next.Value))
-                    {
-                        next = next.Remainder.NextChar();
-                    }
+                    var integer = Numerics.Integer(next.Location);
+                    next = integer.Remainder.NextChar();
 
                     if (next.HasValue && !char.IsPunctuation(next.Value) && !char.IsWhiteSpace(next.Value))
                     {
@@ -39,7 +36,7 @@ namespace Sample
                     }
                     else
                     {
-                        yield return new Token<SExpressionToken>(SExpressionToken.Number, beginNumber.Until(next.Location));
+                        yield return new Token<SExpressionToken>(SExpressionToken.Number, integer.Value);
                     }
                 }
                 else
@@ -53,18 +50,8 @@ namespace Sample
                     yield return new Token<SExpressionToken>(SExpressionToken.Atom, beginIdentifier.Until(next.Location));
                 }
 
-                next = EatWhitespace(next.Location);
+                next = SkipWhiteSpace(next.Location);
             } while (next.HasValue);
-        }
-
-        static Result<char> EatWhitespace(StringSpan span)
-        {
-            var next = span.NextChar();
-            while (next.HasValue && char.IsWhiteSpace(next.Value))
-            {
-                next = next.Remainder.NextChar();
-            }
-            return next;
         }
     }
 }

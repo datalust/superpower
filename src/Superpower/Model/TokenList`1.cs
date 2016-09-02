@@ -1,28 +1,29 @@
 using System;
-using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Superpower.Model
 {
-    public struct TokenList<TTokenKind> : IEquatable<TokenList<TTokenKind>>
+    public struct TokenList<TTokenKind> : IEquatable<TokenList<TTokenKind>>, IEnumerable<Token<TTokenKind>>
     {
         readonly Token<TTokenKind>[] _tokens;
-        readonly int _position;
 
-        public TokenList(string source, Tokenizer<TTokenKind> tokenizer)
-            : this(tokenizer.Tokenize(new StringSpan(source)).ToArray(), 0)
+        public int Position { get; }
+
+        public TokenList(Token<TTokenKind>[] tokens)
+            : this(tokens, 0)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (tokenizer == null) throw new ArgumentNullException(nameof(tokenizer));
+            if (tokens == null) throw new ArgumentNullException(nameof(tokens));
         }
 
         TokenList(Token<TTokenKind>[] tokens, int position)
         {
-#if CHECKED
+#if CHECKED // Called on every advance or backtrack
             if (tokens == null) throw new ArgumentNullException(nameof(tokens));
             if (position > tokens.Length) throw new ArgumentOutOfRangeException(nameof(position), "Position is past end + 1.");
 #endif
 
-            _position = position;
+            Position = position;
             _tokens = tokens;
         }
 
@@ -33,7 +34,7 @@ namespace Superpower.Model
             get
             {
                 EnsureHasValue();
-                return _position == _tokens.Length;
+                return Position == _tokens.Length;
             }
         }
 
@@ -50,8 +51,22 @@ namespace Superpower.Model
             if (IsAtEnd)
                 return TokenResult.Empty<TTokenKind, Token<TTokenKind>>(this);
 
-            var token = _tokens[_position];
-            return TokenResult.Value(token, this, new TokenList<TTokenKind>(_tokens, _position + 1));
+            var token = _tokens[Position];
+            return TokenResult.Value(token, this, new TokenList<TTokenKind>(_tokens, Position + 1));
+        }
+
+        // Usability method, not called during parsing.
+        public IEnumerator<Token<TTokenKind>> GetEnumerator()
+        {
+            EnsureHasValue();
+
+            for (var position = Position; position < _tokens.Length; ++position)
+                yield return _tokens[position];
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public override bool Equals(object obj)
@@ -66,13 +81,13 @@ namespace Superpower.Model
         {
             unchecked
             {
-                return ((_tokens?.GetHashCode() ?? 0) * 397) ^ _position;
+                return ((_tokens?.GetHashCode() ?? 0) * 397) ^ Position;
             }
         }
 
         public bool Equals(TokenList<TTokenKind> other)
         {
-            return string.Equals(_tokens, other._tokens) && _position == other._position;
+            return string.Equals(_tokens, other._tokens) && Position == other.Position;
         }
 
         public static bool operator ==(TokenList<TTokenKind> lhs, TokenList<TTokenKind> rhs)

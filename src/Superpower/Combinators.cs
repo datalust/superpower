@@ -16,7 +16,7 @@ namespace Superpower
                     return TokenResult.Empty<TTokenKind, U>(rt.Remainder);
 
                 var uParser = u(rt.Value);
-                var uResult = uParser(rt.Value.Span); // .End();
+                var uResult = uParser.AtEnd()(rt.Value.Span);
                 if (!uResult.HasValue)
                     return TokenResult.Empty<TTokenKind, U>(rt.Remainder);
 
@@ -27,6 +27,40 @@ namespace Superpower
         public static TokenParser<TTokenKind, U> Apply<TTokenKind, U>(this TokenParser<TTokenKind, Token<TTokenKind>> t, CharParser<U> u)
         {
             return t.Apply(rt => u);
+        }
+
+        public static CharParser<T> AtEnd<T>(this CharParser<T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return input =>
+            {
+                var result = parser(input);
+                if (!result.HasValue)
+                    return result;
+
+                if (result.Remainder.IsAtEnd)
+                    return result;
+
+                return Result.Empty<T>(result.Remainder);
+            };
+        }
+
+        public static TokenParser<TTokenKind, T> AtEnd<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return input =>
+            {
+                var result = parser(input);
+                if (!result.HasValue)
+                    return result;
+
+                if (result.Remainder.IsAtEnd)
+                    return result;
+
+                return TokenResult.Empty<TTokenKind, T>(result.Remainder);
+            };
         }
 
         public static TokenParser<TTokenKind, T[]> AtLeastOnce<TTokenKind, T>(this TokenParser<TTokenKind, T> t)

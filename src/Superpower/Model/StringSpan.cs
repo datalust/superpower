@@ -13,7 +13,7 @@ namespace Superpower.Model
         {
         }
 
-        StringSpan(string source, Position position, int length)
+        public StringSpan(string source, Position position, int length)
         {
 #if CHECKED
             if (source == null) throw new ArgumentNullException(nameof(source));
@@ -28,7 +28,9 @@ namespace Superpower.Model
             Length = length;
         }
 
-        public static StringSpan Empty { get; } = default(StringSpan);
+        public static StringSpan None { get; } = default(StringSpan);
+
+        public static StringSpan Empty { get; } = new StringSpan(string.Empty, Position.Zero, 0);
 
         public bool IsAtEnd
         {
@@ -95,8 +97,10 @@ namespace Superpower.Model
 
         public StringSpan First(int length)
         {
+#if CHECKED
             if (length > Length)
                 throw new ArgumentOutOfRangeException(nameof(length), "Length exceeds the source span's length.");
+#endif
 
             return new StringSpan(Source, Position, length);
         }
@@ -106,10 +110,10 @@ namespace Superpower.Model
             if (Source == null)
                 return "(empty source span)";
 
-            return StringValue();
+            return ToStringValue();
         }
 
-        public string StringValue()
+        public string ToStringValue()
         {
             EnsureHasValue();
             return Source.Substring(Position.Absolute, Length);

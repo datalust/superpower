@@ -9,7 +9,7 @@ namespace Sample
     {
         public static void Main(string[] args)
         {
-            var input = new StringSpan("(abc (234) 567 defgh) ");
+            const string input = "(abc (234) 567 defgh) ";
             Console.WriteLine($"Input is: {input}");
 
             var tok = new SExpressionTokenizer();
@@ -19,17 +19,17 @@ namespace Sample
             }
 
             var number = Parse.Token(SExpressionToken.Number)
-                              .Apply(t => Numerics.Integer);
+                              .Apply(t => Numerics.IntegerInt32);
 
             var number1 = Parse.Token(SExpressionToken.Number)
-                               .Apply(Numerics.Integer);
+                               .Apply(Numerics.IntegerInt32);
 
             var number2 = Parse.Token(SExpressionToken.Number)
                                .Select(t => int.Parse(t.Value));
 
             var numbers = number.AtLeastOnce();
 
-            var stream = new TokenList<SExpressionToken>("1 23 456", tok);
+            var stream = tok.Tokenize("1 23 456");
 
             var result = numbers(stream);
 

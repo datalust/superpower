@@ -2,7 +2,7 @@
   "version": "1.0.0-*",
 
   "description": "Experimental, work-in-progress parser combinator library",
-  "authors": [ "Nicholas Blumhardt", "Superpower Contributors" ],
+  "authors": [ "Datalust", "Superpower Contributors", "Sprache Contributors" ],
 
   "packOptions": {
     "tags": [ "superpower", "parser" ],
@@ -13,6 +13,20 @@
   "buildOptions": {
     "keyFile": "../../asset/Superpower.snk",
     "warningsAsErrors": true
+  },
+
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "DEBUG", "TRACE", "CHECKED" ]
+      }
+    },
+    "Release": {
+      "buildOptions": {
+        "define": [ "RELEASE", "TRACE" ],
+        "optimize": true
+      }
+    }
   },
 
   "dependencies": {
