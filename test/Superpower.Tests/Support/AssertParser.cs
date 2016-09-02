@@ -64,7 +64,7 @@ namespace Superpower.Tests.Support
             FailsWith(parser, input, f => Assert.Equal(position, f.Remainder.Position.Absolute));
         }
 
-        public static void FailsWith<T>(CharParser<T> parser, string input, Action<Result<T>> resultAssertion)
+        public static void FailsWith<T>(CharParser<T> parser, string input, Action<CharResult<T>> resultAssertion)
         {
             var result = parser.TryParse(input);
 

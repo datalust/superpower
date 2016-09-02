@@ -19,7 +19,7 @@ namespace Sample
             }
 
             var number = Parse.Token(SExpressionToken.Number)
-                              .Apply(t => Numerics.IntegerInt32);
+                              .Apply(t => Parse.Char('x'));
 
             var number1 = Parse.Token(SExpressionToken.Number)
                                .Apply(Numerics.IntegerInt32);
@@ -35,7 +35,7 @@ namespace Sample
 
             var stream = tok.Tokenize(" 1 abc 23 456");
 
-            var result = alt.TryParse(stream);
+            var result = numbers.TryParse(stream);
 
             if (result.HasValue)
             {

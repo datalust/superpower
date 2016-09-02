@@ -15,7 +15,7 @@ namespace Superpower
 
         protected abstract IEnumerable<Token<TTokenKind>> Tokenize(StringSpan stringSpan);
 
-        protected static Result<char> SkipWhiteSpace(StringSpan span)
+        protected static CharResult<char> SkipWhiteSpace(StringSpan span)
         {
             var next = span.NextChar();
             while (next.HasValue && char.IsWhiteSpace(next.Value))

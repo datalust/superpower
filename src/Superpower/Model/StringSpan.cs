@@ -47,15 +47,15 @@ namespace Superpower.Model
                 throw new InvalidOperationException("String span has no value.");
         }
 
-        public Result<char> NextChar()
+        public CharResult<char> NextChar()
         {
             EnsureHasValue();
 
             if (IsAtEnd)
-                return Result.Empty<char>(this);
+                return CharResult.Empty<char>(this);
 
             var ch = Source[Position.Absolute];
-            return Result.Value(ch, this, new StringSpan(Source, Position.Advance(ch), Length - 1));
+            return CharResult.Value(ch, this, new StringSpan(Source, Position.Advance(ch), Length - 1));
         }
 
         public override bool Equals(object obj)

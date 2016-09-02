@@ -26,7 +26,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="input">The input.</param>
         /// <returns>The result of the parser</returns>
-        public static Result<T> TryParse<T>(this CharParser<T> parser, string input)
+        public static CharResult<T> TryParse<T>(this CharParser<T> parser, string input)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (input == null) throw new ArgumentNullException(nameof(input));

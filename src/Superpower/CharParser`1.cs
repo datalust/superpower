@@ -2,5 +2,5 @@ using Superpower.Model;
 
 namespace Superpower
 {
-    public delegate Result<T> CharParser<T>(StringSpan input);
+    public delegate CharResult<T> CharParser<T>(StringSpan input);
 }

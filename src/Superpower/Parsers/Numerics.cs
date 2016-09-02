@@ -8,7 +8,7 @@ namespace Superpower.Parsers
         {
             var next = input.NextChar();
             if (!next.HasValue || !char.IsDigit(next.Value))
-                return Result.Empty<StringSpan>(input);
+                return CharResult.Empty<StringSpan>(input);
 
             StringSpan remainder;
             do
@@ -17,14 +17,14 @@ namespace Superpower.Parsers
                 next = remainder.NextChar();
             } while (next.HasValue && char.IsDigit(next.Value));
 
-            return Result.Value(input.Until(remainder), input, remainder);
+            return CharResult.Value(input.Until(remainder), input, remainder);
         };
 
         public static readonly CharParser<int> IntegerInt32 = input =>
         {
             var next = input.NextChar();
             if (!next.HasValue || !char.IsDigit(next.Value))
-                return Result.Empty<int>(input);
+                return CharResult.Empty<int>(input);
 
             StringSpan remainder;
             var val = 0;
@@ -35,7 +35,7 @@ namespace Superpower.Parsers
                 next = remainder.NextChar();
             } while (next.HasValue && char.IsDigit(next.Value));
 
-            return Result.Value(val, input, remainder);
+            return CharResult.Value(val, input, remainder);
         };
     }
 }

@@ -3,53 +3,47 @@ using System.Linq;
 
 namespace Superpower.Model
 {
-    public struct TokenResult<TTokenKind, T>
+    public struct CharResult<T>
     {
         readonly T _value;
 
-        public TokenList<TTokenKind> Location { get; }
-        public TokenList<TTokenKind> Remainder { get; }
+        public StringSpan Location { get; }
+        public StringSpan Remainder { get; }
         public bool HasValue { get; }
-        public Position ErrorPosition { get; }
-        public string ErrorMessage { get; }
         public string[] Expectations { get; }
+
+        public bool IsPartial(StringSpan @from) => @from != Remainder;
 
         public T Value
         {
             get
             {
                 if (!HasValue)
-                    throw new InvalidOperationException("TokenResult has no value.");
+                    throw new InvalidOperationException("Result has no value.");
                 return _value;
             }
         }
 
-        public bool IsPartial(TokenList<TTokenKind> @from) => ErrorPosition.HasValue || @from != Remainder;
-
-        internal TokenResult(T value, TokenList<TTokenKind> location, TokenList<TTokenKind> remainder)
+        internal CharResult(T value, StringSpan location, StringSpan remainder)
         {
             Location = location;
             Remainder = remainder;
             _value = value;
             HasValue = true;
-            ErrorPosition = Position.Empty;
-            ErrorMessage = null;
             Expectations = null;
         }
 
-        internal TokenResult(TokenList<TTokenKind> remainder, Position errorPosition, string errorMessage, string[] expectations)
+        internal CharResult(StringSpan remainder, string[] expectations)
         {
             Location = Remainder = remainder;
             _value = default(T);
             HasValue = false;
-            ErrorPosition = errorPosition;
-            ErrorMessage = errorMessage;
             Expectations = expectations;
-        }        
+        }
 
         public override string ToString()
         {
-            if (Remainder == TokenList<TTokenKind>.Empty)
+            if (Remainder == StringSpan.None)
                 return "(Empty result.)";
 
             if (HasValue)
@@ -59,9 +53,7 @@ namespace Superpower.Model
             var location = "";
             if (!Remainder.IsAtEnd)
             {
-                var next = Remainder.NextToken().Value;
-                var sourcePosition = ErrorPosition.HasValue ? ErrorPosition : next.Position;
-                location = $" (line {sourcePosition.Line}, column {sourcePosition.Column})";
+                location = $" (line {Remainder.Position.Line}, column {Remainder.Position.Column})";
             }
 
             return $"Parsing failure{location}: {message}.";
@@ -69,9 +61,6 @@ namespace Superpower.Model
 
         public string FormatErrorMessageFragment()
         {
-            if (ErrorMessage != null)
-                return ErrorMessage;
-
             string message;
             if (Remainder.IsAtEnd)
             {
@@ -79,12 +68,8 @@ namespace Superpower.Model
             }
             else
             {
-                var next = Remainder.NextToken().Value;
-                var nextKind = Presentation.FormatKind(next.Kind);
-                var nextValue = next.Value;
-                if (nextValue.Length > 12)
-                    nextValue = nextValue.Substring(0, 9) + "...";
-                message = $"unexpected {nextKind} `{nextValue}`";
+                var next = Remainder.NextChar().Value;
+                message = $"unexpected `{next}`";
             }
 
             if (Expectations != null)

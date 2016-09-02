@@ -18,7 +18,10 @@ namespace Superpower
                 var uParser = u(rt.Value);
                 var uResult = uParser.AtEnd()(rt.Value.Span);
                 if (!uResult.HasValue)
-                    return new TokenResult<TTokenKind, U>(input, uResult.Remainder.Position, uResult.ToString(), null);
+                {
+                    var message = $"invalid {Presentation.FormatKind(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
+                    return new TokenResult<TTokenKind, U>(input, uResult.Remainder.Position, message, null);
+                }
 
                 return TokenResult.Value(uResult.Value, rt.Location, rt.Remainder);
             };
@@ -42,7 +45,7 @@ namespace Superpower
                 if (result.Remainder.IsAtEnd)
                     return result;
 
-                return Result.Empty<T>(result.Remainder);
+                return CharResult.Empty<T>(result.Remainder);
             };
         }
 
@@ -63,9 +66,14 @@ namespace Superpower
             };
         }
 
-        public static TokenParser<TTokenKind, T[]> AtLeastOnce<TTokenKind, T>(this TokenParser<TTokenKind, T> t)
+        public static TokenParser<TTokenKind, T[]> AtLeastOnce<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
         {
-            return t.Then(first => t.Many().Select(rest => new[] { first }.Concat(rest).ToArray()));
+            return parser.Then(first => parser.Many().Select(rest => new[] { first }.Concat(rest).ToArray()));
+        }
+
+        public static CharParser<T[]> AtLeastOnce<T>(this CharParser<T> parser)
+        {
+            return parser.Then(first => parser.Many().Select(rest => new[] { first }.Concat(rest).ToArray()));
         }
 
         public static TokenParser<TTokenKind, T[]> Many<TTokenKind, T>(this TokenParser<TTokenKind, T> t)
@@ -94,13 +102,19 @@ namespace Superpower
             return input =>
             {
                 var result = new List<T>();
+                var @from = input;
                 var r = t(input);
                 while (r.HasValue)
                 {
                     result.Add(r.Value);
+                    @from = r.Remainder;
                     r = t(r.Remainder);
                 }
-                return Result.Value(result.ToArray(), input, r.Remainder);
+
+                if (r.IsPartial(@from))
+                    return CharResult.CastEmpty<T, T[]>(r);
+
+                return CharResult.Value(result.ToArray(), input, r.Remainder);
             };
         }
 
@@ -128,7 +142,11 @@ namespace Superpower
                 if (first.HasValue)
                     return first;
 
-                return rhs(input);
+                var second = rhs(input);
+                if (second.HasValue)
+                    return second;
+
+                return CharResult.CombineEmpty(first, second);
             };
         }
 
@@ -160,7 +178,7 @@ namespace Superpower
             {
                 var rt = t(input);
                 if (!rt.HasValue)
-                    return Result.Empty<U>(rt.Remainder);
+                    return CharResult.CastEmpty<T, U>(rt);
 
                 return u(rt.Value)(rt.Remainder);
             };

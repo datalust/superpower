@@ -7,7 +7,7 @@ namespace Superpower.Model
             return new TokenResult<TTokenKind, T>(remainder, Position.Empty, null, null);
         }
 
-        public static TokenResult<TTokenKind, T> Empty<TTokenKind, T>(TokenList<TTokenKind> remainder, TTokenKind[] expectations)
+        public static TokenResult<TTokenKind, T> Empty<TTokenKind, T>(TokenList<TTokenKind> remainder, string[] expectations)
         {
             return new TokenResult<TTokenKind, T>(remainder, Position.Empty, null, expectations);
         }
@@ -45,7 +45,7 @@ namespace Superpower.Model
                 expectations = second.Expectations;
             else if (second.Expectations != null)
             {
-                expectations = new TTokenKind[first.Expectations.Length + second.Expectations.Length];
+                expectations = new string[first.Expectations.Length + second.Expectations.Length];
                 var i = 0;
                 for (; i < first.Expectations.Length; ++i)
                     expectations[i] = first.Expectations[i];
