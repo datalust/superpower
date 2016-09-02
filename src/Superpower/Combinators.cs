@@ -13,12 +13,12 @@ namespace Superpower
             {
                 var rt = t(input);
                 if (!rt.HasValue)
-                    return TokenResult.Empty<TTokenKind, U>(rt.Remainder);
+                    return TokenResult.CastEmpty<TTokenKind, Token<TTokenKind>, U>(rt);
 
                 var uParser = u(rt.Value);
                 var uResult = uParser.AtEnd()(rt.Value.Span);
                 if (!uResult.HasValue)
-                    return TokenResult.Empty<TTokenKind, U>(rt.Remainder);
+                    return new TokenResult<TTokenKind, U>(input, uResult.Remainder.Position, uResult.ToString(), null);
 
                 return TokenResult.Value(uResult.Value, rt.Location, rt.Remainder);
             };
@@ -73,12 +73,18 @@ namespace Superpower
             return input =>
             {
                 var result = new List<T>();
+                var @from = input;
                 var r = t(input);
                 while (r.HasValue)
                 {
                     result.Add(r.Value);
+                    @from = r.Remainder;
                     r = t(r.Remainder);
                 }
+
+                if (r.IsPartial(@from))
+                    return TokenResult.CastEmpty<TTokenKind, T, T[]>(r);
+
                 return TokenResult.Value(result.ToArray(), input, r.Remainder);
             };
         }
@@ -103,10 +109,14 @@ namespace Superpower
             return input =>
             {
                 var first = lhs(input);
-                if (first.HasValue)
+                if (first.HasValue || first.IsPartial(input))
                     return first;
 
-                return rhs(input);
+                var second = rhs(input);
+                if (second.HasValue)
+                    return second;
+
+                return TokenResult.CombineEmpty(first, second);
             };
         }
 
@@ -138,7 +148,7 @@ namespace Superpower
             {
                 var rt = t(input);
                 if (!rt.HasValue)
-                    return TokenResult.Empty<TTokenKind, U>(rt.Remainder);
+                    return TokenResult.CastEmpty<TTokenKind, T, U>(rt);
 
                 return u(rt.Value)(rt.Remainder);
             };

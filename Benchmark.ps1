@@ -10,6 +10,9 @@ foreach ($test in ls test/*.Benchmarks) {
     & dotnet test -c Release
     if($LASTEXITCODE -ne 0) { exit 2 }
 
+	mv ./BenchmarkDotNet.Artifacts/results $PSScriptRoot
+	rm -Recurse ./BenchmarkDotNet.Artifacts
+
     Pop-Location
 }
 

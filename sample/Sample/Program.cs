@@ -27,11 +27,15 @@ namespace Sample
             var number2 = Parse.Token(SExpressionToken.Number)
                                .Select(t => int.Parse(t.Value));
 
-            var numbers = number.AtLeastOnce();
+            var atom = Parse.Token(SExpressionToken.Atom).Or(Parse.Token(SExpressionToken.LParen)).Select(t => t.Value);
 
-            var stream = tok.Tokenize("1 23 456");
+            var numbers = number.AtLeastOnce().AtEnd();
 
-            var result = numbers(stream);
+            var alt = number.Then(n => atom.Select(a => $"({n}, {a})")).AtLeastOnce().AtEnd();
+
+            var stream = tok.Tokenize(" 1 abc 23 456");
+
+            var result = alt.TryParse(stream);
 
             if (result.HasValue)
             {

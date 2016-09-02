@@ -18,11 +18,13 @@ namespace Superpower
 
         public static TokenParser<TTokenKind, Token<TTokenKind>> Token<TTokenKind>(TTokenKind token)
         {
+            var expectations = new[] { token };
+
             return input =>
             {
                 var next = input.NextToken();
                 if (!next.HasValue || !next.Value.Kind.Equals(token))
-                    return TokenResult.Empty<TTokenKind, Token<TTokenKind>>(input);
+                    return TokenResult.Empty<TTokenKind, Token<TTokenKind>>(input, expectations);
 
                 return next;
             };
