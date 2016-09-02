@@ -19,7 +19,7 @@ namespace Sample
             }
 
             var number = Parse.Token(SExpressionToken.Number)
-                              .Apply(t => Parse.Char('x'));
+                              .Apply(t => Numerics.IntegerInt32);
 
             var number1 = Parse.Token(SExpressionToken.Number)
                                .Apply(Numerics.IntegerInt32);
