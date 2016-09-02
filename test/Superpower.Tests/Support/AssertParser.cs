@@ -14,11 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 using Superpower;
 using Superpower.Model;
-using Superpower.Tests.SExpressionScenario;
+using System.Linq;
 
 namespace Superpower.Tests.Support
 {
@@ -89,6 +88,11 @@ namespace Superpower.Tests.Support
             Succeeds(parser, input, t => Assert.True(t.SequenceEqual(expectedResult)));
         }
 
+        public static void SucceedsWithMany(TokenParser<char, Token<char>[]> parser, string input, IEnumerable<char> expectedResult)
+        {
+            Succeeds(parser, input, t => Assert.True(t.Select(tok => tok.Kind).SequenceEqual(expectedResult)));
+        }
+
         public static void SucceedsWithAll(TokenParser<char, Token<char>[]> parser, string input)
         {
             SucceedsWithMany(parser.Select(t => t.Select(tk => tk.Kind).ToArray()), input, input.ToCharArray());
@@ -96,7 +100,7 @@ namespace Superpower.Tests.Support
 
         public static void Succeeds<T>(TokenParser<char, T> parser, string input, Action<T> resultAssertion)
         {
-            var t = parser.Parse(Tokenize(input));
+            var t = parser.Parse(StringAsCharTokenList.Tokenize(input));
             resultAssertion(t);
         }
 
@@ -126,9 +130,10 @@ namespace Superpower.Tests.Support
             FailsWith(parser, input, f => Assert.Equal(position, f.Remainder.Position));
         }
 
-        public static void FailsWith<T>(TokenParser<char, T> parser, string input, Action<TokenResult<char, T>> resultAssertion)
+        public static void FailsWith<T>(TokenParser<char, T> parser, string input,
+            Action<TokenResult<char, T>> resultAssertion)
         {
-            var result = parser.TryParse(Tokenize(input));
+            var result = parser.TryParse(StringAsCharTokenList.Tokenize((input)));
 
             if (result.HasValue)
                 Assert.False(result.HasValue, $"Expected failure but succeeded with {result.Value}.");
@@ -136,16 +141,8 @@ namespace Superpower.Tests.Support
             resultAssertion(result);
         }
 
-        static TokenList<char> Tokenize(string tokens)
-        {
-            var items = tokens.ToCharArray()
-                .Select((ch, i) => new Token<char>(ch, new StringSpan(tokens, new Position(i, 1, 1), 1)))
-                .ToArray();
-
-            return new TokenList<char>(items);
-        }
-
-        public static void FailsWithMessage<TTokenKind, T>(TokenParser<TTokenKind, T> parser, string input, Tokenizer<TTokenKind> tokenizer, string message)
+        public static void FailsWithMessage<TTokenKind, T>(TokenParser<TTokenKind, T> parser, string input,
+            Tokenizer<TTokenKind> tokenizer, string message)
         {
             var result = parser.TryParse(tokenizer.Tokenize(input));
             Assert.Equal(message, result.ToString());

@@ -24,6 +24,14 @@ namespace Superpower.Tests.Combinators
         }
 
         [Fact]
+        public void ManyFailsWithPartialItemMatch()
+        {
+            var ab = Parse.Char('a').Then(_ => Parse.Char('b'));
+            var list = ab.Many();
+            AssertParser.Fails(list, "ababa");
+        }
+
+        [Fact]
         public void TokenManySucceedsWithNone()
         {
             AssertParser.SucceedsWithAll(Parse.Token('a').Many(), "");
@@ -39,6 +47,14 @@ namespace Superpower.Tests.Combinators
         public void TokenManySucceedsWithTwo()
         {
             AssertParser.SucceedsWithAll(Parse.Token('a').Many(), "aa");
+        }
+
+        [Fact]
+        public void TokenManyFailsWithPartialItemMatch()
+        {
+            var ab = Parse.Token('a').Then(_ => Parse.Token('b'));
+            var list = ab.Many();
+            AssertParser.Fails(list, "ababa");
         }
     }
 }

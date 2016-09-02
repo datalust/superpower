@@ -5,7 +5,7 @@ A highly-experimental parser combinator library. The code in this repository is 
  * [ ] Easy migration path from [Sprache](https://github.com/Sprache/Sprache)
    - Migrate/re-use high-level grammars
    - Migrate/re-use low-level parsers
-   - Recompile and use simple parsers as-is
+   - Migrate/Recompile simple parsers as-is
  * [ ] Better error messages: instead of `unexpected '1', expected 'a'` get `unexpected number '123', expected keyword 'and'`
  * [ ] At least as fast as Sprache, ideally faster
  * [ ] Rethink some awkward APIs: `A.XOr(B)` -> `A.Or(B)`, `A.Or(B)` -> `A.Try().Or(B)`

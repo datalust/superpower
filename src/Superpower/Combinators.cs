@@ -7,15 +7,15 @@ namespace Superpower
 {
     public static class Combinators
     {
-        public static TokenParser<TTokenKind, U> Apply<TTokenKind, U>(this TokenParser<TTokenKind, Token<TTokenKind>> t, Func<Token<TTokenKind>, CharParser<U>> u)
+        public static TokenParser<TTokenKind, U> Apply<TTokenKind, U>(this TokenParser<TTokenKind, Token<TTokenKind>> parser, Func<Token<TTokenKind>, CharParser<U>> valueParser)
         {
             return input =>
             {
-                var rt = t(input);
+                var rt = parser(input);
                 if (!rt.HasValue)
                     return TokenResult.CastEmpty<TTokenKind, Token<TTokenKind>, U>(rt);
 
-                var uParser = u(rt.Value);
+                var uParser = valueParser(rt.Value);
                 var uResult = uParser.AtEnd()(rt.Value.Span);
                 if (!uResult.HasValue)
                 {
@@ -27,9 +27,9 @@ namespace Superpower
             };
         }
 
-        public static TokenParser<TTokenKind, U> Apply<TTokenKind, U>(this TokenParser<TTokenKind, Token<TTokenKind>> t, CharParser<U> u)
+        public static TokenParser<TTokenKind, U> Apply<TTokenKind, U>(this TokenParser<TTokenKind, Token<TTokenKind>> parser, CharParser<U> valueParser)
         {
-            return t.Apply(rt => u);
+            return parser.Apply(rt => valueParser);
         }
 
         public static CharParser<T> AtEnd<T>(this CharParser<T> parser)
@@ -76,18 +76,18 @@ namespace Superpower
             return parser.Then(first => parser.Many().Select(rest => new[] { first }.Concat(rest).ToArray()));
         }
 
-        public static TokenParser<TTokenKind, T[]> Many<TTokenKind, T>(this TokenParser<TTokenKind, T> t)
+        public static TokenParser<TTokenKind, T[]> Many<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
         {
             return input =>
             {
                 var result = new List<T>();
                 var @from = input;
-                var r = t(input);
+                var r = parser(input);
                 while (r.HasValue)
                 {
                     result.Add(r.Value);
                     @from = r.Remainder;
-                    r = t(r.Remainder);
+                    r = parser(r.Remainder);
                 }
 
                 if (r.IsPartial(@from))
@@ -97,18 +97,18 @@ namespace Superpower
             };
         }
 
-        public static CharParser<T[]> Many<T>(this CharParser<T> t)
+        public static CharParser<T[]> Many<T>(this CharParser<T> parser)
         {
             return input =>
             {
                 var result = new List<T>();
                 var @from = input;
-                var r = t(input);
+                var r = parser(input);
                 while (r.HasValue)
                 {
                     result.Add(r.Value);
                     @from = r.Remainder;
-                    r = t(r.Remainder);
+                    r = parser(r.Remainder);
                 }
 
                 if (r.IsPartial(@from))
@@ -150,14 +150,14 @@ namespace Superpower
             };
         }
 
-        public static TokenParser<TTokenKind, U> Select<TTokenKind, T, U>(this TokenParser<TTokenKind, T> t, Func<T, U> u)
+        public static TokenParser<TTokenKind, U> Select<TTokenKind, T, U>(this TokenParser<TTokenKind, T> parser, Func<T, U> selector)
         {
-            return t.Then(rt => Parse.Return<TTokenKind, U>(u(rt)));
+            return parser.Then(rt => Parse.Return<TTokenKind, U>(selector(rt)));
         }
 
-        public static CharParser<U> Select<T, U>(this CharParser<T> t, Func<T, U> u)
+        public static CharParser<U> Select<T, U>(this CharParser<T> parser, Func<T, U> selector)
         {
-            return t.Then(rt => Parse.Return(u(rt)));
+            return parser.Then(rt => Parse.Return(selector(rt)));
         }
 
         public static TokenParser<TTokenKind, U> Then<TTokenKind, T, U>(this TokenParser<TTokenKind, T> t, Func<T, TokenParser<TTokenKind, U>> u)
@@ -172,26 +172,50 @@ namespace Superpower
             };
         }
 
-        public static CharParser<U> Then<T, U>(this CharParser<T> t, Func<T, CharParser<U>> u)
+        public static CharParser<U> Then<T, U>(this CharParser<T> first, Func<T, CharParser<U>> second)
         {
             return input =>
             {
-                var rt = t(input);
+                var rt = first(input);
                 if (!rt.HasValue)
                     return CharResult.CastEmpty<T, U>(rt);
 
-                return u(rt.Value)(rt.Remainder);
+                return second(rt.Value)(rt.Remainder);
             };
         }
 
-        public static TokenParser<TTokenKind, U> Value<TTokenKind, T, U>(this TokenParser<TTokenKind, T> t, U u)
+        public static TokenParser<TTokenKind, T> Try<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
         {
-            return t.Then(_ => Parse.Return<TTokenKind, U>(u));
+            return input =>
+            {
+                var rt = parser(input);
+                if (rt.HasValue)
+                    return rt;
+
+                return TokenResult.Empty<TTokenKind, T>(input);
+            };
         }
 
-        public static CharParser<U> Value<T, U>(this CharParser<T> t, U u)
+        public static CharParser<T> Try<T>(this CharParser<T> parser)
         {
-            return t.Then(_ => Parse.Return(u));
+            return input =>
+            {
+                var rt = parser(input);
+                if (rt.HasValue)
+                    return rt;
+
+                return CharResult.Empty<T>(input);
+            };
+        }
+
+        public static TokenParser<TTokenKind, U> Value<TTokenKind, T, U>(this TokenParser<TTokenKind, T> parser, U u)
+        {
+            return parser.Then(_ => Parse.Return<TTokenKind, U>(u));
+        }
+
+        public static CharParser<U> Value<T, U>(this CharParser<T> parser, U u)
+        {
+            return parser.Then(_ => Parse.Return(u));
         }
     }
 }
