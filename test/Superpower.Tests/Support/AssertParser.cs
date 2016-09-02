@@ -18,12 +18,13 @@ using System.Linq;
 using Xunit;
 using Superpower;
 using Superpower.Model;
+using Superpower.Tests.SExpressionScenario;
 
 namespace Superpower.Tests.Support
 {
     static class AssertParser
     {
-        public static void SucceedsWithOne<T>(CharParser<IEnumerable<T>> parser, string input, T expectedResult)
+        public static void SucceedsWithOne<T>(CharParser<T[]> parser, string input, T expectedResult)
         {
             Succeeds(parser, input, t =>
             {
@@ -32,12 +33,12 @@ namespace Superpower.Tests.Support
             });
         }
 
-        public static void SucceedsWithMany<T>(CharParser<IEnumerable<T>> parser, string input, IEnumerable<T> expectedResult)
+        public static void SucceedsWithMany<T>(CharParser<T[]> parser, string input, IEnumerable<T> expectedResult)
         {
             Succeeds(parser, input, t => Assert.True(t.SequenceEqual(expectedResult)));
         }
 
-        public static void SucceedsWithAll(CharParser<IEnumerable<char>> parser, string input)
+        public static void SucceedsWithAll(CharParser<char[]> parser, string input)
         {
             SucceedsWithMany(parser, input, input.ToCharArray());
         }
@@ -74,7 +75,7 @@ namespace Superpower.Tests.Support
             resultAssertion(result);
         }
 
-        public static void SucceedsWithOne<T>(TokenParser<char, IEnumerable<T>> parser, string input, T expectedResult)
+        public static void SucceedsWithOne<T>(TokenParser<char, T[]> parser, string input, T expectedResult)
         {
             Succeeds(parser, input, t =>
             {
@@ -83,14 +84,14 @@ namespace Superpower.Tests.Support
             });
         }
 
-        public static void SucceedsWithMany<T>(TokenParser<char, IEnumerable<T>> parser, string input, IEnumerable<T> expectedResult)
+        public static void SucceedsWithMany<T>(TokenParser<char, T[]> parser, string input, IEnumerable<T> expectedResult)
         {
             Succeeds(parser, input, t => Assert.True(t.SequenceEqual(expectedResult)));
         }
 
-        public static void SucceedsWithAll(TokenParser<char, IEnumerable<char>> parser, string input)
+        public static void SucceedsWithAll(TokenParser<char, Token<char>[]> parser, string input)
         {
-            SucceedsWithMany(parser, input, input.ToCharArray());
+            SucceedsWithMany(parser.Select(t => t.Select(tk => tk.Kind).ToArray()), input, input.ToCharArray());
         }
 
         public static void Succeeds<T>(TokenParser<char, T> parser, string input, Action<T> resultAssertion)
@@ -104,6 +105,14 @@ namespace Superpower.Tests.Support
             Succeeds(parser, input, tok =>
             {
                 Assert.Equal(value, tok.Kind);
+            });
+        }
+
+        public static void SucceedsWith<T>(TokenParser<char, T> parser, string input, T value)
+        {
+            Succeeds(parser, input, v =>
+            {
+                Assert.Equal(value, v);
             });
         }
 
@@ -135,5 +144,12 @@ namespace Superpower.Tests.Support
 
             return new TokenList<char>(items);
         }
+
+        public static void FailsWithMessage<TTokenKind, T>(TokenParser<TTokenKind, T> parser, string input, Tokenizer<TTokenKind> tokenizer, string message)
+        {
+            var result = parser.TryParse(tokenizer.Tokenize(input));
+            Assert.Equal(message, result.ToString());
+        }
     }
 }
+

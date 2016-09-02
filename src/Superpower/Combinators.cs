@@ -139,7 +139,7 @@ namespace Superpower
             return input =>
             {
                 var first = lhs(input);
-                if (first.HasValue)
+                if (first.HasValue || first.IsPartial(input))
                     return first;
 
                 var second = rhs(input);
