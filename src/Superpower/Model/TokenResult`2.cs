@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Superpower.Model
 {
+    // Should probably be TokenParserResult<T>
     public struct TokenResult<TTokenKind, T>
     {
         readonly T _value;
@@ -81,7 +82,7 @@ namespace Superpower.Model
             {
                 var next = Remainder.NextToken().Value;
                 var nextKind = Presentation.FormatKind(next.Kind);
-                var nextValue = next.Value;
+                var nextValue = next.ToStringValue();
                 if (nextValue.Length > 12)
                     nextValue = nextValue.Substring(0, 9) + "...";
                 message = $"unexpected {nextKind} `{nextValue}`";

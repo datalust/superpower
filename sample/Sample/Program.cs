@@ -25,9 +25,9 @@ namespace Sample
                                .Apply(Numerics.IntegerInt32);
 
             var number2 = Parse.Token(SExpressionToken.Number)
-                               .Select(t => int.Parse(t.Value));
+                               .Select(t => int.Parse(t.ToStringValue()));
 
-            var atom = Parse.Token(SExpressionToken.Atom).Or(Parse.Token(SExpressionToken.LParen)).Select(t => t.Value);
+            var atom = Parse.Token(SExpressionToken.Atom).Or(Parse.Token(SExpressionToken.LParen)).Select(t => t.ToStringValue());
 
             var numbers = number.AtLeastOnce().AtEnd();
 

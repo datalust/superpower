@@ -7,7 +7,7 @@ namespace Superpower.Benchmarks.NumberListScenario
 {
     class NumberListTokenizer : Tokenizer<NumberListToken>
     {
-        protected override IEnumerable<Token<NumberListToken>> Tokenize(StringSpan span)
+        protected override IEnumerable<CharResult<NumberListToken>> Tokenize(StringSpan span)
         {
             var next = SkipWhiteSpace(span);
             if (!next.HasValue)
@@ -19,11 +19,11 @@ namespace Superpower.Benchmarks.NumberListScenario
                 {
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.NextChar();
-                    yield return new Token<NumberListToken>(NumberListToken.Number, integer.Value);
+                    yield return CharResult.Value(NumberListToken.Number, integer.Location, integer.Remainder);
                 }
                 else
                 {
-                    throw new NotImplementedException("Tokenization errors not yet implemented.");
+                    yield return CharResult.Empty<NumberListToken>(next.Location, new[] { "digit" });
                 }
 
                 next = SkipWhiteSpace(next.Location);

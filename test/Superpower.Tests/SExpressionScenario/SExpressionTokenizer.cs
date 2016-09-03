@@ -7,7 +7,7 @@ namespace Superpower.Tests.SExpressionScenario
 {
     class SExpressionTokenizer : Tokenizer<SExpressionToken>
     {
-        protected override IEnumerable<Token<SExpressionToken>> Tokenize(StringSpan span)
+        protected override IEnumerable<CharResult<SExpressionToken>> Tokenize(StringSpan span)
         {
             var next = SkipWhiteSpace(span);
             if (!next.HasValue)
@@ -17,12 +17,12 @@ namespace Superpower.Tests.SExpressionScenario
             {
                 if (next.Value == '(')
                 {
-                    yield return new Token<SExpressionToken>(SExpressionToken.LParen, next.Location.First(1));
+                    yield return CharResult.Value(SExpressionToken.LParen, next.Location, next.Remainder);
                     next = next.Remainder.NextChar();
                 }
                 else if (next.Value == ')')
                 {
-                    yield return new Token<SExpressionToken>(SExpressionToken.RParen, next.Location.First(1));
+                    yield return CharResult.Value(SExpressionToken.RParen, next.Location, next.Remainder);
                     next = next.Remainder.NextChar();
                 }
                 else if (char.IsDigit(next.Value))
@@ -30,13 +30,11 @@ namespace Superpower.Tests.SExpressionScenario
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.NextChar();
 
+                    yield return CharResult.Value(SExpressionToken.Number, integer.Location, integer.Remainder);
+
                     if (next.HasValue && !char.IsPunctuation(next.Value) && !char.IsWhiteSpace(next.Value))
                     {
-                        // Yield token with error
-                    }
-                    else
-                    {
-                        yield return new Token<SExpressionToken>(SExpressionToken.Number, integer.Value);
+                        yield return CharResult.Empty<SExpressionToken>(next.Location, new[] {"whitespace", "punctuation"});
                     }
                 }
                 else
@@ -47,7 +45,7 @@ namespace Superpower.Tests.SExpressionScenario
                         next = next.Remainder.NextChar();
                     }
 
-                    yield return new Token<SExpressionToken>(SExpressionToken.Atom, beginIdentifier.Until(next.Location));
+                    yield return CharResult.Value(SExpressionToken.Atom, beginIdentifier, next.Location);
                 }
 
                 next = SkipWhiteSpace(next.Location);

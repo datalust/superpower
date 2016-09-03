@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Superpower.Model
 {
+    // Should probably be CharParserResult<T>
     public struct CharResult<T>
     {
         readonly T _value;

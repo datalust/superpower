@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Superpower.Model;
 
 namespace Superpower
@@ -10,10 +9,20 @@ namespace Superpower
         public TokenList<TTokenKind> Tokenize(string source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return new TokenList<TTokenKind>(Tokenize(new StringSpan(source)).ToArray());
+
+            var results = new List<Token<TTokenKind>>();
+            foreach (var result in Tokenize(new StringSpan(source)))
+            {
+                if (!result.HasValue)
+                    throw new ParseException(result.ToString());
+
+                results.Add(new Token<TTokenKind>(result.Value, result.Location.Until(result.Remainder)));
+            }
+
+            return new TokenList<TTokenKind>(results.ToArray());
         }
 
-        protected abstract IEnumerable<Token<TTokenKind>> Tokenize(StringSpan stringSpan);
+        protected abstract IEnumerable<CharResult<TTokenKind>> Tokenize(StringSpan stringSpan);
 
         protected static CharResult<char> SkipWhiteSpace(StringSpan span)
         {

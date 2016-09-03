@@ -4,7 +4,7 @@ namespace Superpower.Model
     {
         public TTokenKind Kind { get; }
         public StringSpan Span { get; }
-        public string Value => Span.ToStringValue();
+        public string ToStringValue() => Span.ToStringValue();
         public Position Position => Span.Position;
 
         public Token(TTokenKind kind, StringSpan span)
