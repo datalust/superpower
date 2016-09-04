@@ -11,6 +11,10 @@ namespace Superpower.Model
         public StringSpan Location { get; }
         public StringSpan Remainder { get; }
         public bool HasValue { get; }
+
+        // Just here to show symmetry with TokenResult`2.
+        public Position ErrorPosition => Remainder.Position;
+        public string ErrorMessage { get; }
         public string[] Expectations { get; }
 
         public bool IsPartial(StringSpan @from) => @from != Remainder;
@@ -31,15 +35,17 @@ namespace Superpower.Model
             Remainder = remainder;
             _value = value;
             HasValue = true;
+            ErrorMessage = null;
             Expectations = null;
         }
 
-        internal CharResult(StringSpan remainder, string[] expectations)
+        internal CharResult(StringSpan remainder, string errorMessage, string[] expectations)
         {
             Location = Remainder = remainder;
             _value = default(T);
             HasValue = false;
             Expectations = expectations;
+            ErrorMessage = errorMessage;
         }
 
         public override string ToString()
@@ -62,6 +68,9 @@ namespace Superpower.Model
 
         public string FormatErrorMessageFragment()
         {
+            if (ErrorMessage != null)
+                return ErrorMessage;
+            
             string message;
             if (Remainder.IsAtEnd)
             {

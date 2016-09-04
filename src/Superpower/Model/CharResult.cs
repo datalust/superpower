@@ -4,12 +4,17 @@ namespace Superpower.Model
     {
         public static CharResult<T> Empty<T>(StringSpan remainder)
         {
-            return new CharResult<T>(remainder, null);
+            return new CharResult<T>(remainder, null, null);
         }
 
         public static CharResult<T> Empty<T>(StringSpan remainder, string[] expectations)
         {
-            return new CharResult<T>(remainder, expectations);
+            return new CharResult<T>(remainder, null, expectations);
+        }
+
+        public static CharResult<T> Empty<T>(StringSpan remainder, string errorMessage)
+        {
+            return new CharResult<T>(remainder, errorMessage, null);
         }
 
         public static CharResult<T> Value<T>(T value, StringSpan location, StringSpan remainder)
@@ -19,7 +24,7 @@ namespace Superpower.Model
 
         public static CharResult<U> CastEmpty<T, U>(CharResult<T> result)
         {
-            return new CharResult<U>(result.Remainder, result.Expectations);
+            return new CharResult<U>(result.Remainder, result.ErrorMessage, result.Expectations);
         }
 
         public static CharResult<T> CombineEmpty<T>(CharResult<T> first, CharResult<T> second)
@@ -48,7 +53,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new CharResult<T>(first.Remainder, expectations);
+            return new CharResult<T>(first.Remainder, first.ErrorMessage, expectations);
         }
     }
 }

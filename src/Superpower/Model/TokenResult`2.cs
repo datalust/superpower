@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using Superpower.Util;
 
 namespace Superpower.Model
 {
-    // Should probably be TokenParserResult<T>
+    // Should probably be TokenParserResult<T> (or just a combined Result<TokenList<TTokenKind>,T> - but CharResult<T> is currently smaller)
     public struct TokenResult<TTokenKind, T>
     {
         readonly T _value;
@@ -40,6 +41,8 @@ namespace Superpower.Model
 
         internal TokenResult(TokenList<TTokenKind> remainder, Position errorPosition, string errorMessage, string[] expectations)
         {
+            // Errors don't really carry a location - it's always the remainder, which is the first item unable to
+            // be successfully parsed.
             Location = Remainder = remainder;
             _value = default(T);
             HasValue = false;
