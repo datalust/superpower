@@ -12,6 +12,11 @@ namespace Superpower.Model
             return new TokenResult<TTokenKind, T>(remainder, Position.Empty, null, expectations);
         }
 
+        public static TokenResult<TTokenKind, T> Empty<TTokenKind, T>(TokenList<TTokenKind> remainder, string errorMessage)
+        {
+            return new TokenResult<TTokenKind, T>(remainder, Position.Empty, errorMessage, null);
+        }
+
         public static TokenResult<TTokenKind, T> Empty<TTokenKind, T>(TokenList<TTokenKind> remainder, Position errorPosition, string errorMessage)
         {
             return new TokenResult<TTokenKind, T>(remainder, errorPosition, errorMessage, null);

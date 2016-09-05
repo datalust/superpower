@@ -4,7 +4,7 @@ namespace Superpower.Parsers
 {
     public static class Numerics
     {
-        public static readonly CharParser<StringSpan> Integer = input =>
+        public static CharParser<StringSpan> Integer { get; } = input =>
         {
             var next = input.ConsumeChar();
             if (!next.HasValue || !char.IsDigit(next.Value))
@@ -20,7 +20,7 @@ namespace Superpower.Parsers
             return CharResult.Value(input.Until(remainder), input, remainder);
         };
 
-        public static readonly CharParser<int> IntegerInt32 = input =>
+        public static CharParser<int> IntegerInt32 { get; } = input =>
         {
             var next = input.ConsumeChar();
             if (!next.HasValue || !char.IsDigit(next.Value))

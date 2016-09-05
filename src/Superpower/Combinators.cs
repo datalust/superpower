@@ -95,6 +95,9 @@ namespace Superpower
                 var r = parser(input);
                 while (r.HasValue)
                 {
+                    if (@from == r.Remainder) // Broken parser, not a failed parsing.
+                        throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
+
                     result.Add(r.Value);
                     @from = r.Remainder;
                     r = parser(r.Remainder);
@@ -118,7 +121,11 @@ namespace Superpower
                 var r = parser(input);
                 while (r.HasValue)
                 {
+                    if (@from == r.Remainder) // Broken parser, not a failed parsing.
+                        throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
+
                     result.Add(r.Value);
+
                     @from = r.Remainder;
                     r = parser(r.Remainder);
                 }
@@ -193,6 +200,52 @@ namespace Superpower
                     return result;
 
                 return CharResult.Empty<T>(result.Remainder, new[] { name });
+            };
+        }
+
+        /// <summary>
+        /// Constructs a parser that will fail if the given parser succeeds,
+        /// and will succeed if the given parser fails. In any case, it won't
+        /// consume any input. It's like a negative look-ahead in a regular expression.
+        /// </summary>
+        /// <typeparam name="T">The result type of the given parser</typeparam>
+        /// <param name="parser">The parser to wrap</param>
+        /// <returns>A parser that is the negation of the given parser.</returns>
+        public static CharParser<Unit> Not<T>(this CharParser<T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return input =>
+            {
+                var result = parser(input);
+
+                if (result.HasValue)
+                    return CharResult.Empty<Unit>(input, $"unexpected parsing of {result.Value}");
+
+                return CharResult.Value(Unit.Value, input, input);
+            };
+        }
+
+        /// <summary>
+        /// Constructs a parser that will fail if the given parser succeeds,
+        /// and will succeed if the given parser fails. In any case, it won't
+        /// consume any input. It's like a negative look-ahead in a regular expression.
+        /// </summary>
+        /// <typeparam name="T">The result type of the given parser</typeparam>
+        /// <param name="parser">The parser to wrap</param>
+        /// <returns>A parser that is the negation of the given parser.</returns>
+        public static TokenParser<TTokenKind, Unit> Not<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return input =>
+            {
+                var result = parser(input);
+
+                if (result.HasValue)
+                    return TokenResult.Empty<TTokenKind, Unit>(input, $"unexpected parsing of {result.Value}");
+
+                return TokenResult.Value<TTokenKind, Unit>(Unit.Value, input, input);
             };
         }
 

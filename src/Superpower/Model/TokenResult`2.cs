@@ -93,9 +93,7 @@ namespace Superpower.Model
 
             if (Expectations != null)
             {
-                var expected = Expectations.Last();
-                if (Expectations.Length > 1)
-                    expected = $"{string.Join(", ", Expectations.Take(Expectations.Length - 1))} or {expected}";
+                var expected = Presentation.List(Expectations);
                 message += $", expected {expected}";
             }
 

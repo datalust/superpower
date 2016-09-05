@@ -1,4 +1,5 @@
-﻿using Superpower.Tests.Support;
+﻿using Superpower.Parsers;
+using Superpower.Tests.Support;
 using Xunit;
 
 namespace Superpower.Tests.Combinators
@@ -8,7 +9,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TryFailureConsumesNoInput()
         {
-            var tryAb = Parse.Char('a').Then(_ => Parse.Char('b')).Try();
+            var tryAb = Character.EqualTo('a').Then(_ => Character.EqualTo('b')).Try();
             var result = tryAb.TryParse("ac");
             Assert.False(result.HasValue);
             Assert.Equal(0, result.Remainder.Position.Absolute);
@@ -17,7 +18,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TrySuccessIsTransparent()
         {
-            var tryAb = Parse.Char('a').Then(_ => Parse.Char('b')).Try();
+            var tryAb = Character.EqualTo('a').Then(_ => Character.EqualTo('b')).Try();
             var result = tryAb.TryParse("ab");
             Assert.True(result.HasValue);
             Assert.True(result.Remainder.IsAtEnd);
@@ -26,7 +27,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TryItemMakesManyBacktrack()
         {
-            var ab = Parse.Char('a').Then(_ => Parse.Char('b'));
+            var ab = Character.EqualTo('a').Then(_ => Character.EqualTo('b'));
             var list = ab.Try().Many();
             AssertParser.SucceedsWithMany(list, "ababa", "bb".ToCharArray());
         }
@@ -34,7 +35,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TryAlternativeMakesOrBacktrack()
         {
-            var tryAOrAB = Parse.Char('a').Then(_ => Parse.Char('b')).Try().Or(Parse.Char('a'));
+            var tryAOrAB = Character.EqualTo('a').Then(_ => Character.EqualTo('b')).Try().Or(Character.EqualTo('a'));
             AssertParser.SucceedsWith(tryAOrAB, "a", 'a');
         }
 

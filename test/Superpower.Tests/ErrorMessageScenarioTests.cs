@@ -1,4 +1,5 @@
-﻿using Superpower.Tests.ArithmeticExpressionScenario;
+﻿using Superpower.Parsers;
+using Superpower.Tests.ArithmeticExpressionScenario;
 using Superpower.Tests.SExpressionScenario;
 using Superpower.Tests.Support;
 using Xunit;
@@ -11,7 +12,7 @@ namespace Superpower.Tests
         public void ErrorMessagesFromAppliedCharacterParsersPropagate()
         {
             var number = Parse.Token(SExpressionToken.Number)
-                  .Apply(t => Parse.Char('1').Then(_ => Parse.Char('x')));
+                  .Apply(t => Character.EqualTo('1').Then(_ => Character.EqualTo('x')));
             
             var numbers = number.AtEnd();
             

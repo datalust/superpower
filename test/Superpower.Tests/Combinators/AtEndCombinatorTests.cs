@@ -1,6 +1,7 @@
 ﻿using Superpower.Tests.Support;
 using Superpower.Model;
 using Xunit;
+using Superpower.Parsers;
 
 namespace Superpower.Tests.Combinators
 {
@@ -9,19 +10,19 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void AtEndSucceedsAtTheEnd()
         {
-            AssertParser.SucceedsWith(Parse.Char('a').AtEnd(), "a", 'a');
+            AssertParser.SucceedsWith(Character.EqualTo('a').AtEnd(), "a", 'a');
         }
 
         [Fact]
         public void AtEndFailsIfThereIsARemainder()
         {
-            AssertParser.Fails(Parse.Char('a').AtEnd(), "ab");
+            AssertParser.Fails(Character.EqualTo('a').AtEnd(), "ab");
         }
 
         [Fact]
         public void AtEndFailsIfThePrecedingParserFails()
         {
-            AssertParser.Fails(Parse.Char('b').AtEnd(), "a");
+            AssertParser.Fails(Character.EqualTo('b').AtEnd(), "a");
         }
 
         [Fact]

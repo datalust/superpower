@@ -42,7 +42,7 @@ namespace Superpower.Benchmarks
 
         static readonly CharParser<int[]> SuperpowerSimpleParser =
             Numerics.Integer
-                .Then(n => Parse.Char(' ').Many().Select(_ => int.Parse(n.ToStringValue())))
+                .Then(n => Span.WhiteSpace.Select(_ => int.Parse(n.ToStringValue())))
                 .Many();
 
         [Benchmark]
@@ -54,7 +54,7 @@ namespace Superpower.Benchmarks
 
         static readonly CharParser<int[]> SuperpowerCharParser =
             Numerics.IntegerInt32
-                .Then(n => Parse.Char(' ').Many().Select(_ => n))
+                .Then(n => Span.WhiteSpace.Select(_ => n))
                 .Many();
 
         [Benchmark]

@@ -28,7 +28,7 @@ namespace Superpower
                 if (!result.HasValue)
                     return CharResult.CastEmpty<TTokenKind, TokenList<TTokenKind>>(result);
 
-                if (result.Remainder == remainder)
+                if (result.Remainder == remainder) // Broken parser, not a failed parsing.
                     throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatKind(result.Value)} at position {result.Location.Position}.");
 
                 remainder = result.Remainder;

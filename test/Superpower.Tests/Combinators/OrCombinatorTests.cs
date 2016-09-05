@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Superpower.Tests.Support;
 using Xunit;
+using Superpower.Parsers;
 
 namespace Superpower.Tests.Combinators
 {
@@ -12,31 +13,31 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void OrFailsWithNone()
         {
-            AssertParser.Fails(Parse.Char('a').Or(Parse.Char('b')), "");
+            AssertParser.Fails(Character.EqualTo('a').Or(Character.EqualTo('b')), "");
         }
 
         [Fact]
         public void OrFailsWithUnmatched()
         {
-            AssertParser.Fails(Parse.Char('a').Or(Parse.Char('b')), "c");
+            AssertParser.Fails(Character.EqualTo('a').Or(Character.EqualTo('b')), "c");
         }
 
         [Fact]
         public void OrSucceedsWithFirstMatch()
         {
-            AssertParser.SucceedsWith(Parse.Char('a').Or(Parse.Char('b')), "a", 'a');
+            AssertParser.SucceedsWith(Character.EqualTo('a').Or(Character.EqualTo('b')), "a", 'a');
         }
 
         [Fact]
         public void OrSucceedsWithSecondMatch()
         {
-            AssertParser.SucceedsWith(Parse.Char('a').Or(Parse.Char('b')), "b", 'b');
+            AssertParser.SucceedsWith(Character.EqualTo('a').Or(Character.EqualTo('b')), "b", 'b');
         }
 
         [Fact]
         public void OrFailsWithPartialFirstMatch()
         {
-            AssertParser.Fails(Parse.Char('a').Then(_ => Parse.Char('b')).Or(Parse.Char('a')), "a");
+            AssertParser.Fails(Character.EqualTo('a').Then(_ => Character.EqualTo('b')).Or(Character.EqualTo('a')), "a");
         }
 
         [Fact]

@@ -1,4 +1,5 @@
-﻿using Superpower.Tests.Support;
+﻿using Superpower.Parsers;
+using Superpower.Tests.Support;
 using Xunit;
 
 namespace Superpower.Tests.Combinators
@@ -8,19 +9,19 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void SelectFailsIfPrecedingParserFails()
         {
-            AssertParser.Fails(Parse.Char('a').Select(_ => 42), "b");
+            AssertParser.Fails(Character.EqualTo('a').Select(_ => 42), "b");
         }
 
         [Fact]
         public void SelectTransformsPrecedingResult()
         {
-            AssertParser.SucceedsWith(Parse.Char('a').Select(_ => 42), "a", 42);
+            AssertParser.SucceedsWith(Character.EqualTo('a').Select(_ => 42), "a", 42);
         }
 
         [Fact]
         public void TokenSelectFailsIfPrecedingParserFails()
         {
-            AssertParser.Fails(Parse.Char('a').Select(_ => 42), "b");
+            AssertParser.Fails(Character.EqualTo('a').Select(_ => 42), "b");
         }
 
         [Fact]

@@ -1,4 +1,5 @@
-﻿using Superpower.Tests.Support;
+﻿using Superpower.Parsers;
+using Superpower.Tests.Support;
 using Xunit;
 
 namespace Superpower.Tests.Combinators
@@ -8,25 +9,25 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void ManySucceedsWithNone()
         {
-            AssertParser.SucceedsWithAll(Parse.Char('a').Many(), "");
+            AssertParser.SucceedsWithAll(Character.EqualTo('a').Many(), "");
         }
 
         [Fact]
         public void ManySucceedsWithOne()
         {
-            AssertParser.SucceedsWithAll(Parse.Char('a').Many(), "a");
+            AssertParser.SucceedsWithAll(Character.EqualTo('a').Many(), "a");
         }
 
         [Fact]
         public void ManySucceedsWithTwo()
         {
-            AssertParser.SucceedsWithAll(Parse.Char('a').Many(), "aa");
+            AssertParser.SucceedsWithAll(Character.EqualTo('a').Many(), "aa");
         }
 
         [Fact]
         public void ManyFailsWithPartialItemMatch()
         {
-            var ab = Parse.Char('a').Then(_ => Parse.Char('b'));
+            var ab = Character.EqualTo('a').Then(_ => Character.EqualTo('b'));
             var list = ab.Many();
             AssertParser.Fails(list, "ababa");
         }

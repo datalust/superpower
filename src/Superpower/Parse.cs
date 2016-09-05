@@ -6,20 +6,6 @@ namespace Superpower
 {
     public static class Parse
     {
-        public static CharParser<char> Char(char c)
-        {
-            var expectations = new[] { "`" + c + "`" };
-
-            return input =>
-            {
-                var next = input.ConsumeChar();
-                if (!next.HasValue || next.Value != c)
-                    return CharResult.Empty<char>(input, expectations);
-
-                return next;
-            };
-        }
-
         public static TokenParser<TTokenKind, Token<TTokenKind>> Token<TTokenKind>(TTokenKind token)
         {
             var expectations = new[] { Presentation.FormatKind(token) };

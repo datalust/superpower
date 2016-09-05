@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 
 namespace Superpower.Util
@@ -22,6 +25,23 @@ namespace Superpower.Util
             }
 
             return kind.ToString().ToLower();
+        }
+
+        public static string FormatCharacter(char ch)
+        {
+            // Should check for unprintable/awkward chars here like `\n` and display appropriately.
+            return "`" + ch + "`";
+        }
+
+        public static string List(IEnumerable<string> items)
+        {
+            if (items == null) throw new ArgumentNullException(nameof(items));
+
+            var list = items.Last();
+            var count = items.Count();
+            if (count > 1)
+                list = $"{string.Join(", ", items.Take(count - 1))} or {list}";
+            return list;
         }
     }
 }

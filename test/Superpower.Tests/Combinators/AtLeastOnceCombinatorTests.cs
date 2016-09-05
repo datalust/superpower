@@ -1,4 +1,5 @@
-﻿using Superpower.Tests.Support;
+﻿using Superpower.Parsers;
+using Superpower.Tests.Support;
 using Xunit;
 
 namespace Superpower.Tests.Combinators
@@ -8,19 +9,19 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void AtLeastOnceSucceedsWithOne()
         {
-            AssertParser.SucceedsWithAll(Parse.Char('a').AtLeastOnce(), "a");
+            AssertParser.SucceedsWithAll(Character.EqualTo('a').AtLeastOnce(), "a");
         }
 
         [Fact]
         public void AtLeastOnceSucceedsWithTwo()
         {
-            AssertParser.SucceedsWithAll(Parse.Char('a').AtLeastOnce(), "aa");
+            AssertParser.SucceedsWithAll(Character.EqualTo('a').AtLeastOnce(), "aa");
         }
 
         [Fact]
         public void AtLeastOnceFailsWithNone()
         {
-            AssertParser.Fails(Parse.Char('a').AtLeastOnce(), "");
+            AssertParser.Fails(Character.EqualTo('a').AtLeastOnce(), "");
         }
 
         [Fact]
