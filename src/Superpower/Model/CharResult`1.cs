@@ -78,7 +78,7 @@ namespace Superpower.Model
             }
             else
             {
-                var next = Remainder.NextChar().Value;
+                var next = Remainder.ConsumeChar().Value;
                 message = $"unexpected `{next}`";
             }
 

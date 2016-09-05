@@ -1,4 +1,5 @@
-﻿using Superpower.Tests.SExpressionScenario;
+﻿using Superpower.Tests.ArithmeticExpressionScenario;
+using Superpower.Tests.SExpressionScenario;
 using Superpower.Tests.Support;
 using Xunit;
 
@@ -52,6 +53,20 @@ namespace Superpower.Tests
 
             AssertParser.FailsWithMessage(alternating, "123", new SExpressionTokenizer(),
                 "Parsing failure: unexpected end of input, expected atom.");
+        }
+
+        [Fact]
+        public void DroppedClosingParenthesisProducesMeaningfulError()
+        {
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + (2 * 3", new ArithmeticExpressionTokenizer(),
+                "Parsing failure: unexpected end of input, expected closing parenthesis.");
+        }
+
+        [Fact]
+        public void MissingOperandProducesMeaningfulError()
+        {
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + * 3", new ArithmeticExpressionTokenizer(),
+                 "Parsing failure (line 1, column 5): unexpected multiplication operator `*`, expected expression.");
         }
     }
 }

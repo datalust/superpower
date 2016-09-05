@@ -168,7 +168,7 @@ namespace Superpower
             return input =>
             {
                 var result = parser(input);
-                if (result.HasValue)
+                if (result.HasValue || result.Remainder != input)
                     return result;
 
                 // result.IsSubTokenError?
@@ -189,7 +189,7 @@ namespace Superpower
             return input =>
             {
                 var result = parser(input);
-                if (result.HasValue)
+                if (result.HasValue || result.Remainder != input)
                     return result;
 
                 return CharResult.Empty<T>(result.Remainder, new[] { name });
@@ -248,6 +248,30 @@ namespace Superpower
             if (selector == null) throw new ArgumentNullException(nameof(selector));
 
             return parser.Then(rt => Parse.Return(selector(rt)));
+        }
+
+        public static CharParser<V> SelectMany<T, U, V>(
+            this CharParser<T> parser,
+            Func<T, CharParser<U>> selector,
+            Func<T, U, V> projector)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (selector == null) throw new ArgumentNullException(nameof(selector));
+            if (projector == null) throw new ArgumentNullException(nameof(projector));
+
+            return parser.Then(t => selector(t).Select(u => projector(t, u)));
+        }
+
+        public static TokenParser<TTokenKind, V> SelectMany<TTokenKind, T, U, V>(
+            this TokenParser<TTokenKind, T> parser,
+            Func<T, TokenParser<TTokenKind, U>> selector,
+            Func<T, U, V> projector)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (selector == null) throw new ArgumentNullException(nameof(selector));
+            if (projector == null) throw new ArgumentNullException(nameof(projector));
+
+            return parser.Then(t => selector(t).Select(u => projector(t, u)));
         }
 
         public static TokenParser<TTokenKind, U> Then<TTokenKind, T, U>(this TokenParser<TTokenKind, T> t, Func<T, TokenParser<TTokenKind, U>> u)

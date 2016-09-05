@@ -30,15 +30,7 @@ namespace Superpower.Model
         public static TokenResult<TTokenKind, T> CombineEmpty<TTokenKind, T>(TokenResult<TTokenKind, T> first, TokenResult<TTokenKind, T> second)
         {
             if (first.Remainder != second.Remainder)
-            {
-                if (first.Remainder.Position > second.Remainder.Position)
-                    return first;
-
-                if (second.IsPartial(second.Location))
-                    return second;
-
-                return first;
-            }
+                return second;
 
             var expectations = first.Expectations;
             if (expectations == null)
@@ -53,7 +45,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new TokenResult<TTokenKind, T>(first.Remainder, first.ErrorPosition, first.ErrorMessage, expectations);
+            return new TokenResult<TTokenKind, T>(second.Remainder, second.ErrorPosition, first.ErrorMessage, expectations);
         }
     }
 }

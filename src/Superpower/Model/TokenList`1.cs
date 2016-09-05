@@ -44,7 +44,7 @@ namespace Superpower.Model
                 throw new InvalidOperationException("Token list has no value.");
         }
 
-        public TokenResult<TTokenKind, Token<TTokenKind>> NextToken()
+        public TokenResult<TTokenKind, Token<TTokenKind>> ConsumeToken()
         {
             EnsureHasValue();
 

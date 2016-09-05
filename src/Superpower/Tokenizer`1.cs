@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Superpower.Model;
+using Superpower.Util;
 
 namespace Superpower
 {
@@ -27,6 +28,9 @@ namespace Superpower
                 if (!result.HasValue)
                     return CharResult.CastEmpty<TTokenKind, TokenList<TTokenKind>>(result);
 
+                if (result.Remainder == remainder)
+                    throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatKind(result.Value)} at position {result.Location.Position}.");
+
                 remainder = result.Remainder;
                 results.Add(new Token<TTokenKind>(result.Value, result.Location.Until(result.Remainder)));
             }
@@ -39,10 +43,10 @@ namespace Superpower
 
         protected static CharResult<char> SkipWhiteSpace(StringSpan span)
         {
-            var next = span.NextChar();
+            var next = span.ConsumeChar();
             while (next.HasValue && char.IsWhiteSpace(next.Value))
             {
-                next = next.Remainder.NextChar();
+                next = next.Remainder.ConsumeChar();
             }
             return next;
         }

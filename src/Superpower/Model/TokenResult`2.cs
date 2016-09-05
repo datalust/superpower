@@ -63,7 +63,7 @@ namespace Superpower.Model
             var location = "";
             if (!Remainder.IsAtEnd)
             {
-                var next = Remainder.NextToken().Value;
+                var next = Remainder.ConsumeToken().Value;
                 var sourcePosition = ErrorPosition.HasValue ? ErrorPosition : next.Position;
                 location = $" (line {sourcePosition.Line}, column {sourcePosition.Column})";
             }
@@ -83,7 +83,7 @@ namespace Superpower.Model
             }
             else
             {
-                var next = Remainder.NextToken().Value;
+                var next = Remainder.ConsumeToken().Value;
                 var nextKind = Presentation.FormatKind(next.Kind);
                 var nextValue = next.ToStringValue();
                 if (nextValue.Length > 12)

@@ -18,17 +18,17 @@ namespace Sample
                 if (next.Value == '(')
                 {
                     yield return CharResult.Value(SExpressionToken.LParen, next.Location, next.Remainder);
-                    next = next.Remainder.NextChar();
+                    next = next.Remainder.ConsumeChar();
                 }
                 else if (next.Value == ')')
                 {
                     yield return CharResult.Value(SExpressionToken.RParen, next.Location, next.Remainder);
-                    next = next.Remainder.NextChar();
+                    next = next.Remainder.ConsumeChar();
                 }
                 else if (char.IsDigit(next.Value))
                 {
                     var integer = Numerics.Integer(next.Location);
-                    next = integer.Remainder.NextChar();
+                    next = integer.Remainder.ConsumeChar();
 
                     yield return CharResult.Value(SExpressionToken.Number, integer.Location, integer.Remainder);
 
@@ -42,7 +42,7 @@ namespace Sample
                     var beginIdentifier = next.Location;
                     while (next.HasValue && char.IsLetterOrDigit(next.Value))
                     {
-                        next = next.Remainder.NextChar();
+                        next = next.Remainder.ConsumeChar();
                     }
 
                     yield return CharResult.Value(SExpressionToken.Atom, beginIdentifier, next.Location);

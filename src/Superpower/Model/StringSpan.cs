@@ -47,7 +47,7 @@ namespace Superpower.Model
                 throw new InvalidOperationException("String span has no value.");
         }
 
-        public CharResult<char> NextChar()
+        public CharResult<char> ConsumeChar()
         {
             EnsureHasValue();
 

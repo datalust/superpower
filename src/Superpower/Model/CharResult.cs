@@ -30,15 +30,7 @@ namespace Superpower.Model
         public static CharResult<T> CombineEmpty<T>(CharResult<T> first, CharResult<T> second)
         {
             if (first.Remainder != second.Remainder)
-            {
-                if (first.Remainder.Position.Absolute > second.Remainder.Position.Absolute)
-                    return first;
-
-                if (second.IsPartial(second.Location))
-                    return second;
-
-                return first;
-            }
+                return second;
 
             var expectations = first.Expectations;
             if (expectations == null)
@@ -53,7 +45,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new CharResult<T>(first.Remainder, first.ErrorMessage, expectations);
+            return new CharResult<T>(second.Remainder, second.ErrorMessage, expectations);
         }
     }
 }

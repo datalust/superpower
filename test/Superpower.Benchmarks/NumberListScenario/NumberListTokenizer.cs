@@ -18,7 +18,7 @@ namespace Superpower.Benchmarks.NumberListScenario
                 if (char.IsDigit(next.Value))
                 {
                     var integer = Numerics.Integer(next.Location);
-                    next = integer.Remainder.NextChar();
+                    next = integer.Remainder.ConsumeChar();
                     yield return CharResult.Value(NumberListToken.Number, integer.Location, integer.Remainder);
                 }
                 else
