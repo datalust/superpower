@@ -1,0 +1,3 @@
+Type;Method;Mode;Platform;Jit;Toolchain;Runtime;GcMode;LaunchCount;WarmupCount;TargetCount;Affinity;Median;StdDev;Scaled;Scaled-SD
+ArithmeticExpressionBenchmark;Sprache;Throughput;Host;Host;Host;Host;Host;Auto;Auto;Auto;Auto;272.2026 us;7.7209 us;1.00;0.00
+ArithmeticExpressionBenchmark;SuperpowerToken;Throughput;Host;Host;Host;Host;Host;Auto;Auto;Auto;Auto;77.8067 us;1.1060 us;0.28;0.01

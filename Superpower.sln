@@ -34,6 +34,9 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Superpower.Benchmarks", "te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "results", "results", "{D8D9BA69-4FD8-4F31-9ECC-227D85733D15}"
 	ProjectSection(SolutionItems) = preProject
+		results\ArithmeticExpressionBenchmark-report-github.md = results\ArithmeticExpressionBenchmark-report-github.md
+		results\ArithmeticExpressionBenchmark-report.csv = results\ArithmeticExpressionBenchmark-report.csv
+		results\ArithmeticExpressionBenchmark-report.html = results\ArithmeticExpressionBenchmark-report.html
 		results\NumberListBenchmark-report-github.md = results\NumberListBenchmark-report-github.md
 		results\NumberListBenchmark-report.csv = results\NumberListBenchmark-report.csv
 		results\NumberListBenchmark-report.html = results\NumberListBenchmark-report.html

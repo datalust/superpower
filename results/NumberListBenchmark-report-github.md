@@ -12,10 +12,10 @@ dotnet cli version: 1.0.0-preview2-003121
 Type=NumberListBenchmark  Mode=Throughput  
 
 ```
-                   Method |        Median |     StdDev | Scaled | Scaled-SD |
-------------------------- |-------------- |----------- |------- |---------- |
- StringSplitAndInt32Parse |   139.1851 us |  3.3844 us |   1.00 |      0.00 |
-            SpracheSimple | 2,946.0222 us | 13.3321 us |  20.96 |      0.47 |
-         SuperpowerSimple |   847.5184 us |  5.0221 us |   6.03 |      0.14 |
-           SuperpowerChar |   649.3021 us |  3.9925 us |   4.62 |      0.11 |
-          SuperpowerToken | 1,206.7713 us | 36.9006 us |   8.61 |      0.32 |
+                   Method |        Median |      StdDev | Scaled | Scaled-SD |
+------------------------- |-------------- |------------ |------- |---------- |
+ StringSplitAndInt32Parse |   140.5250 us |   1.7288 us |   1.00 |      0.00 |
+            SpracheSimple | 3,043.3244 us | 137.0805 us |  22.13 |      0.99 |
+         SuperpowerSimple |   877.2944 us |  30.0207 us |   6.24 |      0.22 |
+           SuperpowerChar |   668.7951 us |  14.0927 us |   4.74 |      0.11 |
+          SuperpowerToken | 1,169.5392 us |  14.0349 us |   8.32 |      0.14 |
