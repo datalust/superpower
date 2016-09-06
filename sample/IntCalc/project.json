@@ -1,0 +1,27 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Superpower": {"target": "project"}
+  },
+
+  "frameworks": {
+    "net4.6": {},
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Superpower": { "target": "project" },
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        }
+      },
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ]
+    }
+  }
+}
