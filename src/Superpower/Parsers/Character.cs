@@ -56,6 +56,14 @@ namespace Superpower.Parsers
         }
 
         /// <summary>
+        /// Parse a single specified character, ignoring case differences.
+        /// </summary>
+        public static CharParser<char> EqualToIgnoreCase(char ch)
+        {
+            return Matching(parsed => char.ToUpper(parsed) == char.ToUpperInvariant(ch), Presentation.FormatCharacter(ch));
+        }
+
+        /// <summary>
         /// Parse any single character in <paramref name="chars"/>.
         /// </summary>
         public static CharParser<char> In(params char[] chars)

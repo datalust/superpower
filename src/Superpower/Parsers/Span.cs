@@ -1,4 +1,5 @@
 ﻿using Superpower.Model;
+using Superpower.Util;
 using System;
 
 namespace Superpower.Parsers
@@ -46,19 +47,49 @@ namespace Superpower.Parsers
         public static CharParser<StringSpan> EqualToIgnoreCase(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
+            var textUpper = text.ToUpperInvariant();
 
             var expectations = new[] { text };
             return input =>
             {
                 var remainder = input;
-                for (var i = 0; i < text.Length; ++i)
+                for (var i = 0; i < textUpper.Length; ++i)
                 {
                     var ch = remainder.ConsumeChar();
-                    if (!ch.HasValue || char.ToUpperInvariant(ch.Value) != char.ToUpperInvariant(text[i]))
+                    if (!ch.HasValue || char.ToUpperInvariant(ch.Value) != textUpper[i])
                         return CharResult.Empty<StringSpan>(ch.Remainder, expectations);
                     remainder = ch.Remainder;
                 }
                 return CharResult.Value(input.Until(remainder), input, remainder);
+            };
+        }
+
+        public static CharParser<StringSpan> EqualTo(char ch)
+        {
+            var expectations = new[] { Presentation.FormatCharacter(ch) };
+            return input =>
+            {
+                var result = input.ConsumeChar();
+                if (!result.HasValue)
+                    return CharResult.CastEmpty<char, StringSpan>(result);
+                if (result.Value == ch)
+                    return CharResult.Value(input.Until(result.Remainder), input, result.Remainder);
+                return CharResult.Empty<StringSpan>(input, expectations);
+            };
+        }
+
+        public static CharParser<StringSpan> EqualToIgnoreCase(char ch)
+        {
+            var chToUpper = char.ToUpperInvariant(ch);
+            var expectations = new[] { Presentation.FormatCharacter(ch) };
+            return input =>
+            {
+                var result = input.ConsumeChar();
+                if (!result.HasValue)
+                    return CharResult.CastEmpty<char, StringSpan>(result);
+                if (char.ToUpperInvariant(result.Value) == chToUpper)
+                   return CharResult.Value(input.Until(result.Remainder), input, result.Remainder);
+                return CharResult.Empty<StringSpan>(input, expectations);
             };
         }
 
