@@ -1,4 +1,4 @@
-# Superpower [![Build status](https://ci.appveyor.com/api/projects/status/366q7k3nv4fiuwuv?svg=true)](https://ci.appveyor.com/project/NicholasBlumhardt/superpower)
+# Superpower [![Build status](https://ci.appveyor.com/api/projects/status/7bj6if6tyc68urpy?svg=true)](https://ci.appveyor.com/project/datalust/superpower)  [![Join the chat at https://gitter.im/datalust/superpower](https://img.shields.io/gitter/room/datalust/superpower.svg)](https://gitter.im/datalust/superpower) [![NuGet Version](https://img.shields.io/nuget/vpre/Superpower.svg?style=flat)](https://www.nuget.org/packages/Superpower/)
 
 A highly-experimental parser combinator library. The code in this repository is not ready for any kind of consumption - I'm currently just sketching some ideas and exploring the feasibility of meeting the following high-level goals:
 
