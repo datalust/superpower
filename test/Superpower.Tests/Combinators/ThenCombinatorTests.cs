@@ -27,19 +27,19 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenThenFailsIfFirstParserFails()
         {
-            AssertParser.Fails(Parse.Token('a').Then(_ => Parse.Token('b')), "cb");
+            AssertParser.Fails(Token.EqualTo('a').Then(_ => Token.EqualTo('b')), "cb");
         }
 
         [Fact]
         public void TokenThenFailsIfSecondParserFails()
         {
-            AssertParser.Fails(Parse.Token('a').Then(_ => Parse.Token('b')), "ac");
+            AssertParser.Fails(Token.EqualTo('a').Then(_ => Token.EqualTo('b')), "ac");
         }
 
         [Fact]
         public void TokenThenSucceedsIfBothSucceedInSequence()
         {
-            AssertParser.SucceedsWith(Parse.Token('a').Then(_ => Parse.Token('b')), "ab", 'b');
+            AssertParser.SucceedsWith(Token.EqualTo('a').Then(_ => Token.EqualTo('b')), "ab", 'b');
         }
     }
 }

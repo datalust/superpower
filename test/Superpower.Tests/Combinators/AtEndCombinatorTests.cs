@@ -34,19 +34,19 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenAtEndSucceedsAtTheEnd()
         {
-            AssertParser.SucceedsWith(Parse.Token('a').AtEnd(), "a", 'a');
+            AssertParser.SucceedsWith(Token.EqualTo('a').AtEnd(), "a", 'a');
         }
 
         [Fact]
         public void TokenAtEndFailsIfThereIsARemainder()
         {
-            AssertParser.Fails(Parse.Token('a').AtEnd(), "ab");
+            AssertParser.Fails(Token.EqualTo('a').AtEnd(), "ab");
         }
 
         [Fact]
         public void TokenAtEndFailsIfThePrecedingParserFails()
         {
-            AssertParser.Fails(Parse.Token('b').AtEnd(), "a");
+            AssertParser.Fails(Token.EqualTo('b').AtEnd(), "a");
         }
 
         [Fact]

@@ -35,25 +35,25 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenManySucceedsWithNone()
         {
-            AssertParser.SucceedsWithAll(Parse.Token('a').Many(), "");
+            AssertParser.SucceedsWithAll(Token.EqualTo('a').Many(), "");
         }
 
         [Fact]
         public void TokenManySucceedsWithOne()
         {
-            AssertParser.SucceedsWithAll(Parse.Token('a').Many(), "a");
+            AssertParser.SucceedsWithAll(Token.EqualTo('a').Many(), "a");
         }
 
         [Fact]
         public void TokenManySucceedsWithTwo()
         {
-            AssertParser.SucceedsWithAll(Parse.Token('a').Many(), "aa");
+            AssertParser.SucceedsWithAll(Token.EqualTo('a').Many(), "aa");
         }
 
         [Fact]
         public void TokenManyFailsWithPartialItemMatch()
         {
-            var ab = Parse.Token('a').Then(_ => Parse.Token('b'));
+            var ab = Token.EqualTo('a').Then(_ => Token.EqualTo('b'));
             var list = ab.Many();
             AssertParser.Fails(list, "ababa");
         }

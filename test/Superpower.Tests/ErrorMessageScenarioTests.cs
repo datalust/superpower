@@ -11,7 +11,7 @@ namespace Superpower.Tests
         [Fact]
         public void ErrorMessagesFromAppliedCharacterParsersPropagate()
         {
-            var number = Parse.Token(SExpressionToken.Number)
+            var number = Token.EqualTo(SExpressionToken.Number)
                   .Apply(t => Character.EqualTo('1').Then(_ => Character.EqualTo('x')));
             
             var numbers = number.AtEnd();
@@ -23,8 +23,8 @@ namespace Superpower.Tests
         [Fact]
         public void ErrorMessageFromPartialItemsPropagate()
         {
-            var atom = Parse.Token(SExpressionToken.Atom);
-            var number = Parse.Token(SExpressionToken.Number);
+            var atom = Token.EqualTo(SExpressionToken.Atom);
+            var number = Token.EqualTo(SExpressionToken.Number);
 
             var alternating = number.Then(n => atom).AtEnd();
 
@@ -35,8 +35,8 @@ namespace Superpower.Tests
         [Fact]
         public void ErrorMessageFromLastPartialItemPropagates()
         {
-            var atom = Parse.Token(SExpressionToken.Atom);
-            var number = Parse.Token(SExpressionToken.Number);
+            var atom = Token.EqualTo(SExpressionToken.Atom);
+            var number = Token.EqualTo(SExpressionToken.Number);
 
             var alternating = number.Then(n => atom).Many().AtEnd();
 
@@ -47,8 +47,8 @@ namespace Superpower.Tests
         [Fact]
         public void ErrorMessageFromIncompleteItemPropagates()
         {
-            var atom = Parse.Token(SExpressionToken.Atom);
-            var number = Parse.Token(SExpressionToken.Number);
+            var atom = Token.EqualTo(SExpressionToken.Atom);
+            var number = Token.EqualTo(SExpressionToken.Number);
 
             var alternating = number.Then(n => atom).AtEnd();
 

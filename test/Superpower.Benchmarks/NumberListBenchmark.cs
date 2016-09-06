@@ -65,7 +65,7 @@ namespace Superpower.Benchmarks
         }
 
         static readonly TokenParser<NumberListToken, int[]> SuperpowerTokenParser =
-            Parse.Token(NumberListToken.Number)
+            Token.EqualTo(NumberListToken.Number)
                 .Apply(Numerics.IntegerInt32) // Slower that int.Parse(), but worth benchmarking
                 .Many();
 

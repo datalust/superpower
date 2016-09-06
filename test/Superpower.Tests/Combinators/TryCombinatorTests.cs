@@ -42,7 +42,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenTryFailureConsumesNoInput()
         {
-            var tryAb = Parse.Token('a').Then(_ => Parse.Token('b')).Try();
+            var tryAb = Token.EqualTo('a').Then(_ => Token.EqualTo('b')).Try();
             var result = tryAb.TryParse(StringAsCharTokenList.Tokenize("ac"));
             Assert.False(result.HasValue);
             Assert.Equal(0, result.Remainder.Position);
@@ -51,7 +51,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenTrySuccessIsTransparent()
         {
-            var tryAb = Parse.Token('a').Then(_ => Parse.Token('b')).Try();
+            var tryAb = Token.EqualTo('a').Then(_ => Token.EqualTo('b')).Try();
             var result = tryAb.TryParse(StringAsCharTokenList.Tokenize("ab"));
             Assert.True(result.HasValue);
             Assert.True(result.Remainder.IsAtEnd);
@@ -60,7 +60,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenTryItemMakesManyBacktrack()
         {
-            var ab = Parse.Token('a').Then(_ => Parse.Token('b'));
+            var ab = Token.EqualTo('a').Then(_ => Token.EqualTo('b'));
             var list = ab.Try().Many();
             AssertParser.SucceedsWithMany(list, "ababa", "bb".ToCharArray());
         }
@@ -68,7 +68,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenTryAlternativeMakesOrBacktrack()
         {
-            var tryAOrAB = Parse.Token('a').Then(_ => Parse.Token('b')).Try().Or(Parse.Token('a'));
+            var tryAOrAB = Token.EqualTo('a').Then(_ => Token.EqualTo('b')).Try().Or(Token.EqualTo('a'));
             AssertParser.SucceedsWith(tryAOrAB, "a", 'a');
         }
     }

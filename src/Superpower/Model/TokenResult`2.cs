@@ -85,9 +85,7 @@ namespace Superpower.Model
             {
                 var next = Remainder.ConsumeToken().Value;
                 var nextKind = Presentation.FormatKind(next.Kind);
-                var nextValue = next.ToStringValue();
-                if (nextValue.Length > 12)
-                    nextValue = nextValue.Substring(0, 9) + "...";
+                var nextValue = Presentation.Clip(next.ToStringValue(), 12);
                 message = $"unexpected {nextKind} `{nextValue}`";
             }
 

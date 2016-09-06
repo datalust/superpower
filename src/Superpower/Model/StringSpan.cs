@@ -119,7 +119,7 @@ namespace Superpower.Model
             return Source.Substring(Position.Absolute, Length);
         }
 
-        public bool Equals(string otherValue)
+        public bool EqualsValue(string otherValue)
         {
             if (otherValue == null) throw new ArgumentNullException(nameof(otherValue));
             EnsureHasValue();
@@ -133,7 +133,7 @@ namespace Superpower.Model
             return true;
         }
 
-        public bool EqualsIgnoreCase(string otherValue)
+        public bool EqualsValueIgnoreCase(string otherValue)
         {
             if (otherValue == null) throw new ArgumentNullException(nameof(otherValue));
             EnsureHasValue();

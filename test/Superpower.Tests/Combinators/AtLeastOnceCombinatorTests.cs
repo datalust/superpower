@@ -27,19 +27,19 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenAtLeastOnceSucceedsWithOne()
         {
-            AssertParser.SucceedsWithAll(Parse.Token('a').AtLeastOnce(), "a");
+            AssertParser.SucceedsWithAll(Token.EqualTo('a').AtLeastOnce(), "a");
         }
 
         [Fact]
         public void TokenAtLeastOnceSucceedsWithTwo()
         {
-            AssertParser.SucceedsWithAll(Parse.Token('a').AtLeastOnce(), "aa");
+            AssertParser.SucceedsWithAll(Token.EqualTo('a').AtLeastOnce(), "aa");
         }
 
         [Fact]
         public void TokenAtLeastOnceFailsWithNone()
         {
-            AssertParser.Fails(Parse.Token('a').AtLeastOnce(), "");
+            AssertParser.Fails(Token.EqualTo('a').AtLeastOnce(), "");
         }
     }
 }

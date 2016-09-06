@@ -1,6 +1,5 @@
 ﻿using Superpower.Util;
 using System;
-using System.Linq;
 
 namespace Superpower.Model
 {

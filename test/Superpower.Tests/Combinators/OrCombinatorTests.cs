@@ -43,31 +43,31 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenOrFailsWithNone()
         {
-            AssertParser.Fails(Parse.Token('a').Or(Parse.Token('b')), "");
+            AssertParser.Fails(Token.EqualTo('a').Or(Token.EqualTo('b')), "");
         }
 
         [Fact]
         public void TokenOrFailsWithUnmatched()
         {
-            AssertParser.Fails(Parse.Token('a').Or(Parse.Token('b')), "c");
+            AssertParser.Fails(Token.EqualTo('a').Or(Token.EqualTo('b')), "c");
         }
 
         [Fact]
         public void TokenOrSucceedsWithFirstMatch()
         {
-            AssertParser.SucceedsWith(Parse.Token('a').Or(Parse.Token('b')), "a", 'a');
+            AssertParser.SucceedsWith(Token.EqualTo('a').Or(Token.EqualTo('b')), "a", 'a');
         }
 
         [Fact]
         public void TokenOrSucceedsWithSecondMatch()
         {
-            AssertParser.SucceedsWith(Parse.Token('a').Or(Parse.Token('b')), "b", 'b');
+            AssertParser.SucceedsWith(Token.EqualTo('a').Or(Token.EqualTo('b')), "b", 'b');
         }
 
         [Fact]
         public void TokenOrFailsWithPartialFirstMatch()
         {
-            AssertParser.Fails(Parse.Token('a').Then(_ => Parse.Token('b')).Or(Parse.Token('a')), "a");
+            AssertParser.Fails(Token.EqualTo('a').Then(_ => Token.EqualTo('b')).Or(Token.EqualTo('a')), "a");
         }
     }
 }

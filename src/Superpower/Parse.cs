@@ -6,60 +6,6 @@ namespace Superpower
 {
     public static class Parse
     {
-        public static TokenParser<TTokenKind, Token<TTokenKind>> Token<TTokenKind>(TTokenKind token)
-        {
-            var expectations = new[] { Presentation.FormatKind(token) };
-
-            return input =>
-            {
-                var next = input.ConsumeToken();
-                if (!next.HasValue || !next.Value.Kind.Equals(token))
-                    return TokenResult.Empty<TTokenKind, Token<TTokenKind>>(input, expectations);
-
-                return next;
-            };
-        }
-
-        public static CharParser<T> Ref<T>(Func<CharParser<T>> reference)
-        {
-            if (reference == null) throw new ArgumentNullException(nameof(reference));
-
-            CharParser<T> parser = null;
-
-            return i =>
-            {
-                if (parser == null)
-                    parser = reference();
-
-                return parser(i);
-            };
-        }
-
-        public static TokenParser<TTokenKind, T> Ref<TTokenKind, T>(Func<TokenParser<TTokenKind, T>> reference)
-        {
-            if (reference == null) throw new ArgumentNullException(nameof(reference));
-
-            TokenParser<TTokenKind, T> parser = null;
-
-            return i =>
-            {
-                if (parser == null)
-                    parser = reference();
-
-                return parser(i);
-            };
-        }
-
-        public static CharParser<T> Return<T>(T t)
-        {
-            return input => CharResult.Value(t, input, input);
-        }
-
-        public static TokenParser<TTokenKind, T> Return<TTokenKind, T>(T t)
-        {
-            return input => TokenResult.Value(t, input, input);
-        }
-
         public static CharParser<T> Chain<T, TOperator>(
             CharParser<TOperator> @operator,
             CharParser<T> operand,
@@ -162,6 +108,105 @@ namespace Superpower
                 operand.Then(operandValue =>
                     ChainRightOperatorRest(operandValue, @operator, operand, apply)).Then(r => Return<TTokenKind, T>(apply(opvalue, lastOperand, r))))
                     .Or(Return<TTokenKind, T>(lastOperand));
+        }
+        /// <summary>
+        /// Constructs a parser that will fail if the given parser succeeds,
+        /// and will succeed if the given parser fails. In any case, it won't
+        /// consume any input. It's like a negative look-ahead in a regular expression.
+        /// </summary>
+        /// <typeparam name="T">The result type of the given parser</typeparam>
+        /// <param name="parser">The parser to wrap</param>
+        /// <returns>A parser that is the negation of the given parser.</returns>
+        public static CharParser<Unit> Not<T>(CharParser<T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return input =>
+            {
+                var result = parser(input);
+
+                if (result.HasValue)
+                    return CharResult.Empty<Unit>(input, $"unexpected successful parsing of `{input.Until(result.Remainder)}`");
+
+                return CharResult.Value(Unit.Value, input, input);
+            };
+        }
+
+        /// <summary>
+        /// Constructs a parser that will fail if the given parser succeeds,
+        /// and will succeed if the given parser fails. In any case, it won't
+        /// consume any input. It's like a negative look-ahead in a regular expression.
+        /// </summary>
+        /// <typeparam name="T">The result type of the given parser</typeparam>
+        /// <param name="parser">The parser to wrap</param>
+        /// <returns>A parser that is the negation of the given parser.</returns>
+        public static TokenParser<TTokenKind, Unit> Not<TTokenKind, T>(TokenParser<TTokenKind, T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return input =>
+            {
+                var result = parser(input);
+
+                if (result.HasValue)
+                {
+                    // This is usually a success case for Not(), so the allocations here are a bit of a pity.
+
+                    var current = input.ConsumeToken();
+                    var last = result.Remainder.ConsumeToken();
+                    if (current.HasValue)
+                    {
+                        var span = last.HasValue ?
+                            current.Value.Span.Source.Substring(current.Value.Position.Absolute, last.Value.Position.Absolute - current.Value.Position.Absolute) :
+                            current.Value.Span.Source.Substring(current.Value.Position.Absolute);
+                        return TokenResult.Empty<TTokenKind, Unit>(input, $"unexpected successful parsing of `{Presentation.Clip(span, 12)}`");
+                    }
+
+                    return TokenResult.Empty<TTokenKind, Unit>(input, $"unexpected successful parsing");
+                }
+
+                return TokenResult.Value<TTokenKind, Unit>(Unit.Value, input, input);
+            };
+        }
+
+        public static CharParser<T> Ref<T>(Func<CharParser<T>> reference)
+        {
+            if (reference == null) throw new ArgumentNullException(nameof(reference));
+
+            CharParser<T> parser = null;
+
+            return i =>
+            {
+                if (parser == null)
+                    parser = reference();
+
+                return parser(i);
+            };
+        }
+
+        public static TokenParser<TTokenKind, T> Ref<TTokenKind, T>(Func<TokenParser<TTokenKind, T>> reference)
+        {
+            if (reference == null) throw new ArgumentNullException(nameof(reference));
+
+            TokenParser<TTokenKind, T> parser = null;
+
+            return i =>
+            {
+                if (parser == null)
+                    parser = reference();
+
+                return parser(i);
+            };
+        }
+
+        public static CharParser<T> Return<T>(T t)
+        {
+            return input => CharResult.Value(t, input, input);
+        }
+
+        public static TokenParser<TTokenKind, T> Return<TTokenKind, T>(T t)
+        {
+            return input => TokenResult.Value(t, input, input);
         }
     }
 }

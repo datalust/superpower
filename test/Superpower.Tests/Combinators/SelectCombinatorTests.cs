@@ -27,7 +27,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenSelectTransformsPrecedingResult()
         {
-            AssertParser.SucceedsWith(Parse.Token('a').Select(_ => 42), "a", 42);
+            AssertParser.SucceedsWith(Token.EqualTo('a').Select(_ => 42), "a", 42);
         }
     }
 }

@@ -74,6 +74,11 @@ namespace Superpower.Tests.Support
             resultAssertion(result);
         }
 
+        public static void FailsWithMessage<T>(CharParser<T> parser, string input, string message)
+        {
+            FailsWith(parser, input, r => { Assert.Equal(message, r.ToString()); });
+        }
+
         public static void SucceedsWithOne<T>(TokenParser<char, T[]> parser, string input, T expectedResult)
         {
             Succeeds(parser, input, t =>
@@ -145,6 +150,12 @@ namespace Superpower.Tests.Support
             Tokenizer<TTokenKind> tokenizer, string message)
         {
             var result = parser.TryParse(tokenizer.Tokenize(input));
+            Assert.Equal(message, result.ToString());
+        }
+
+        public static void FailsWithMessage<T>(TokenParser<char, T> parser, string input, string message)
+        {
+            var result = parser.TryParse(StringAsCharTokenList.Tokenize(input));
             Assert.Equal(message, result.ToString());
         }
     }

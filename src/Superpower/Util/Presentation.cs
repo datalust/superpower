@@ -43,5 +43,12 @@ namespace Superpower.Util
                 list = $"{string.Join(", ", items.Take(count - 1))} or {list}";
             return list;
         }
+
+        public static string Clip(string value, int maxLength)
+        {
+            if (value.Length > maxLength)
+                return value.Substring(0, maxLength - 3) + "...";
+            return value;
+        }
     }
 }
