@@ -1,5 +1,7 @@
 # Superpower [![Build status](https://ci.appveyor.com/api/projects/status/366q7k3nv4fiuwuv?svg=true)](https://ci.appveyor.com/project/NicholasBlumhardt/superpower)
 
+[![Join the chat at https://gitter.im/datalust/superpower](https://badges.gitter.im/datalust/superpower.svg)](https://gitter.im/datalust/superpower?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A highly-experimental parser combinator library. The code in this repository is not ready for any kind of consumption - I'm currently just sketching some ideas and exploring the feasibility of meeting the following high-level goals:
 
  * [ ] Easy migration path from [Sprache](https://github.com/Sprache/Sprache)
