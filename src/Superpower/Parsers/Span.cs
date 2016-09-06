@@ -1,6 +1,7 @@
 ﻿using Superpower.Model;
 using Superpower.Util;
 using System;
+using System.Linq;
 
 namespace Superpower.Parsers
 {
@@ -93,6 +94,13 @@ namespace Superpower.Parsers
             };
         }
 
+        public static CharParser<StringSpan> Until(Func<char, bool> predicate)
+        {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+            return While(ch => !predicate(ch));
+        }
+
         public static CharParser<StringSpan> While(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -107,13 +115,6 @@ namespace Superpower.Parsers
 
                 return CharResult.Value(input.Until(next.Location), input, next.Location);
             };
-        }
-
-        public static CharParser<StringSpan> Until(Func<char, bool> predicate)
-        {
-            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-
-            return While(ch => !predicate(ch));
         }
 
         public static CharParser<StringSpan> WhiteSpace { get; } = input =>

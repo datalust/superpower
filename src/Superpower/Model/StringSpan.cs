@@ -118,5 +118,33 @@ namespace Superpower.Model
             EnsureHasValue();
             return Source.Substring(Position.Absolute, Length);
         }
+
+        public bool Equals(string otherValue)
+        {
+            if (otherValue == null) throw new ArgumentNullException(nameof(otherValue));
+            EnsureHasValue();
+            if (Length != otherValue.Length)
+                return false;
+            for (var i = 0; i < Length; ++i)
+            {
+                if (Source[Position.Absolute + i] != otherValue[i])
+                    return false;
+            }
+            return true;
+        }
+
+        public bool EqualsIgnoreCase(string otherValue)
+        {
+            if (otherValue == null) throw new ArgumentNullException(nameof(otherValue));
+            EnsureHasValue();
+            if (Length != otherValue.Length)
+                return false;
+            for (var i = 0; i < Length; ++i)
+            {
+                if (char.ToUpperInvariant(Source[Position.Absolute + i]) != char.ToUpperInvariant(otherValue[i]))
+                    return false;
+            }
+            return true;
+        }
     }
 }
