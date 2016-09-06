@@ -16,13 +16,13 @@ artifacts:
 deploy:
 - provider: NuGet
   api_key:
-    secure: /Dm+EI0E1vCa+rZfYkluSnk7iSnAFKNOcEpreQrG88uYqCm//dKpY5vwqb1EJm3j
+    secure: 7AS4wbHVs08D6so0JGAVczexCX9ST6CRbNToHZC08rtPqkQENpyNhhSAIX0FShzh
   skip_symbols: true
   on:
     branch: /^(master|dev)$/
 - provider: GitHub
   auth_token:
-    secure: lcrOr7wosx2rfIwHgGBXi9OSotVHSjrWGGnZkk98NqiGbbAnV4aHjIfB9ReP7EdB
+    secure: hX+cZmW+9BCXy7vyH8myWsYdtQHyzzil9K5yvjJv7dK9XmyrGYYDj/DPzMqsXSjo
   artifact: /Superpower.*\.nupkg/
   tag: v$(appveyor_build_version)
   on:
