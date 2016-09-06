@@ -12,7 +12,6 @@
     "net4.6": {},
     "netcoreapp1.0": {
       "dependencies": {
-        "Superpower": { "target": "project" },
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.0.0"
