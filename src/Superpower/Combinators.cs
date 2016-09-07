@@ -380,7 +380,11 @@ namespace Superpower
                 if (!rt.HasValue)
                     return TokenResult.CastEmpty<TTokenKind, T, U>(rt);
 
-                return second(rt.Value)(rt.Remainder);
+                var ru = second(rt.Value)(rt.Remainder);
+                if (!ru.HasValue)
+                    return ru;
+
+                return TokenResult.Value<TTokenKind, U>(ru.Value, input, ru.Remainder);
             };
         }
 
@@ -395,7 +399,11 @@ namespace Superpower
                 if (!rt.HasValue)
                     return CharResult.CastEmpty<T, U>(rt);
 
-                return second(rt.Value)(rt.Remainder);
+                var ru = second(rt.Value)(rt.Remainder);
+                if (!ru.HasValue)
+                    return ru;
+
+                return CharResult.Value(ru.Value, input, ru.Remainder);
             };
         }
 

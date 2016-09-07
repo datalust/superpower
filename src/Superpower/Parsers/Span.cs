@@ -21,11 +21,9 @@ namespace Superpower.Parsers
                     {
                         if (ch.Remainder == input)
                             return CharResult.Empty<StringSpan>(ch.Location, expectations);
-                        else
-                        {
-                            var remaining = length - i;
-                            return CharResult.Empty<StringSpan>(ch.Location, new[] { $"{remaining} more {Presentation.Pluralize("character", remaining)}" });
-                        }
+
+                        var remaining = length - i;
+                        return CharResult.Empty<StringSpan>(ch.Location, new[] { $"{remaining} more {Presentation.Pluralize("character", remaining)}" });
                     }
                     remainder = ch.Remainder;
                 }
@@ -48,8 +46,8 @@ namespace Superpower.Parsers
                     {
                         if (ch.Remainder == input)
                             return CharResult.Empty<StringSpan>(ch.Location, expectations);
-                        else
-                            return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatCharacter(text[i]) });
+
+                        return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatCharacter(text[i]) });
                     }
                     remainder = ch.Remainder;
                 }
