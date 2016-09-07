@@ -8,7 +8,7 @@ A [parser combinator](https://en.wikipedia.org/wiki/Parser_combinator) library b
 
 ### Usage
 
-Like Sprache, Superpower is used directly from your program code, without requiring any build-time code generation tasks.
+Superpower is embedded directly into your program code, without the need for any additional tools or build-time code generation tasks.
 
 The simplest parsers are character-based: 
 
@@ -178,6 +178,11 @@ class ArithmeticExpressionParser
 ### Error messages
 
 The [error scenario tests](https://github.com/datalust/superpower/blob/dev/test/Superpower.Tests/ErrorMessageScenarioTests.cs) demonstrate some of the error message formatting capabilities of Superpower. Check out the parsers referenced in the tests for some examples.
+
+```csharp
+ArithmeticExpressionParser.Lambda.Parse(new ArithmeticExpressionTokenizer().Tokenize("1 + * 3"));
+     // -> Parsing failure (line 1, column 5): unexpected operator `*`, expected expression.
+```
 
 To improve the error reporting for a particular token type, apply the `[Token]` attribute:
 
