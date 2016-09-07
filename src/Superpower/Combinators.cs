@@ -277,18 +277,18 @@ namespace Superpower
             return parser.Select(t => (T?)t).Or(Parse.Return<T?>(null));
         }
 
-        public static TokenParser<TTokenKind, T> OptionalOrDefault<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        public static TokenParser<TTokenKind, T> OptionalOrDefault<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, T defaultValue = default(T))
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Or(Parse.Return<TTokenKind, T>(default(T)));
+            return parser.Or(Parse.Return<TTokenKind, T>(defaultValue));
         }
 
-        public static CharParser<T> OptionalOrDefault<T>(this CharParser<T> parser)
+        public static CharParser<T> OptionalOrDefault<T>(this CharParser<T> parser, T defaultValue = default(T))
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Or(Parse.Return(default(T)));
+            return parser.Or(Parse.Return(defaultValue));
         }
 
         public static TokenParser<TTokenKind, T> Or<TTokenKind, T>(this TokenParser<TTokenKind, T> lhs, TokenParser<TTokenKind, T> rhs)
