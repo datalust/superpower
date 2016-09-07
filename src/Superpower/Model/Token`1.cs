@@ -6,6 +6,7 @@ namespace Superpower.Model
         public StringSpan Span { get; }
         public string ToStringValue() => Span.ToStringValue();
         public Position Position => Span.Position;
+        public bool HasValue => Span != StringSpan.None;
 
         public Token(TTokenKind kind, StringSpan span)
         {
@@ -17,7 +18,7 @@ namespace Superpower.Model
 
         public override string ToString()
         {
-            if (Span == StringSpan.None)
+            if (!HasValue)
                 return "(empty token)";
 
             return $"{Kind}@{Position}: {Span}";

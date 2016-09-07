@@ -32,12 +32,16 @@ namespace Superpower
                     throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatKind(result.Value)} at position {result.Location.Position}.");
 
                 remainder = result.Remainder;
-                results.Add(new Token<TTokenKind>(result.Value, result.Location.Until(result.Remainder)));
+                var token = new Token<TTokenKind>(result.Value, result.Location.Until(result.Remainder));
+                Previous = token;
+                results.Add(token);
             }
 
             var value = new TokenList<TTokenKind>(results.ToArray());
             return CharResult.Value(value, sourceSpan, remainder);
         }
+
+        protected Token<TTokenKind> Previous { get; private set; }
 
         protected abstract IEnumerable<CharResult<TTokenKind>> Tokenize(StringSpan stringSpan);
 
