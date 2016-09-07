@@ -1,7 +1,6 @@
 ﻿using Superpower.Model;
 using Superpower.Util;
 using System;
-using System.Linq;
 
 namespace Superpower.Parsers
 {
@@ -19,7 +18,15 @@ namespace Superpower.Parsers
                 {
                     var ch = remainder.ConsumeChar();
                     if (!ch.HasValue)
-                        return CharResult.Empty<StringSpan>(ch.Remainder, expectations);
+                    {
+                        if (ch.Remainder == input)
+                            return CharResult.Empty<StringSpan>(ch.Location, expectations);
+                        else
+                        {
+                            var remaining = length - i;
+                            return CharResult.Empty<StringSpan>(ch.Location, new[] { $"{remaining} more {Presentation.Pluralize("character", remaining)}" });
+                        }
+                    }
                     remainder = ch.Remainder;
                 }
                 return CharResult.Value(input.Until(remainder), input, remainder);
@@ -38,7 +45,12 @@ namespace Superpower.Parsers
                 {
                     var ch = remainder.ConsumeChar();
                     if (!ch.HasValue || ch.Value != text[i])
-                        return CharResult.Empty<StringSpan>(ch.Remainder, expectations);
+                    {
+                        if (ch.Remainder == input)
+                            return CharResult.Empty<StringSpan>(ch.Location, expectations);
+                        else
+                            return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatCharacter(text[i]) });
+                    }
                     remainder = ch.Remainder;
                 }
                 return CharResult.Value(input.Until(remainder), input, remainder);
@@ -58,7 +70,12 @@ namespace Superpower.Parsers
                 {
                     var ch = remainder.ConsumeChar();
                     if (!ch.HasValue || char.ToUpperInvariant(ch.Value) != textUpper[i])
-                        return CharResult.Empty<StringSpan>(ch.Remainder, expectations);
+                    {
+                        if (ch.Remainder == input)
+                            return CharResult.Empty<StringSpan>(ch.Location, expectations);
+                        else
+                            return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatCharacter(text[i]) });
+                    }
                     remainder = ch.Remainder;
                 }
                 return CharResult.Value(input.Until(remainder), input, remainder);

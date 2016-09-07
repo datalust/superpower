@@ -33,6 +33,16 @@ namespace Superpower.Util
             return "`" + ch + "`";
         }
 
+        public static string Pluralize(string noun, int count)
+        {
+            if (noun == null) throw new ArgumentNullException(nameof(noun));
+
+            if (count == 1)
+                return noun;
+
+            return noun + "s";
+        }
+
         public static string List(IEnumerable<string> items)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
