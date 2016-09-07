@@ -4,11 +4,13 @@ namespace Superpower.Parsers
 {
     public static class Numerics
     {
+        static readonly string[] ExpectedDigit = { "digit" };
+
         public static CharParser<StringSpan> Integer { get; } = input =>
         {
             var next = input.ConsumeChar();
             if (!next.HasValue || !char.IsDigit(next.Value))
-                return CharResult.Empty<StringSpan>(input);
+                return CharResult.Empty<StringSpan>(input, ExpectedDigit);
 
             StringSpan remainder;
             do
@@ -24,7 +26,7 @@ namespace Superpower.Parsers
         {
             var next = input.ConsumeChar();
             if (!next.HasValue || !char.IsDigit(next.Value))
-                return CharResult.Empty<int>(input);
+                return CharResult.Empty<int>(input, ExpectedDigit);
 
             StringSpan remainder;
             var val = 0;
