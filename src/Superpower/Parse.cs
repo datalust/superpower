@@ -1,6 +1,7 @@
 ﻿using Superpower.Model;
 using Superpower.Util;
 using System;
+using Superpower.Display;
 
 namespace Superpower
 {
@@ -137,7 +138,8 @@ namespace Superpower
         /// and will succeed if the given parser fails. In any case, it won't
         /// consume any input. It's like a negative look-ahead in a regular expression.
         /// </summary>
-        /// <typeparam name="T">The result type of the given parser</typeparam>
+        /// <typeparam name="T">The result type of the given parser.</typeparam>
+        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
         /// <param name="parser">The parser to wrap</param>
         /// <returns>A parser that is the negation of the given parser.</returns>
         public static TokenParser<TTokenKind, Unit> Not<TTokenKind, T>(TokenParser<TTokenKind, T> parser)
@@ -159,13 +161,13 @@ namespace Superpower
                         var span = last.HasValue ?
                             current.Value.Span.Source.Substring(current.Value.Position.Absolute, last.Value.Position.Absolute - current.Value.Position.Absolute) :
                             current.Value.Span.Source.Substring(current.Value.Position.Absolute);
-                        return TokenResult.Empty<TTokenKind, Unit>(input, $"unexpected successful parsing of `{Presentation.Clip(span, 12)}`");
+                        return TokenResult.Empty<TTokenKind, Unit>(input, $"unexpected successful parsing of {Presentation.FormatLiteral(Friendly.Clip(span, 12))}");
                     }
 
-                    return TokenResult.Empty<TTokenKind, Unit>(input, $"unexpected successful parsing");
+                    return TokenResult.Empty<TTokenKind, Unit>(input, "unexpected successful parsing");
                 }
 
-                return TokenResult.Value<TTokenKind, Unit>(Unit.Value, input, input);
+                return TokenResult.Value(Unit.Value, input, input);
             };
         }
 

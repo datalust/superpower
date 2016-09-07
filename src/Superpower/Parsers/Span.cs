@@ -1,6 +1,7 @@
 ﻿using Superpower.Model;
 using Superpower.Util;
 using System;
+using Superpower.Display;
 
 namespace Superpower.Parsers
 {
@@ -23,7 +24,7 @@ namespace Superpower.Parsers
                             return CharResult.Empty<StringSpan>(ch.Location, expectations);
 
                         var remaining = length - i;
-                        return CharResult.Empty<StringSpan>(ch.Location, new[] { $"{remaining} more {Presentation.Pluralize("character", remaining)}" });
+                        return CharResult.Empty<StringSpan>(ch.Location, new[] { $"{remaining} more {Friendly.Pluralize("character", remaining)}" });
                     }
                     remainder = ch.Remainder;
                 }
@@ -47,7 +48,7 @@ namespace Superpower.Parsers
                         if (ch.Remainder == input)
                             return CharResult.Empty<StringSpan>(ch.Location, expectations);
 
-                        return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatCharacter(text[i]) });
+                        return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
                     }
                     remainder = ch.Remainder;
                 }
@@ -72,7 +73,7 @@ namespace Superpower.Parsers
                         if (ch.Remainder == input)
                             return CharResult.Empty<StringSpan>(ch.Location, expectations);
                         else
-                            return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatCharacter(text[i]) });
+                            return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
                     }
                     remainder = ch.Remainder;
                 }
@@ -82,7 +83,7 @@ namespace Superpower.Parsers
 
         public static CharParser<StringSpan> EqualTo(char ch)
         {
-            var expectations = new[] { Presentation.FormatCharacter(ch) };
+            var expectations = new[] { Presentation.FormatLiteral(ch) };
             return input =>
             {
                 var result = input.ConsumeChar();
@@ -97,7 +98,7 @@ namespace Superpower.Parsers
         public static CharParser<StringSpan> EqualToIgnoreCase(char ch)
         {
             var chToUpper = char.ToUpperInvariant(ch);
-            var expectations = new[] { Presentation.FormatCharacter(ch) };
+            var expectations = new[] { Presentation.FormatLiteral(ch) };
             return input =>
             {
                 var result = input.ConsumeChar();

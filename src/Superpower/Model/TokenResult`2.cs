@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using Superpower.Display;
 using Superpower.Util;
 
 namespace Superpower.Model
@@ -84,14 +84,13 @@ namespace Superpower.Model
             else
             {
                 var next = Remainder.ConsumeToken().Value;
-                var nextKind = Presentation.FormatKind(next.Kind);
-                var nextValue = Presentation.Clip(next.ToStringValue(), 12);
-                message = $"unexpected {nextKind} `{nextValue}`";
+                var appearance = Presentation.FormatAppearance(next.Kind, next.ToStringValue());
+                message = $"unexpected {appearance}";
             }
 
             if (Expectations != null)
             {
-                var expected = Presentation.List(Expectations);
+                var expected = Friendly.List(Expectations);
                 message += $", expected {expected}";
             }
 

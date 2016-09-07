@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Superpower.Display;
 using Superpower.Model;
-using Superpower.Util;
 
 namespace Superpower
 {
@@ -22,7 +22,7 @@ namespace Superpower
                 var uResult = uParser.AtEnd()(rt.Value.Span);
                 if (!uResult.HasValue)
                 {
-                    var message = $"invalid {Presentation.FormatKind(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
+                    var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
                     return new TokenResult<TTokenKind, U>(input, uResult.Remainder.Position, message, null);
                 }
 

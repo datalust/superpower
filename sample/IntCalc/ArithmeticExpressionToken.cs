@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Superpower.Display;
+using Superpower.Model;
 
 namespace IntCalc
 {
@@ -8,22 +9,22 @@ namespace IntCalc
 
         Number,
 
-        [Description("addition operator")]
+        [Token(Category="operator", Example = "+")]
         Plus,
 
-        [Description("subtraction operator")]
+        [Token(Category = "operator", Example = "-")]
         Minus,
 
-        [Description("multiplication operator")]
+        [Token(Category = "operator", Example = "*")]
         Times,
 
-        [Description("division operator")]
+        [Token(Category = "operator", Example = "-")]
         Divide,
 
-        [Description("opening parenthesis")]
+        [Token(Example = "(")]
         LParen,
 
-        [Description("closing parenthesis")]
+        [Token(Example = ")")]
         RParen
     }
 }

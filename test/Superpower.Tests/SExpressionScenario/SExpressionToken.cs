@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Superpower.Display;
+using Superpower.Model;
 
 namespace Superpower.Tests.SExpressionScenario
 {
@@ -8,10 +9,10 @@ namespace Superpower.Tests.SExpressionScenario
         Atom,
         Number,
 
-        [Description("open parenthesis")]
+        [Token(Description = "open parenthesis")]
         LParen,
 
-        [Description("closing parenthesis")]
+        [Token(Description = "closing parenthesis")]
         RParen
     }
 }

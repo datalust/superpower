@@ -1,6 +1,6 @@
 ﻿using System;
+using Superpower.Display;
 using Superpower.Model;
-using Superpower.Util;
 
 namespace Superpower.Parsers
 {
@@ -8,7 +8,7 @@ namespace Superpower.Parsers
     {
         public static TokenParser<TTokenKind, Token<TTokenKind>> EqualTo<TTokenKind>(TTokenKind token)
         {
-            var expectations = new[] { Presentation.FormatKind(token) };
+            var expectations = new[] { Presentation.FormatExpectation(token) };
 
             return input =>
             {

@@ -60,14 +60,14 @@ namespace Superpower.Tests
         public void DroppedClosingParenthesisProducesMeaningfulError()
         {
             AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + (2 * 3", new ArithmeticExpressionTokenizer(),
-                "Parsing failure: unexpected end of input, expected closing parenthesis.");
+                "Parsing failure: unexpected end of input, expected `)`.");
         }
 
         [Fact]
         public void MissingOperandProducesMeaningfulError()
         {
             AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + * 3", new ArithmeticExpressionTokenizer(),
-                 "Parsing failure (line 1, column 5): unexpected multiplication operator `*`, expected expression.");
+                 "Parsing failure (line 1, column 5): unexpected operator `*`, expected expression.");
         }
     }
 }

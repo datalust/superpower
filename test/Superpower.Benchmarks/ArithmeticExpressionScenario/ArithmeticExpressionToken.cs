@@ -1,21 +1,28 @@
-﻿using System.ComponentModel;
+﻿using Superpower.Display;
 
 namespace Superpower.Benchmarks.ArithmeticExpressionScenario
 {
     enum ArithmeticExpressionToken
     {
         None,
+
         Number,
+        [Token(Category = "operator", Example = "+")]
         Plus,
+
+        [Token(Category = "operator", Example = "-")]
         Minus,
 
-        [Description("multiplication operator")]
+        [Token(Category = "operator", Example = "*")]
         Times,
 
+        [Token(Category = "operator", Example = "-")]
         Divide,
+
+        [Token(Example = "(")]
         LParen,
 
-        [Description("closing parenthesis")]
+        [Token(Example = ")")]
         RParen
     }
 }

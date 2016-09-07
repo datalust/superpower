@@ -1,22 +1,22 @@
-﻿using Superpower.Tests.SExpressionScenario;
-using Superpower.Util;
+﻿using Superpower.Display;
+using Superpower.Tests.SExpressionScenario;
 using Xunit;
 
-namespace Superpower.Tests.Util
+namespace Superpower.Tests.Display
 {
     public class PresentationTests
     {
         [Fact]
         public void AnUnadornedEnumMemberIsLowercasedForDisplay()
         {
-            var display = Presentation.FormatKind(SExpressionToken.Number);
+            var display = Presentation.FormatExpectation(SExpressionToken.Number);
             Assert.Equal("number", display);
         }
 
         [Fact]
         public void DescriptionAttributeIsInterrogatedForDisplay()
         {
-            var display = Presentation.FormatKind(SExpressionToken.LParen);
+            var display = Presentation.FormatExpectation(SExpressionToken.LParen);
             Assert.Equal("open parenthesis", display);
         }
     }

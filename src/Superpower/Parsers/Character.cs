@@ -2,6 +2,7 @@
 using Superpower.Util;
 using System;
 using System.Linq;
+using Superpower.Display;
 
 namespace Superpower.Parsers
 {
@@ -52,7 +53,7 @@ namespace Superpower.Parsers
         /// </summary>
         public static CharParser<char> EqualTo(char ch)
         {
-            return Matching(parsed => parsed == ch, Presentation.FormatCharacter(ch));
+            return Matching(parsed => parsed == ch, Presentation.FormatLiteral(ch));
         }
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace Superpower.Parsers
         /// </summary>
         public static CharParser<char> EqualToIgnoreCase(char ch)
         {
-            return Matching(parsed => char.ToUpper(parsed) == char.ToUpperInvariant(ch), Presentation.FormatCharacter(ch));
+            return Matching(parsed => char.ToUpper(parsed) == char.ToUpperInvariant(ch), Presentation.FormatLiteral(ch));
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace Superpower.Parsers
         /// </summary>
         public static CharParser<char> In(params char[] chars)
         {
-            return Matching(chars.Contains, chars.Select(Presentation.FormatCharacter).ToArray());
+            return Matching(chars.Contains, chars.Select(Presentation.FormatLiteral).ToArray());
         }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace Superpower.Parsers
         /// </summary>
         public static CharParser<char> Except(char ch)
         {
-            return Except(parsed => parsed == ch, Presentation.FormatCharacter(ch));
+            return Except(parsed => parsed == ch, Presentation.FormatLiteral(ch));
         }
 
         /// <summary>
@@ -84,7 +85,7 @@ namespace Superpower.Parsers
         /// </summary>
         public static CharParser<char> ExceptIn(params char[] chars)
         {
-            return Matching(c => !chars.Contains(c), "any character except " + Presentation.List(chars.Select(Presentation.FormatCharacter)));
+            return Matching(c => !chars.Contains(c), "any character except " + Friendly.List(chars.Select(Presentation.FormatLiteral)));
         }
 
         /// <summary>

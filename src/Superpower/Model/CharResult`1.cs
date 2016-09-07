@@ -84,7 +84,7 @@ namespace Superpower.Model
 
             if (Expectations != null)
             {
-                var expected = Presentation.List(Expectations);
+                var expected = Friendly.List(Expectations);
                 message += $", expected {expected}";
             }
 

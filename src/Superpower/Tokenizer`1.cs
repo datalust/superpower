@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Superpower.Display;
 using Superpower.Model;
-using Superpower.Util;
 
 namespace Superpower
 {
@@ -29,7 +29,7 @@ namespace Superpower
                     return CharResult.CastEmpty<TTokenKind, TokenList<TTokenKind>>(result);
 
                 if (result.Remainder == remainder) // Broken parser, not a failed parsing.
-                    throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatKind(result.Value)} at position {result.Location.Position}.");
+                    throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatExpectation(result.Value)} at position {result.Location.Position}.");
 
                 remainder = result.Remainder;
                 var token = new Token<TTokenKind>(result.Value, result.Location.Until(result.Remainder));
