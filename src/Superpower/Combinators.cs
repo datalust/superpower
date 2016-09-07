@@ -84,6 +84,36 @@ namespace Superpower
             return parser.Then(first => parser.Many().Select(rest => new[] { first }.Concat(rest).ToArray()));
         }
 
+        public static TokenParser<TTokenKind, U> IgnoreThen<TTokenKind, T, U>(this TokenParser<TTokenKind, T> first, TokenParser<TTokenKind, U> second)
+        {
+            if (first == null) throw new ArgumentNullException(nameof(first));
+            if (second == null) throw new ArgumentNullException(nameof(second));
+
+            return input =>
+            {
+                var rt = first(input);
+                if (!rt.HasValue)
+                    return TokenResult.CastEmpty<TTokenKind, T, U>(rt);
+
+                return second(rt.Remainder);
+            };
+        }
+
+        public static CharParser<U> IgnoreThen<T, U>(this CharParser<T> first, CharParser<U> second)
+        {
+            if (first == null) throw new ArgumentNullException(nameof(first));
+            if (second == null) throw new ArgumentNullException(nameof(second));
+
+            return input =>
+            {
+                var rt = first(input);
+                if (!rt.HasValue)
+                    return CharResult.CastEmpty<T, U>(rt);
+
+                return second(rt.Remainder);
+            };
+        }
+
         public static TokenParser<TTokenKind, T[]> Many<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
@@ -142,7 +172,7 @@ namespace Superpower
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
-            return parser.Then(first => delimiter.Then(_ => parser).Many().Select(rest =>
+            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest =>
             {
                 var all = new T[rest.Length + 1];
                 all[0] = first;
@@ -156,7 +186,7 @@ namespace Superpower
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
-            return parser.Then(first => delimiter.Then(_ => parser).Many().Select(rest =>
+            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest =>
             {
                 var all = new T[rest.Length + 1];
                 all[0] = first;
@@ -258,7 +288,7 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Or(Parse.Return<T>(default(T)));
+            return parser.Or(Parse.Return(default(T)));
         }
 
         public static TokenParser<TTokenKind, T> Or<TTokenKind, T>(this TokenParser<TTokenKind, T> lhs, TokenParser<TTokenKind, T> rhs)
@@ -339,18 +369,18 @@ namespace Superpower
             return parser.Then(t => selector(t).Select(u => projector(t, u)));
         }
 
-        public static TokenParser<TTokenKind, U> Then<TTokenKind, T, U>(this TokenParser<TTokenKind, T> t, Func<T, TokenParser<TTokenKind, U>> u)
+        public static TokenParser<TTokenKind, U> Then<TTokenKind, T, U>(this TokenParser<TTokenKind, T> first, Func<T, TokenParser<TTokenKind, U>> second)
         {
-            if (t == null) throw new ArgumentNullException(nameof(t));
-            if (u == null) throw new ArgumentNullException(nameof(u));
+            if (first == null) throw new ArgumentNullException(nameof(first));
+            if (second == null) throw new ArgumentNullException(nameof(second));
 
             return input =>
             {
-                var rt = t(input);
+                var rt = first(input);
                 if (!rt.HasValue)
                     return TokenResult.CastEmpty<TTokenKind, T, U>(rt);
 
-                return u(rt.Value)(rt.Remainder);
+                return second(rt.Value)(rt.Remainder);
             };
         }
 
@@ -401,14 +431,14 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Then(_ => Parse.Return<TTokenKind, U>(value));
+            return parser.IgnoreThen(Parse.Return<TTokenKind, U>(value));
         }
 
         public static CharParser<U> Value<T, U>(this CharParser<T> parser, U value)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Then(_ => Parse.Return(value));
+            return parser.IgnoreThen(Parse.Return(value));
         }
 
         public static TokenParser<TTokenKind, T> Where<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, Func<T, bool> predicate)
