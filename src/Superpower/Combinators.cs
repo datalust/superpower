@@ -137,6 +137,34 @@ namespace Superpower
             };
         }
 
+        public static TokenParser<TTokenKind, T[]> ManyDelimitedBy<TTokenKind, T, U>(this TokenParser<TTokenKind, T> parser, TokenParser<TTokenKind, U> delimiter)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
+
+            return parser.Then(first => delimiter.Then(_ => parser).Many().Select(rest =>
+            {
+                var all = new T[rest.Length + 1];
+                all[0] = first;
+                Array.Copy(rest, 0, all, 1, rest.Length);
+                return all;
+            }));
+        }
+
+        public static CharParser<T[]> ManyDelimitedBy<T, U>(this CharParser<T> parser, CharParser<U> delimiter)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
+
+            return parser.Then(first => delimiter.Then(_ => parser).Many().Select(rest =>
+            {
+                var all = new T[rest.Length + 1];
+                all[0] = first;
+                Array.Copy(rest, 0, all, 1, rest.Length);
+                return all;
+            }));
+        }
+
         public static TokenParser<TTokenKind, T> Message<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, string errorMessage)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
@@ -201,6 +229,36 @@ namespace Superpower
 
                 return CharResult.Empty<T>(result.Remainder, new[] { name });
             };
+        }
+
+        public static TokenParser<TTokenKind, T?> Optional<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+            where T : struct
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return parser.Select(t => (T?)t).Or(Parse.Return<TTokenKind, T?>(null));
+        }
+
+        public static CharParser<T?> Optional<T>(this CharParser<T> parser)
+            where T : struct
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return parser.Select(t => (T?)t).Or(Parse.Return<T?>(null));
+        }
+
+        public static TokenParser<TTokenKind, T> OptionalOrDefault<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return parser.Or(Parse.Return<TTokenKind, T>(default(T)));
+        }
+
+        public static CharParser<T> OptionalOrDefault<T>(this CharParser<T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return parser.Or(Parse.Return<T>(default(T)));
         }
 
         public static TokenParser<TTokenKind, T> Or<TTokenKind, T>(this TokenParser<TTokenKind, T> lhs, TokenParser<TTokenKind, T> rhs)
@@ -351,6 +409,42 @@ namespace Superpower
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
             return parser.Then(_ => Parse.Return(value));
+        }
+
+        public static TokenParser<TTokenKind, T> Where<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, Func<T, bool> predicate)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+            return input =>
+            {
+                var rt = parser(input);
+                if (!rt.HasValue)
+                    return rt;
+
+                if (predicate(rt.Value))
+                    return rt;
+
+                return TokenResult.Empty<TTokenKind, T>(input, "unsatisfied condition");
+            };
+        }
+
+        public static CharParser<T> Where<T>(this CharParser<T> parser, Func<T, bool> predicate)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+            return input =>
+            {
+                var rt = parser(input);
+                if (!rt.HasValue)
+                    return rt;
+
+                if (predicate(rt.Value))
+                    return rt;
+
+                return CharResult.Empty<T>(input, "unsatisfied condition");
+            };
         }
     }
 }
