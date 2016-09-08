@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Superpower.Display;
 using Superpower.Model;
+using Superpower.Util;
 
 namespace Superpower
 {
@@ -75,13 +75,29 @@ namespace Superpower
         public static TokenParser<TTokenKind, T[]> AtLeastOnce<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
-            return parser.Then(first => parser.Many().Select(rest => new[] { first }.Concat(rest).ToArray()));
+            return parser.Then(first => parser.Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
         }
 
         public static CharParser<T[]> AtLeastOnce<T>(this CharParser<T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
-            return parser.Then(first => parser.Many().Select(rest => new[] { first }.Concat(rest).ToArray()));
+            return parser.Then(first => parser.Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
+        }
+
+        public static TokenParser<TTokenKind, T[]> AtLeastOnceDelimitedBy<TTokenKind, T, U>(this TokenParser<TTokenKind, T> parser, TokenParser<TTokenKind, U> delimiter)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
+
+            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
+        }
+
+        public static CharParser<T[]> AtLeastOnceDelimitedBy<T, U>(this CharParser<T> parser, CharParser<U> delimiter)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
+
+            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
         }
 
         public static TokenParser<TTokenKind, U> IgnoreThen<TTokenKind, T, U>(this TokenParser<TTokenKind, T> first, TokenParser<TTokenKind, U> second)
@@ -172,13 +188,8 @@ namespace Superpower
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
-            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest =>
-            {
-                var all = new T[rest.Length + 1];
-                all[0] = first;
-                Array.Copy(rest, 0, all, 1, rest.Length);
-                return all;
-            }));
+            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
+                .OptionalOrDefault(new T[0]);
         }
 
         public static CharParser<T[]> ManyDelimitedBy<T, U>(this CharParser<T> parser, CharParser<U> delimiter)
@@ -186,13 +197,8 @@ namespace Superpower
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
-            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest =>
-            {
-                var all = new T[rest.Length + 1];
-                all[0] = first;
-                Array.Copy(rest, 0, all, 1, rest.Length);
-                return all;
-            }));
+            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
+                .OptionalOrDefault(new T[0]);
         }
 
         public static TokenParser<TTokenKind, T> Message<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, string errorMessage)
@@ -384,7 +390,7 @@ namespace Superpower
                 if (!ru.HasValue)
                     return ru;
 
-                return TokenResult.Value<TTokenKind, U>(ru.Value, input, ru.Remainder);
+                return TokenResult.Value(ru.Value, input, ru.Remainder);
             };
         }
 
