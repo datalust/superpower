@@ -1,12 +1,38 @@
-﻿using Superpower.Model;
+﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at  
+//
+//     http://www.apache.org/licenses/LICENSE-2.0  
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Superpower.Model;
 using Superpower.Util;
 using System;
 using Superpower.Display;
 
 namespace Superpower
 {
+    /// <summary>
+    /// General parsing helper methods.
+    /// </summary>
     public static class Parse
     {
+        /// <summary>
+        /// Parse a sequence of operands connected by left-associative operators.
+        /// </summary>
+        /// <typeparam name="T">The type being parsed.</typeparam>
+        /// <typeparam name="TOperator">The type of the operator.</typeparam>
+        /// <param name="operator">A parser matching operators.</param>
+        /// <param name="operand">A parser matching operands.</param>
+        /// <param name="apply">A function combining an operator and two operands into the result.</param>
+        /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
         public static CharParser<T> Chain<T, TOperator>(
             CharParser<TOperator> @operator,
             CharParser<T> operand,
@@ -33,6 +59,15 @@ namespace Superpower
                     .Or(Return(firstOperand));
         }
 
+        /// <summary>
+        /// Parse a sequence of operands connected by right-associative operators.
+        /// </summary>
+        /// <typeparam name="T">The type being parsed.</typeparam>
+        /// <typeparam name="TOperator">The type of the operator.</typeparam>
+        /// <param name="operator">A parser matching operators.</param>
+        /// <param name="operand">A parser matching operands.</param>
+        /// <param name="apply">A function combining an operator and two operands into the result.</param>
+        /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
         public static CharParser<T> ChainRight<T, TOperator>(
             CharParser<TOperator> @operator,
             CharParser<T> operand,
@@ -59,6 +94,16 @@ namespace Superpower
                     .Or(Return(lastOperand));
         }
 
+        /// <summary>
+        /// Parse a sequence of operands connected by left-associative operators.
+        /// </summary>
+        /// <typeparam name="T">The type being parsed.</typeparam>
+        /// <typeparam name="TOperator">The type of the operator.</typeparam>
+        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <param name="operator">A parser matching operators.</param>
+        /// <param name="operand">A parser matching operands.</param>
+        /// <param name="apply">A function combining an operator and two operands into the result.</param>
+        /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
         public static TokenParser<TTokenKind, T> Chain<TTokenKind, T, TOperator>(
             TokenParser<TTokenKind, TOperator> @operator,
             TokenParser<TTokenKind, T> operand,
@@ -85,6 +130,16 @@ namespace Superpower
                     .Or(Return<TTokenKind, T>(firstOperand));
         }
 
+        /// <summary>
+        /// Parse a sequence of operands connected by right-associative operators.
+        /// </summary>
+        /// <typeparam name="T">The type being parsed.</typeparam>
+        /// <typeparam name="TOperator">The type of the operator.</typeparam>
+        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <param name="operator">A parser matching operators.</param>
+        /// <param name="operand">A parser matching operands.</param>
+        /// <param name="apply">A function combining an operator and two operands into the result.</param>
+        /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
         public static TokenParser<TTokenKind, T> ChainRight<TTokenKind, T, TOperator>(
             TokenParser<TTokenKind, TOperator> @operator,
             TokenParser<TTokenKind, T> operand,
@@ -171,6 +226,13 @@ namespace Superpower
             };
         }
 
+        /// <summary>
+        /// Lazily construct a parser, so that circular dependencies are possible.
+        /// </summary>
+        /// <param name="reference">A function creating the parser, when required.</param>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <returns>A parser that lazily evaluates <paramref name="reference"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="reference"/> is null.</exception>
         public static CharParser<T> Ref<T>(Func<CharParser<T>> reference)
         {
             if (reference == null) throw new ArgumentNullException(nameof(reference));
@@ -186,6 +248,14 @@ namespace Superpower
             };
         }
 
+        /// <summary>
+        /// Lazily construct a parser, so that circular dependencies are possible.
+        /// </summary>
+        /// <param name="reference">A function creating the parser, when required.</param>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <returns>A parser that lazily evaluates <paramref name="reference"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="reference"/> is null.</exception>
         public static TokenParser<TTokenKind, T> Ref<TTokenKind, T>(Func<TokenParser<TTokenKind, T>> reference)
         {
             if (reference == null) throw new ArgumentNullException(nameof(reference));
@@ -201,14 +271,27 @@ namespace Superpower
             };
         }
 
-        public static CharParser<T> Return<T>(T t)
+        /// <summary>
+        /// Construct a parser with a fixed value.
+        /// </summary>
+        /// <param name="value">The value returned by the parser.</param>
+        /// <typeparam name="T">The type of <paramref name="value"/>.</typeparam>
+        /// <returns>The parser.</returns>
+        public static CharParser<T> Return<T>(T value)
         {
-            return input => CharResult.Value(t, input, input);
+            return input => CharResult.Value(value, input, input);
         }
 
-        public static TokenParser<TTokenKind, T> Return<TTokenKind, T>(T t)
+        /// <summary>
+        /// Construct a parser with a fixed value.
+        /// </summary>
+        /// <param name="value">The value returned by the parser.</param>
+        /// <typeparam name="T">The type of <paramref name="value"/>.</typeparam>
+        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <returns>The parser.</returns>
+        public static TokenParser<TTokenKind, T> Return<TTokenKind, T>(T value)
         {
-            return input => TokenResult.Value(t, input, input);
+            return input => TokenResult.Value(value, input, input);
         }
     }
 }

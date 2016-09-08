@@ -17,6 +17,9 @@ using Superpower.Model;
 
 namespace Superpower
 {
+    /// <summary>
+    /// Helper methods for working with parsers.
+    /// </summary>
     public static class ParserExtensions
     {
         /// <summary>

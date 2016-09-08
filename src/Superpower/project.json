@@ -13,7 +13,8 @@
 
   "buildOptions": {
     "keyFile": "../../asset/Superpower.snk",
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+    "xmlDoc": true
   },
 
   "configurations": {

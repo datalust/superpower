@@ -1,12 +1,34 @@
-﻿using Superpower.Model;
+﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at  
+//
+//     http://www.apache.org/licenses/LICENSE-2.0  
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Superpower.Model;
 using Superpower.Util;
 using System;
 using Superpower.Display;
 
 namespace Superpower.Parsers
 {
+    /// <summary>
+    /// Parsers for spans of characters.
+    /// </summary>
     public class Span
     {
+        /// <summary>
+        /// Parse a span of length <paramref name="length"/>/>.
+        /// </summary>
+        /// <param name="length">The number of characters to parse.</param>
+        /// <returns>The parsed span.</returns>
         public static CharParser<StringSpan> Length(int length)
         {
             if (length < 0) throw new ArgumentOutOfRangeException(nameof(length));
@@ -32,6 +54,11 @@ namespace Superpower.Parsers
             };
         }
 
+        /// <summary>
+        /// Match a span equal to <paramref name="text"/>.
+        /// </summary>
+        /// <param name="text">The text to match.</param>
+        /// <returns>The matched text.</returns>
         public static CharParser<StringSpan> EqualTo(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
@@ -56,6 +83,11 @@ namespace Superpower.Parsers
             };
         }
 
+        /// <summary>
+        /// Match a span equal to <paramref name="text"/>, ignoring invariant case.
+        /// </summary>
+        /// <param name="text">The text to match.</param>
+        /// <returns>The matched text.</returns>
         public static CharParser<StringSpan> EqualToIgnoreCase(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
@@ -81,6 +113,11 @@ namespace Superpower.Parsers
             };
         }
 
+        /// <summary>
+        /// Match a span equal to a singe character <paramref name="ch"/>.
+        /// </summary>
+        /// <param name="ch">The character to match.</param>
+        /// <returns>The matched text.</returns>
         public static CharParser<StringSpan> EqualTo(char ch)
         {
             var expectations = new[] { Presentation.FormatLiteral(ch) };
@@ -95,6 +132,11 @@ namespace Superpower.Parsers
             };
         }
 
+        /// <summary>
+        /// Match a span equal to a singe character <paramref name="ch"/>, ignoring invariant character case.
+        /// </summary>
+        /// <param name="ch">The character to match.</param>
+        /// <returns>The matched text.</returns>
         public static CharParser<StringSpan> EqualToIgnoreCase(char ch)
         {
             var chToUpper = char.ToUpperInvariant(ch);
@@ -110,6 +152,11 @@ namespace Superpower.Parsers
             };
         }
 
+        /// <summary>
+        /// Parse until finding a character for which <paramref name="predicate"/> returns true.
+        /// </summary>
+        /// <param name="predicate">A predicate.</param>
+        /// <returns>The matched text.</returns>
         public static CharParser<StringSpan> Until(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -117,6 +164,12 @@ namespace Superpower.Parsers
             return While(ch => !predicate(ch));
         }
 
+
+        /// <summary>
+        /// Parse until finding a character for which <paramref name="predicate"/> returns false.
+        /// </summary>
+        /// <param name="predicate">A predicate.</param>
+        /// <returns>The matched text.</returns>
         public static CharParser<StringSpan> While(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -133,6 +186,9 @@ namespace Superpower.Parsers
             };
         }
 
+        /// <summary>
+        /// Parse until a non-whitespace character is encountered, returning the matched span of whitespace.
+        /// </summary>
         public static CharParser<StringSpan> WhiteSpace { get; } = input =>
         {
             var next = input.ConsumeChar();

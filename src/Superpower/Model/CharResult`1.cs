@@ -1,24 +1,65 @@
-﻿using Superpower.Util;
+﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at  
+//
+//     http://www.apache.org/licenses/LICENSE-2.0  
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Superpower.Util;
 using System;
 
 namespace Superpower.Model
 {
-    // Should probably be CharParserResult<T>
+    /// <summary>
+    /// The result of parsing a character stream.
+    /// </summary>
+    /// <typeparam name="T">The type of the value being parsed.</typeparam>
     public struct CharResult<T>
     {
         readonly T _value;
 
+        /// <summary>
+        /// The location in the stream where the parsing began.
+        /// </summary>
         public StringSpan Location { get; }
+
+        /// <summary>
+        /// The first un-parsed location in the stream.
+        /// </summary>
         public StringSpan Remainder { get; }
+
+        /// <summary>
+        /// True if the result carries a successfully-parsed value; otherwise, false.
+        /// </summary>
         public bool HasValue { get; }
 
-        // Just here to show symmetry with TokenResult`2.
+        /// <summary>
+        /// The position of the first un-parsed location.
+        /// </summary>
         public Position ErrorPosition => Remainder.Position;
+
+        /// <summary>
+        /// A provided error message, or null.
+        /// </summary>
         public string ErrorMessage { get; }
+
+        /// <summary>
+        /// A list of expectations that were unmet, or null.
+        /// </summary>
         public string[] Expectations { get; }
 
-        public bool IsPartial(StringSpan @from) => @from != Remainder;
+        internal bool IsPartial(StringSpan @from) => @from != Remainder;
 
+        /// <summary>
+        /// The parsed value.
+        /// </summary>
         public T Value
         {
             get
@@ -48,6 +89,7 @@ namespace Superpower.Model
             ErrorMessage = errorMessage;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             if (Remainder == StringSpan.None)
@@ -66,6 +108,10 @@ namespace Superpower.Model
             return $"Parsing failure{location}: {message}.";
         }
 
+        /// <summary>
+        /// If the result is empty, format the fragment of text describing the error.
+        /// </summary>
+        /// <returns>The error fragment.</returns>
         public string FormatErrorMessageFragment()
         {
             if (ErrorMessage != null)
