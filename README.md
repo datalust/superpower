@@ -199,9 +199,9 @@ public enum ArithmeticExpressionToken
 
 ### Performance
 
-Superpower is built with performance as a priority. Less frequent backtracking, combined with avoidance of allocations and indirect dispatch, means Superpower can be quite a bit faster than Sprache, at the expense of a little usability.
+Superpower is built with performance as a priority. Less frequent backtracking, combined with the avoidance of allocations and indirect dispatch, mean that Superpower can be quite a bit faster than Sprache.
 
-Recen benchmark for parsing a long arithmetic expression:
+Recent benchmark for parsing a long arithmetic expression:
 
 ```ini
 Host Process Environment Information:
