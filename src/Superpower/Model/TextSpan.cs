@@ -17,9 +17,9 @@ using System;
 namespace Superpower.Model
 {
     /// <summary>
-    /// A span of text.
+    /// A span of text within a larger string.
     /// </summary>
-    public struct StringSpan : IEquatable<StringSpan>
+    public struct TextSpan : IEquatable<TextSpan>
     {
         /// <summary>
         /// The source string containing the span.
@@ -37,10 +37,10 @@ namespace Superpower.Model
         public int Length { get; }
 
         /// <summary>
-        /// Construct a string span encompassing an entire string.
+        /// Construct a span encompassing an entire string.
         /// </summary>
         /// <param name="source">The source string.</param>
-        public StringSpan(string source)
+        public TextSpan(string source)
             : this(source, Position.Zero, source.Length)
         {
         }
@@ -51,7 +51,7 @@ namespace Superpower.Model
         /// <param name="source">The source string.</param>
         /// <param name="position">The start of the span.</param>
         /// <param name="length">The length of the span.</param>
-        public StringSpan(string source, Position position, int length)
+        public TextSpan(string source, Position position, int length)
         {
 #if CHECKED
             if (source == null) throw new ArgumentNullException(nameof(source));
@@ -69,12 +69,12 @@ namespace Superpower.Model
         /// <summary>
         /// A span with no value.
         /// </summary>
-        public static StringSpan None { get; } = default(StringSpan);
+        public static TextSpan None { get; } = default(TextSpan);
 
         /// <summary>
         /// A span corresponding to the empty string.
         /// </summary>
-        public static StringSpan Empty { get; } = new StringSpan(string.Empty, Position.Zero, 0);
+        public static TextSpan Empty { get; } = new TextSpan(string.Empty, Position.Zero, 0);
 
         /// <summary>
         /// True if the span has no content.
@@ -98,24 +98,24 @@ namespace Superpower.Model
         /// Consume a character from the start of the span.
         /// </summary>
         /// <returns>A result with the character and remainder.</returns>
-        public CharResult<char> ConsumeChar()
+        public Result<char> ConsumeChar()
         {
             EnsureHasValue();
 
             if (IsAtEnd)
-                return CharResult.Empty<char>(this);
+                return Result.Empty<char>(this);
 
             var ch = Source[Position.Absolute];
-            return CharResult.Value(ch, this, new StringSpan(Source, Position.Advance(ch), Length - 1));
+            return Result.Value(ch, this, new TextSpan(Source, Position.Advance(ch), Length - 1));
         }
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (!(obj is StringSpan))
+            if (!(obj is TextSpan))
                 return false;
 
-            return Equals((StringSpan)obj);
+            return Equals((TextSpan)obj);
         }
 
         /// <inheritdoc/>
@@ -132,7 +132,7 @@ namespace Superpower.Model
         /// </summary>
         /// <param name="other">The other span.</param>
         /// <returns>True if the spans are the same.</returns>
-        public bool Equals(StringSpan other)
+        public bool Equals(TextSpan other)
         {
             return string.Equals(Source, other.Source) && Position.Absolute == other.Position.Absolute;
         }
@@ -143,7 +143,7 @@ namespace Superpower.Model
         /// <param name="lhs">One span.</param>
         /// <param name="rhs">Another span.</param>
         /// <returns>True if the spans are the same.</returns>
-        public static bool operator ==(StringSpan lhs, StringSpan rhs)
+        public static bool operator ==(TextSpan lhs, TextSpan rhs)
         {
             return lhs.Equals(rhs);
         }
@@ -154,7 +154,7 @@ namespace Superpower.Model
         /// <param name="lhs">One span.</param>
         /// <param name="rhs">Another span.</param>
         /// <returns>True if the spans are the different.</returns>
-        public static bool operator !=(StringSpan lhs, StringSpan rhs)
+        public static bool operator !=(TextSpan lhs, TextSpan rhs)
         {
             return !(lhs == rhs);
         }
@@ -164,7 +164,7 @@ namespace Superpower.Model
         /// </summary>
         /// <param name="next">The next span.</param>
         /// <returns>A sub-span.</returns>
-        public StringSpan Until(StringSpan next)
+        public TextSpan Until(TextSpan next)
         {
 #if CHECKED
             next.EnsureHasValue();
@@ -179,14 +179,14 @@ namespace Superpower.Model
         /// </summary>
         /// <param name="length">The number of characters to return.</param>
         /// <returns>The sub-span.</returns>
-        public StringSpan First(int length)
+        public TextSpan First(int length)
         {
 #if CHECKED
             if (length > Length)
                 throw new ArgumentOutOfRangeException(nameof(length), "Length exceeds the source span's length.");
 #endif
 
-            return new StringSpan(Source, Position, length);
+            return new TextSpan(Source, Position, length);
         }
 
         /// <inheritdoc/>

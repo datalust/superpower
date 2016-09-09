@@ -52,7 +52,7 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void TokenAtEndSucceedsIfThereIsNoInput()
         {
-            AssertParser.SucceedsWith(Parse.Return<char, Token<char>>(new Token<char>('a', StringSpan.Empty)).AtEnd(), "", 'a');
+            AssertParser.SucceedsWith(Parse.Return<char, Token<char>>(new Token<char>('a', TextSpan.Empty)).AtEnd(), "", 'a');
         }
     }
 }

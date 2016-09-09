@@ -22,8 +22,8 @@ namespace Superpower
     /// <summary>
     /// Base class for tokenizers, types whose instances convert strings into lists of tokens.
     /// </summary>
-    /// <typeparam name="TTokenKind">The kind of tokens produced.</typeparam>
-    public abstract class Tokenizer<TTokenKind>
+    /// <typeparam name="TKind">The kind of tokens produced.</typeparam>
+    public abstract class Tokenizer<TKind>
     {
         /// <summary>
         /// Tokenize <paramref name="source"/>.
@@ -31,7 +31,7 @@ namespace Superpower
         /// <param name="source">The source to tokenize.</param>
         /// <returns>The list of tokens or an error.</returns>
         /// <exception cref="ParseException">Tokenization failed.</exception>
-        public TokenList<TTokenKind> Tokenize(string source)
+        public TokenList<TKind> Tokenize(string source)
         {
             var result = TryTokenize(source);
             if (result.HasValue)
@@ -47,49 +47,49 @@ namespace Superpower
         /// <returns>A result with the list of tokens or an error.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is null.</exception>
         /// <exception cref="ParseException">The tokenizer could not correctly perform tokenization.</exception>
-        public CharResult<TokenList<TTokenKind>> TryTokenize(string source)
+        public Result<TokenList<TKind>> TryTokenize(string source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
-            var sourceSpan = new StringSpan(source);
+            var sourceSpan = new TextSpan(source);
             var remainder = sourceSpan;
-            var results = new List<Token<TTokenKind>>();
+            var results = new List<Token<TKind>>();
             foreach (var result in Tokenize(sourceSpan))
             {
                 if (!result.HasValue)
-                    return CharResult.CastEmpty<TTokenKind, TokenList<TTokenKind>>(result);
+                    return Result.CastEmpty<TKind, TokenList<TKind>>(result);
 
                 if (result.Remainder == remainder) // Broken parser, not a failed parsing.
                     throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatExpectation(result.Value)} at position {result.Location.Position}.");
 
                 remainder = result.Remainder;
-                var token = new Token<TTokenKind>(result.Value, result.Location.Until(result.Remainder));
+                var token = new Token<TKind>(result.Value, result.Location.Until(result.Remainder));
                 Previous = token;
                 results.Add(token);
             }
 
-            var value = new TokenList<TTokenKind>(results.ToArray());
-            return CharResult.Value(value, sourceSpan, remainder);
+            var value = new TokenList<TKind>(results.ToArray());
+            return Result.Value(value, sourceSpan, remainder);
         }
 
         /// <summary>
         /// The previous token parsed.
         /// </summary>
-        protected Token<TTokenKind> Previous { get; private set; }
+        protected Token<TKind> Previous { get; private set; }
 
         /// <summary>
         /// Subclasses should override to perform tokenization.
         /// </summary>
-        /// <param name="stringSpan">The input span to tokenize.</param>
+        /// <param name="span">The input span to tokenize.</param>
         /// <returns>A list of parsed tokens.</returns>
-        protected abstract IEnumerable<CharResult<TTokenKind>> Tokenize(StringSpan stringSpan);
+        protected abstract IEnumerable<Result<TKind>> Tokenize(TextSpan span);
 
         /// <summary>
         /// Advance until the first non-whitespace character is encountered.
         /// </summary>
         /// <param name="span">The span to advance from.</param>
         /// <returns>A result with the first non-whitespace character.</returns>
-        protected static CharResult<char> SkipWhiteSpace(StringSpan span)
+        protected static Result<char> SkipWhiteSpace(TextSpan span)
         {
             var next = span.ConsumeChar();
             while (next.HasValue && char.IsWhiteSpace(next.Value))

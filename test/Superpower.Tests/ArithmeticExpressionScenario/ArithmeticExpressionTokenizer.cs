@@ -16,7 +16,7 @@ namespace Superpower.Tests.ArithmeticExpressionScenario
             [')'] = ArithmeticExpressionToken.RParen,
         };
 
-        protected override IEnumerable<CharResult<ArithmeticExpressionToken>> Tokenize(StringSpan span)
+        protected override IEnumerable<Result<ArithmeticExpressionToken>> Tokenize(TextSpan span)
         {
             var next = SkipWhiteSpace(span);
             if (!next.HasValue)
@@ -30,16 +30,16 @@ namespace Superpower.Tests.ArithmeticExpressionScenario
                 {
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.ConsumeChar();
-                    yield return CharResult.Value(ArithmeticExpressionToken.Number, integer.Location, integer.Remainder);
+                    yield return Result.Value(ArithmeticExpressionToken.Number, integer.Location, integer.Remainder);
                 }
                 else if (_operators.TryGetValue(next.Value, out charToken))
                 {
-                    yield return CharResult.Value(charToken, next.Location, next.Remainder);
+                    yield return Result.Value(charToken, next.Location, next.Remainder);
                     next = next.Remainder.ConsumeChar();
                 }
                 else
                 {
-                    yield return CharResult.Empty<ArithmeticExpressionToken>(next.Location, new[] { "number", "operator" });
+                    yield return Result.Empty<ArithmeticExpressionToken>(next.Location, new[] { "number", "operator" });
                 }
 
                 next = SkipWhiteSpace(next.Location);

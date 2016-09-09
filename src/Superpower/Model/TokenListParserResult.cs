@@ -15,99 +15,99 @@
 namespace Superpower.Model
 {
     /// <summary>
-    /// Helper methods for working with <see cref="TokenResult{TTokenKind,T}"/>.
+    /// Helper methods for working with <see cref="TokenListParserResult{TKind,T}"/>.
     /// </summary>
-    public static class TokenResult
+    public static class TokenListParserResult
     {
         /// <summary>
         /// Create a token result with no value, indicating a failure to parse any value.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of token.</typeparam>
+        /// <typeparam name="TKind">The kind of token.</typeparam>
         /// <typeparam name="T">The result type.</typeparam>
         /// <param name="remainder">The start of un-parsed input.</param>
         /// <returns>An empty result.</returns>
-        public static TokenResult<TTokenKind, T> Empty<TTokenKind, T>(TokenList<TTokenKind> remainder)
+        public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder)
         {
-            return new TokenResult<TTokenKind, T>(remainder, Position.Empty, null, null);
+            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, null, null);
         }
 
         /// <summary>
         /// Create a token result with no value, indicating a failure to parse any value.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of token.</typeparam>
+        /// <typeparam name="TKind">The kind of token.</typeparam>
         /// <typeparam name="T">The result type.</typeparam>
         /// <param name="remainder">The start of un-parsed input.</param>
         /// <param name="expectations">Expectations that could not be fulfilled.</param>
         /// <returns>An empty result.</returns>
-        public static TokenResult<TTokenKind, T> Empty<TTokenKind, T>(TokenList<TTokenKind> remainder, string[] expectations)
+        public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder, string[] expectations)
         {
-            return new TokenResult<TTokenKind, T>(remainder, Position.Empty, null, expectations);
+            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, null, expectations);
         }
 
         /// <summary>
         /// Create a token result with no value, indicating a failure to parse any value.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of token.</typeparam>
+        /// <typeparam name="TKind">The kind of token.</typeparam>
         /// <typeparam name="T">The result type.</typeparam>
         /// <param name="remainder">The start of un-parsed input.</param>
         /// <param name="errorMessage">An error message describing why the tokens could not be parsed.</param>
         /// <returns>An empty result.</returns>
-        public static TokenResult<TTokenKind, T> Empty<TTokenKind, T>(TokenList<TTokenKind> remainder, string errorMessage)
+        public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder, string errorMessage)
         {
-            return new TokenResult<TTokenKind, T>(remainder, Position.Empty, errorMessage, null);
+            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, errorMessage, null);
         }
 
         /// <summary>
         /// Create a token result with no value, indicating a failure to parse any value.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of token.</typeparam>
+        /// <typeparam name="TKind">The kind of token.</typeparam>
         /// <typeparam name="T">The result type.</typeparam>
         /// <param name="remainder">The start of un-parsed input.</param>
         /// <param name="errorPosition">A source position within an individual token where parsing failed. In this case the position will be within
         /// the first token in <paramref name="remainder"/>.</param>
         /// <param name="errorMessage">A message describing the problem.</param>
         /// <returns>An empty result.</returns>
-        public static TokenResult<TTokenKind, T> Empty<TTokenKind, T>(TokenList<TTokenKind> remainder, Position errorPosition, string errorMessage)
+        public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder, Position errorPosition, string errorMessage)
         {
-            return new TokenResult<TTokenKind, T>(remainder, errorPosition, errorMessage, null);
+            return new TokenListParserResult<TKind, T>(remainder, errorPosition, errorMessage, null);
         }
 
         /// <summary>
         /// Create a token result with the provided value.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of token.</typeparam>
+        /// <typeparam name="TKind">The kind of token.</typeparam>
         /// <typeparam name="T">The result type.</typeparam>
         /// <param name="value">The value.</param>
         /// <param name="location">The location where parsing began.</param>
         /// <param name="remainder">The first un-parsed location.</param>
         /// <returns></returns>
-        public static TokenResult<TTokenKind, T> Value<TTokenKind, T>(T value, TokenList<TTokenKind> location, TokenList<TTokenKind> remainder)
+        public static TokenListParserResult<TKind, T> Value<TKind, T>(T value, TokenList<TKind> location, TokenList<TKind> remainder)
         {
-            return new TokenResult<TTokenKind, T>(value, location, remainder);
+            return new TokenListParserResult<TKind, T>(value, location, remainder);
         }
 
         /// <summary>
         /// Convert an empty result of one type into another.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of token.</typeparam>
+        /// <typeparam name="TKind">The kind of token.</typeparam>
         /// <typeparam name="T">The source type.</typeparam>
         /// <typeparam name="U">The destination type.</typeparam>
-        /// <param name="tokenResult">The result to convert.</param>
+        /// <param name="tokenListParserResult">The result to convert.</param>
         /// <returns>The converted result.</returns>
-        public static TokenResult<TTokenKind,U> CastEmpty<TTokenKind, T, U>(TokenResult<TTokenKind, T> tokenResult)
+        public static TokenListParserResult<TKind,U> CastEmpty<TKind, T, U>(TokenListParserResult<TKind, T> tokenListParserResult)
         {
-            return new TokenResult<TTokenKind, U>(tokenResult.Remainder, tokenResult.ErrorPosition, tokenResult.ErrorMessage, tokenResult.Expectations);
+            return new TokenListParserResult<TKind, U>(tokenListParserResult.Remainder, tokenListParserResult.ErrorPosition, tokenListParserResult.ErrorMessage, tokenListParserResult.Expectations);
         }
 
         /// <summary>
         /// Combine two empty results.
         /// </summary>
         /// <typeparam name="T">The source type.</typeparam>
-        /// <typeparam name="TTokenKind">The kind of token.</typeparam>
+        /// <typeparam name="TKind">The kind of token.</typeparam>
         /// <param name="first">The first value to combine.</param>
         /// <param name="second">The second value to combine.</param>
         /// <returns>A result of type <typeparamref name="T"/> carrying information from both results.</returns>
-        public static TokenResult<TTokenKind, T> CombineEmpty<TTokenKind, T>(TokenResult<TTokenKind, T> first, TokenResult<TTokenKind, T> second)
+        public static TokenListParserResult<TKind, T> CombineEmpty<TKind, T>(TokenListParserResult<TKind, T> first, TokenListParserResult<TKind, T> second)
         {
             if (first.Remainder != second.Remainder)
                 return second;
@@ -125,7 +125,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new TokenResult<TTokenKind, T>(second.Remainder, second.ErrorPosition, first.ErrorMessage, expectations);
+            return new TokenListParserResult<TKind, T>(second.Remainder, second.ErrorPosition, first.ErrorMessage, expectations);
         }
     }
 }

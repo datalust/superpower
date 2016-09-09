@@ -14,8 +14,8 @@ Type=NumberListBenchmark  Mode=Throughput
 ```
                    Method |        Median |      StdDev | Scaled | Scaled-SD |
 ------------------------- |-------------- |------------ |------- |---------- |
- StringSplitAndInt32Parse |   141.8226 us |   0.7297 us |   1.00 |      0.00 |
-            SpracheSimple | 2,967.8178 us | 111.6906 us |  21.28 |      0.78 |
-         SuperpowerSimple |   924.2786 us |   5.0936 us |   6.52 |      0.05 |
-           SuperpowerChar |   711.4206 us |  11.5167 us |   5.04 |      0.08 |
-          SuperpowerToken | 1,179.7802 us |  10.1893 us |   8.32 |      0.08 |
+ StringSplitAndInt32Parse |   141.0917 us |   0.7050 us |   1.00 |      0.00 |
+            SpracheSimple | 3,001.3214 us | 123.1638 us |  21.49 |      0.87 |
+         SuperpowerSimple |   905.1306 us |   6.2815 us |   6.43 |      0.05 |
+           SuperpowerChar |   708.5013 us |   7.7933 us |   5.05 |      0.06 |
+          SuperpowerToken | 1,182.0515 us |   9.0299 us |   8.38 |      0.07 |

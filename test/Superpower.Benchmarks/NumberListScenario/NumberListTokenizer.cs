@@ -7,7 +7,7 @@ namespace Superpower.Benchmarks.NumberListScenario
 {
     class NumberListTokenizer : Tokenizer<NumberListToken>
     {
-        protected override IEnumerable<CharResult<NumberListToken>> Tokenize(StringSpan span)
+        protected override IEnumerable<Result<NumberListToken>> Tokenize(TextSpan span)
         {
             var next = SkipWhiteSpace(span);
             if (!next.HasValue)
@@ -19,11 +19,11 @@ namespace Superpower.Benchmarks.NumberListScenario
                 {
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.ConsumeChar();
-                    yield return CharResult.Value(NumberListToken.Number, integer.Location, integer.Remainder);
+                    yield return Result.Value(NumberListToken.Number, integer.Location, integer.Remainder);
                 }
                 else
                 {
-                    yield return CharResult.Empty<NumberListToken>(next.Location, new[] { "digit" });
+                    yield return Result.Empty<NumberListToken>(next.Location, new[] { "digit" });
                 }
 
                 next = SkipWhiteSpace(next.Location);

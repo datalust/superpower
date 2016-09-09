@@ -33,9 +33,9 @@ namespace Superpower
         /// <param name="operand">A parser matching operands.</param>
         /// <param name="apply">A function combining an operator and two operands into the result.</param>
         /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
-        public static CharParser<T> Chain<T, TOperator>(
-            CharParser<TOperator> @operator,
-            CharParser<T> operand,
+        public static TextParser<T> Chain<T, TOperator>(
+            TextParser<TOperator> @operator,
+            TextParser<T> operand,
             Func<TOperator, T, T, T> apply)
         {
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
@@ -44,10 +44,10 @@ namespace Superpower
             return operand.Then(first => ChainOperatorRest(first, @operator, operand, apply));
         }
 
-        static CharParser<T> ChainOperatorRest<T, TOperator>(
+        static TextParser<T> ChainOperatorRest<T, TOperator>(
             T firstOperand,
-            CharParser<TOperator> @operator,
-            CharParser<T> operand,
+            TextParser<TOperator> @operator,
+            TextParser<T> operand,
             Func<TOperator, T, T, T> apply)
         {
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
@@ -68,9 +68,9 @@ namespace Superpower
         /// <param name="operand">A parser matching operands.</param>
         /// <param name="apply">A function combining an operator and two operands into the result.</param>
         /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
-        public static CharParser<T> ChainRight<T, TOperator>(
-            CharParser<TOperator> @operator,
-            CharParser<T> operand,
+        public static TextParser<T> ChainRight<T, TOperator>(
+            TextParser<TOperator> @operator,
+            TextParser<T> operand,
             Func<TOperator, T, T, T> apply)
         {
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
@@ -79,10 +79,10 @@ namespace Superpower
             return operand.Then(first => ChainRightOperatorRest(first, @operator, operand, apply));
         }
 
-        static CharParser<T> ChainRightOperatorRest<T, TOperator>(
+        static TextParser<T> ChainRightOperatorRest<T, TOperator>(
             T lastOperand,
-            CharParser<TOperator> @operator,
-            CharParser<T> operand,
+            TextParser<TOperator> @operator,
+            TextParser<T> operand,
             Func<TOperator, T, T, T> apply)
         {
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
@@ -99,14 +99,14 @@ namespace Superpower
         /// </summary>
         /// <typeparam name="T">The type being parsed.</typeparam>
         /// <typeparam name="TOperator">The type of the operator.</typeparam>
-        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of token being parsed.</typeparam>
         /// <param name="operator">A parser matching operators.</param>
         /// <param name="operand">A parser matching operands.</param>
         /// <param name="apply">A function combining an operator and two operands into the result.</param>
         /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
-        public static TokenParser<TTokenKind, T> Chain<TTokenKind, T, TOperator>(
-            TokenParser<TTokenKind, TOperator> @operator,
-            TokenParser<TTokenKind, T> operand,
+        public static TokenListParser<TKind, T> Chain<TKind, T, TOperator>(
+            TokenListParser<TKind, TOperator> @operator,
+            TokenListParser<TKind, T> operand,
             Func<TOperator, T, T, T> apply)
         {
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
@@ -115,10 +115,10 @@ namespace Superpower
             return operand.Then(first => ChainOperatorRest(first, @operator, operand, apply));
         }
 
-        static TokenParser<TTokenKind, T> ChainOperatorRest<TTokenKind, T, TOperator>(
+        static TokenListParser<TKind, T> ChainOperatorRest<TKind, T, TOperator>(
             T firstOperand,
-            TokenParser<TTokenKind, TOperator> @operator,
-            TokenParser<TTokenKind, T> operand,
+            TokenListParser<TKind, TOperator> @operator,
+            TokenListParser<TKind, T> operand,
             Func<TOperator, T, T, T> apply)
         {
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
@@ -127,7 +127,7 @@ namespace Superpower
             return @operator.Then(opvalue =>
                 operand.Then(operandValue =>
                     ChainOperatorRest(apply(opvalue, firstOperand, operandValue), @operator, operand, apply)))
-                    .Or(Return<TTokenKind, T>(firstOperand));
+                    .Or(Return<TKind, T>(firstOperand));
         }
 
         /// <summary>
@@ -135,14 +135,14 @@ namespace Superpower
         /// </summary>
         /// <typeparam name="T">The type being parsed.</typeparam>
         /// <typeparam name="TOperator">The type of the operator.</typeparam>
-        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of token being parsed.</typeparam>
         /// <param name="operator">A parser matching operators.</param>
         /// <param name="operand">A parser matching operands.</param>
         /// <param name="apply">A function combining an operator and two operands into the result.</param>
         /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
-        public static TokenParser<TTokenKind, T> ChainRight<TTokenKind, T, TOperator>(
-            TokenParser<TTokenKind, TOperator> @operator,
-            TokenParser<TTokenKind, T> operand,
+        public static TokenListParser<TKind, T> ChainRight<TKind, T, TOperator>(
+            TokenListParser<TKind, TOperator> @operator,
+            TokenListParser<TKind, T> operand,
             Func<TOperator, T, T, T> apply)
         {
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
@@ -151,10 +151,10 @@ namespace Superpower
             return operand.Then(first => ChainRightOperatorRest(first, @operator, operand, apply));
         }
 
-        static TokenParser<TTokenKind, T> ChainRightOperatorRest<TTokenKind, T, TOperator>(
+        static TokenListParser<TKind, T> ChainRightOperatorRest<TKind, T, TOperator>(
             T lastOperand,
-            TokenParser<TTokenKind, TOperator> @operator,
-            TokenParser<TTokenKind, T> operand,
+            TokenListParser<TKind, TOperator> @operator,
+            TokenListParser<TKind, T> operand,
             Func<TOperator, T, T, T> apply)
         {
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
@@ -162,8 +162,8 @@ namespace Superpower
             if (apply == null) throw new ArgumentNullException(nameof(apply));
             return @operator.Then(opvalue =>
                 operand.Then(operandValue =>
-                    ChainRightOperatorRest(operandValue, @operator, operand, apply)).Then(r => Return<TTokenKind, T>(apply(opvalue, lastOperand, r))))
-                    .Or(Return<TTokenKind, T>(lastOperand));
+                    ChainRightOperatorRest(operandValue, @operator, operand, apply)).Then(r => Return<TKind, T>(apply(opvalue, lastOperand, r))))
+                    .Or(Return<TKind, T>(lastOperand));
         }
         /// <summary>
         /// Constructs a parser that will fail if the given parser succeeds,
@@ -173,7 +173,7 @@ namespace Superpower
         /// <typeparam name="T">The result type of the given parser</typeparam>
         /// <param name="parser">The parser to wrap</param>
         /// <returns>A parser that is the negation of the given parser.</returns>
-        public static CharParser<Unit> Not<T>(CharParser<T> parser)
+        public static TextParser<Unit> Not<T>(TextParser<T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -182,9 +182,9 @@ namespace Superpower
                 var result = parser(input);
 
                 if (result.HasValue)
-                    return CharResult.Empty<Unit>(input, $"unexpected successful parsing of `{input.Until(result.Remainder)}`");
+                    return Result.Empty<Unit>(input, $"unexpected successful parsing of `{input.Until(result.Remainder)}`");
 
-                return CharResult.Value(Unit.Value, input, input);
+                return Result.Value(Unit.Value, input, input);
             };
         }
 
@@ -194,10 +194,10 @@ namespace Superpower
         /// consume any input. It's like a negative look-ahead in a regular expression.
         /// </summary>
         /// <typeparam name="T">The result type of the given parser.</typeparam>
-        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of token being parsed.</typeparam>
         /// <param name="parser">The parser to wrap</param>
         /// <returns>A parser that is the negation of the given parser.</returns>
-        public static TokenParser<TTokenKind, Unit> Not<TTokenKind, T>(TokenParser<TTokenKind, T> parser)
+        public static TokenListParser<TKind, Unit> Not<TKind, T>(TokenListParser<TKind, T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -216,13 +216,13 @@ namespace Superpower
                         var span = last.HasValue ?
                             current.Value.Span.Source.Substring(current.Value.Position.Absolute, last.Value.Position.Absolute - current.Value.Position.Absolute) :
                             current.Value.Span.Source.Substring(current.Value.Position.Absolute);
-                        return TokenResult.Empty<TTokenKind, Unit>(input, $"unexpected successful parsing of {Presentation.FormatLiteral(Friendly.Clip(span, 12))}");
+                        return TokenListParserResult.Empty<TKind, Unit>(input, $"unexpected successful parsing of {Presentation.FormatLiteral(Friendly.Clip(span, 12))}");
                     }
 
-                    return TokenResult.Empty<TTokenKind, Unit>(input, "unexpected successful parsing");
+                    return TokenListParserResult.Empty<TKind, Unit>(input, "unexpected successful parsing");
                 }
 
-                return TokenResult.Value(Unit.Value, input, input);
+                return TokenListParserResult.Value(Unit.Value, input, input);
             };
         }
 
@@ -233,11 +233,11 @@ namespace Superpower
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <returns>A parser that lazily evaluates <paramref name="reference"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="reference"/> is null.</exception>
-        public static CharParser<T> Ref<T>(Func<CharParser<T>> reference)
+        public static TextParser<T> Ref<T>(Func<TextParser<T>> reference)
         {
             if (reference == null) throw new ArgumentNullException(nameof(reference));
 
-            CharParser<T> parser = null;
+            TextParser<T> parser = null;
 
             return i =>
             {
@@ -253,14 +253,14 @@ namespace Superpower
         /// </summary>
         /// <param name="reference">A function creating the parser, when required.</param>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
-        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of token being parsed.</typeparam>
         /// <returns>A parser that lazily evaluates <paramref name="reference"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="reference"/> is null.</exception>
-        public static TokenParser<TTokenKind, T> Ref<TTokenKind, T>(Func<TokenParser<TTokenKind, T>> reference)
+        public static TokenListParser<TKind, T> Ref<TKind, T>(Func<TokenListParser<TKind, T>> reference)
         {
             if (reference == null) throw new ArgumentNullException(nameof(reference));
 
-            TokenParser<TTokenKind, T> parser = null;
+            TokenListParser<TKind, T> parser = null;
 
             return i =>
             {
@@ -277,9 +277,9 @@ namespace Superpower
         /// <param name="value">The value returned by the parser.</param>
         /// <typeparam name="T">The type of <paramref name="value"/>.</typeparam>
         /// <returns>The parser.</returns>
-        public static CharParser<T> Return<T>(T value)
+        public static TextParser<T> Return<T>(T value)
         {
-            return input => CharResult.Value(value, input, input);
+            return input => Result.Value(value, input, input);
         }
 
         /// <summary>
@@ -287,11 +287,11 @@ namespace Superpower
         /// </summary>
         /// <param name="value">The value returned by the parser.</param>
         /// <typeparam name="T">The type of <paramref name="value"/>.</typeparam>
-        /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of token being parsed.</typeparam>
         /// <returns>The parser.</returns>
-        public static TokenParser<TTokenKind, T> Return<TTokenKind, T>(T value)
+        public static TokenListParser<TKind, T> Return<TKind, T>(T value)
         {
-            return input => TokenResult.Value(value, input, input);
+            return input => TokenListParserResult.Value(value, input, input);
         }
     }
 }

@@ -19,23 +19,23 @@ using Superpower.Util;
 namespace Superpower.Model
 {
     /// <summary>
-    /// The result of parsing a character stream.
+    /// The result of parsing from a token list.
     /// </summary>
     /// <typeparam name="T">The type of the value being parsed.</typeparam>
-    /// <typeparam name="TTokenKind">The kind of token being parsed.</typeparam>
-    public struct TokenResult<TTokenKind, T>
+    /// <typeparam name="TKind">The kind of token being parsed.</typeparam>
+    public struct TokenListParserResult<TKind, T>
     {
         readonly T _value;
 
         /// <summary>
         /// The location in the stream where the parsing began.
         /// </summary>
-        public TokenList<TTokenKind> Location { get; }
+        public TokenList<TKind> Location { get; }
 
         /// <summary>
         /// The first un-parsed location in the stream.
         /// </summary>
-        public TokenList<TTokenKind> Remainder { get; }
+        public TokenList<TKind> Remainder { get; }
 
         /// <summary>
         /// True if the result carries a successfully-parsed value; otherwise, false.
@@ -70,9 +70,9 @@ namespace Superpower.Model
             }
         }
 
-        internal bool IsPartial(TokenList<TTokenKind> @from) => ErrorPosition.HasValue || @from != Remainder;
+        internal bool IsPartial(TokenList<TKind> @from) => ErrorPosition.HasValue || @from != Remainder;
 
-        internal TokenResult(T value, TokenList<TTokenKind> location, TokenList<TTokenKind> remainder)
+        internal TokenListParserResult(T value, TokenList<TKind> location, TokenList<TKind> remainder)
         {
             Location = location;
             Remainder = remainder;
@@ -83,7 +83,7 @@ namespace Superpower.Model
             Expectations = null;
         }
 
-        internal TokenResult(TokenList<TTokenKind> remainder, Position errorPosition, string errorMessage, string[] expectations)
+        internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string errorMessage, string[] expectations)
         {
             // Errors don't really carry a location - it's always the remainder, which is the first item unable to
             // be successfully parsed.
@@ -98,7 +98,7 @@ namespace Superpower.Model
         /// <inheritdoc />
         public override string ToString()
         {
-            if (Remainder == TokenList<TTokenKind>.Empty)
+            if (Remainder == TokenList<TKind>.Empty)
                 return "(Empty result.)";
 
             if (HasValue)

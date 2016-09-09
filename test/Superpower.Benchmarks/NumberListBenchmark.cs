@@ -40,7 +40,7 @@ namespace Superpower.Benchmarks
             Assert.Equal(NumbersLength, numbers.Length);
         }
 
-        static readonly CharParser<int[]> SuperpowerSimpleParser =
+        static readonly TextParser<int[]> SuperpowerSimpleParser =
             Numerics.Integer
                 .Then(n => Span.WhiteSpace.Select(_ => int.Parse(n.ToStringValue())))
                 .Many();
@@ -48,11 +48,11 @@ namespace Superpower.Benchmarks
         [Benchmark]
         public void SuperpowerSimple()
         {
-            var numbers = SuperpowerSimpleParser(new StringSpan(Numbers));
+            var numbers = SuperpowerSimpleParser(new TextSpan(Numbers));
             Assert.Equal(NumbersLength, numbers.Value.Length);
         }
 
-        static readonly CharParser<int[]> SuperpowerCharParser =
+        static readonly TextParser<int[]> SuperpowerTextParser =
             Numerics.IntegerInt32
                 .Then(n => Span.WhiteSpace.Select(_ => n))
                 .Many();
@@ -60,11 +60,11 @@ namespace Superpower.Benchmarks
         [Benchmark]
         public void SuperpowerChar()
         {
-            var numbers = SuperpowerCharParser(new StringSpan(Numbers));
+            var numbers = SuperpowerTextParser(new TextSpan(Numbers));
             Assert.Equal(NumbersLength, numbers.Value.Length);
         }
 
-        static readonly TokenParser<NumberListToken, int[]> SuperpowerTokenParser =
+        static readonly TokenListParser<NumberListToken, int[]> SuperpowerTokenListParser =
             Token.EqualTo(NumberListToken.Number)
                 .Apply(Numerics.IntegerInt32) // Slower that int.Parse(), but worth benchmarking
                 .Many();
@@ -74,7 +74,7 @@ namespace Superpower.Benchmarks
         [Benchmark]
         public void SuperpowerToken()
         {
-            var numbers = SuperpowerTokenParser(Tokenizer.Tokenize(Numbers));
+            var numbers = SuperpowerTokenListParser(Tokenizer.Tokenize(Numbers));
             Assert.Equal(NumbersLength, numbers.Value.Length);
         }
     }

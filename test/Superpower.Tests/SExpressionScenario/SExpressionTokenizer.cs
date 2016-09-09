@@ -7,7 +7,7 @@ namespace Superpower.Tests.SExpressionScenario
 {
     class SExpressionTokenizer : Tokenizer<SExpressionToken>
     {
-        protected override IEnumerable<CharResult<SExpressionToken>> Tokenize(StringSpan span)
+        protected override IEnumerable<Result<SExpressionToken>> Tokenize(TextSpan span)
         {
             var next = SkipWhiteSpace(span);
             if (!next.HasValue)
@@ -17,12 +17,12 @@ namespace Superpower.Tests.SExpressionScenario
             {
                 if (next.Value == '(')
                 {
-                    yield return CharResult.Value(SExpressionToken.LParen, next.Location, next.Remainder);
+                    yield return Result.Value(SExpressionToken.LParen, next.Location, next.Remainder);
                     next = next.Remainder.ConsumeChar();
                 }
                 else if (next.Value == ')')
                 {
-                    yield return CharResult.Value(SExpressionToken.RParen, next.Location, next.Remainder);
+                    yield return Result.Value(SExpressionToken.RParen, next.Location, next.Remainder);
                     next = next.Remainder.ConsumeChar();
                 }
                 else if (char.IsDigit(next.Value))
@@ -30,11 +30,11 @@ namespace Superpower.Tests.SExpressionScenario
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.ConsumeChar();
 
-                    yield return CharResult.Value(SExpressionToken.Number, integer.Location, integer.Remainder);
+                    yield return Result.Value(SExpressionToken.Number, integer.Location, integer.Remainder);
 
                     if (next.HasValue && !char.IsPunctuation(next.Value) && !char.IsWhiteSpace(next.Value))
                     {
-                        yield return CharResult.Empty<SExpressionToken>(next.Location, new[] {"whitespace", "punctuation"});
+                        yield return Result.Empty<SExpressionToken>(next.Location, new[] {"whitespace", "punctuation"});
                     }
                 }
                 else
@@ -45,7 +45,7 @@ namespace Superpower.Tests.SExpressionScenario
                         next = next.Remainder.ConsumeChar();
                     }
 
-                    yield return CharResult.Value(SExpressionToken.Atom, beginIdentifier, next.Location);
+                    yield return Result.Value(SExpressionToken.Atom, beginIdentifier, next.Location);
                 }
 
                 next = SkipWhiteSpace(next.Location);

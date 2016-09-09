@@ -28,12 +28,12 @@ namespace Superpower
         /// <summary>
         /// Apply the character parser <paramref name="valueParser"/> to the span represented by the parsed token.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="valueParser">A function that determines which character parser to apply.</param>
         /// <returns>A parser that returns the result of parsing the token value.</returns>
-        public static TokenParser<TTokenKind, U> Apply<TTokenKind, U>(this TokenParser<TTokenKind, Token<TTokenKind>> parser, Func<Token<TTokenKind>, CharParser<U>> valueParser)
+        public static TokenListParser<TKind, U> Apply<TKind, U>(this TokenListParser<TKind, Token<TKind>> parser, Func<Token<TKind>, TextParser<U>> valueParser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (valueParser == null) throw new ArgumentNullException(nameof(valueParser));
@@ -41,29 +41,29 @@ namespace Superpower
             {
                 var rt = parser(input);
                 if (!rt.HasValue)
-                    return TokenResult.CastEmpty<TTokenKind, Token<TTokenKind>, U>(rt);
+                    return TokenListParserResult.CastEmpty<TKind, Token<TKind>, U>(rt);
 
                 var uParser = valueParser(rt.Value);
                 var uResult = uParser.AtEnd()(rt.Value.Span);
                 if (!uResult.HasValue)
                 {
                     var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
-                    return new TokenResult<TTokenKind, U>(input, uResult.Remainder.Position, message, null);
+                    return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null);
                 }
 
-                return TokenResult.Value(uResult.Value, rt.Location, rt.Remainder);
+                return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
             };
         }
 
         /// <summary>
         /// Apply the character parser <paramref name="valueParser"/> to the span represented by the parsed token.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="valueParser">A character parser to apply.</param>
         /// <returns>A parser that returns the result of parsing the token value.</returns>
-        public static TokenParser<TTokenKind, U> Apply<TTokenKind, U>(this TokenParser<TTokenKind, Token<TTokenKind>> parser, CharParser<U> valueParser)
+        public static TokenListParser<TKind, U> Apply<TKind, U>(this TokenListParser<TKind, Token<TKind>> parser, TextParser<U> valueParser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (valueParser == null) throw new ArgumentNullException(nameof(valueParser));
@@ -77,7 +77,7 @@ namespace Superpower
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T> AtEnd<T>(this CharParser<T> parser)
+        public static TextParser<T> AtEnd<T>(this TextParser<T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -90,18 +90,18 @@ namespace Superpower
                 if (result.Remainder.IsAtEnd)
                     return result;
 
-                return CharResult.Empty<T>(result.Remainder);
+                return Result.Empty<T>(result.Remainder);
             };
         }
 
         /// <summary>
         /// Construct a parser that succeeds only if the source is at the end of input.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T> AtEnd<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        public static TokenListParser<TKind, T> AtEnd<TKind, T>(this TokenListParser<TKind, T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -114,18 +114,18 @@ namespace Superpower
                 if (result.Remainder.IsAtEnd)
                     return result;
 
-                return TokenResult.Empty<TTokenKind, T>(result.Remainder);
+                return TokenListParserResult.Empty<TKind, T>(result.Remainder);
             };
         }
 
         /// <summary>
         /// Construct a parser that matches one or more instances of applying <paramref name="parser"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T[]> AtLeastOnce<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        public static TokenListParser<TKind, T[]> AtLeastOnce<TKind, T>(this TokenListParser<TKind, T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             return parser.Then(first => parser.Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
@@ -137,7 +137,7 @@ namespace Superpower
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T[]> AtLeastOnce<T>(this CharParser<T> parser)
+        public static TextParser<T[]> AtLeastOnce<T>(this TextParser<T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             return parser.Then(first => parser.Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
@@ -146,13 +146,13 @@ namespace Superpower
         /// <summary>
         /// Construct a parser that matches one or more instances of applying <paramref name="parser"/>, delimited by <paramref name="delimiter"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="delimiter">The parser that matches the delimiters.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T[]> AtLeastOnceDelimitedBy<TTokenKind, T, U>(this TokenParser<TTokenKind, T> parser, TokenParser<TTokenKind, U> delimiter)
+        public static TokenListParser<TKind, T[]> AtLeastOnceDelimitedBy<TKind, T, U>(this TokenListParser<TKind, T> parser, TokenListParser<TKind, U> delimiter)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
@@ -168,7 +168,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="delimiter">The parser that matches the delimiters.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T[]> AtLeastOnceDelimitedBy<T, U>(this CharParser<T> parser, CharParser<U> delimiter)
+        public static TextParser<T[]> AtLeastOnceDelimitedBy<T, U>(this TextParser<T> parser, TextParser<U> delimiter)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
@@ -179,13 +179,13 @@ namespace Superpower
         /// <summary>
         /// Construct a parser that matches <paramref name="first"/>, discards the resulting value, then returns the result of <paramref name="second"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="first">The first parser.</param>
         /// <param name="second">The second parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, U> IgnoreThen<TTokenKind, T, U>(this TokenParser<TTokenKind, T> first, TokenParser<TTokenKind, U> second)
+        public static TokenListParser<TKind, U> IgnoreThen<TKind, T, U>(this TokenListParser<TKind, T> first, TokenListParser<TKind, U> second)
         {
             if (first == null) throw new ArgumentNullException(nameof(first));
             if (second == null) throw new ArgumentNullException(nameof(second));
@@ -194,13 +194,13 @@ namespace Superpower
             {
                 var rt = first(input);
                 if (!rt.HasValue)
-                    return TokenResult.CastEmpty<TTokenKind, T, U>(rt);
+                    return TokenListParserResult.CastEmpty<TKind, T, U>(rt);
 
                 var ru = second(rt.Remainder);
                 if (!ru.HasValue)
                     return ru;
 
-                return TokenResult.Value(ru.Value, input, ru.Remainder);
+                return TokenListParserResult.Value(ru.Value, input, ru.Remainder);
             };
         }
 
@@ -212,7 +212,7 @@ namespace Superpower
         /// <param name="first">The first parser.</param>
         /// <param name="second">The second parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<U> IgnoreThen<T, U>(this CharParser<T> first, CharParser<U> second)
+        public static TextParser<U> IgnoreThen<T, U>(this TextParser<T> first, TextParser<U> second)
         {
             if (first == null) throw new ArgumentNullException(nameof(first));
             if (second == null) throw new ArgumentNullException(nameof(second));
@@ -221,25 +221,25 @@ namespace Superpower
             {
                 var rt = first(input);
                 if (!rt.HasValue)
-                    return CharResult.CastEmpty<T, U>(rt);
+                    return Result.CastEmpty<T, U>(rt);
 
                 var ru = second(rt.Remainder);
                 if (!ru.HasValue)
                     return ru;
 
-                return CharResult.Value(ru.Value, input, ru.Remainder);
+                return Result.Value(ru.Value, input, ru.Remainder);
             };
         }
 
         /// <summary>
         /// Construct a parser that matches <paramref name="parser"/> zero or more times.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        /// <remarks>Many will fail if any item partially matches this. To modify this behavior use <see cref="Try{TTokenKind,T}(TokenParser{TTokenKind,T})"/>.</remarks>
-        public static TokenParser<TTokenKind, T[]> Many<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        /// <remarks>Many will fail if any item partially matches this. To modify this behavior use <see cref="Try{TKind,T}(TokenListParser{TKind,T})"/>.</remarks>
+        public static TokenListParser<TKind, T[]> Many<TKind, T>(this TokenListParser<TKind, T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -259,9 +259,9 @@ namespace Superpower
                 }
 
                 if (r.IsPartial(@from))
-                    return TokenResult.CastEmpty<TTokenKind, T, T[]>(r);
+                    return TokenListParserResult.CastEmpty<TKind, T, T[]>(r);
 
-                return TokenResult.Value(result.ToArray(), input, r.Remainder);
+                return TokenListParserResult.Value(result.ToArray(), input, r.Remainder);
             };
         }
 
@@ -271,8 +271,8 @@ namespace Superpower
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        /// <remarks>Many will fail if any item partially matches this. To modify this behavior use <see cref="Try{T}(CharParser{T})"/>.</remarks>
-        public static CharParser<T[]> Many<T>(this CharParser<T> parser)
+        /// <remarks>Many will fail if any item partially matches this. To modify this behavior use <see cref="Try{T}(TextParser{T})"/>.</remarks>
+        public static TextParser<T[]> Many<T>(this TextParser<T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -293,22 +293,22 @@ namespace Superpower
                 }
 
                 if (r.IsPartial(@from))
-                    return CharResult.CastEmpty<T, T[]>(r);
+                    return Result.CastEmpty<T, T[]>(r);
 
-                return CharResult.Value(result.ToArray(), input, r.Remainder);
+                return Result.Value(result.ToArray(), input, r.Remainder);
             };
         }
 
         /// <summary>
         /// Construct a parser that matches <paramref name="parser"/> zero or more times, delimited by <paramref name="delimiter"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="delimiter">The parser that matches the delimiters.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T[]> ManyDelimitedBy<TTokenKind, T, U>(this TokenParser<TTokenKind, T> parser, TokenParser<TTokenKind, U> delimiter)
+        public static TokenListParser<TKind, T[]> ManyDelimitedBy<TKind, T, U>(this TokenListParser<TKind, T> parser, TokenListParser<TKind, U> delimiter)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
@@ -325,7 +325,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="delimiter">The parser that matches the delimiters.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T[]> ManyDelimitedBy<T, U>(this CharParser<T> parser, CharParser<U> delimiter)
+        public static TextParser<T[]> ManyDelimitedBy<T, U>(this TextParser<T> parser, TextParser<U> delimiter)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
@@ -337,12 +337,12 @@ namespace Superpower
         /// <summary>
         /// Construct a parser that fails with error message <paramref name="errorMessage"/> when <paramref name="parser"/> fails.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T> Message<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, string errorMessage)
+        public static TokenListParser<TKind, T> Message<TKind, T>(this TokenListParser<TKind, T> parser, string errorMessage)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (errorMessage == null) throw new ArgumentNullException(nameof(errorMessage));
@@ -353,7 +353,7 @@ namespace Superpower
                 if (result.HasValue)
                     return result;
 
-                return TokenResult.Empty<TTokenKind, T>(result.Remainder, result.ErrorPosition, errorMessage);
+                return TokenListParserResult.Empty<TKind, T>(result.Remainder, result.ErrorPosition, errorMessage);
             };
         }
 
@@ -364,7 +364,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="errorMessage">The error message.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T> Message<T>(this CharParser<T> parser, string errorMessage)
+        public static TextParser<T> Message<T>(this TextParser<T> parser, string errorMessage)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (errorMessage == null) throw new ArgumentNullException(nameof(errorMessage));
@@ -375,19 +375,19 @@ namespace Superpower
                 if (result.HasValue)
                     return result;
 
-                return CharResult.Empty<T>(result.Remainder, errorMessage);
+                return Result.Empty<T>(result.Remainder, errorMessage);
             };
         }
 
         /// <summary>
         /// Construct a parser that returns <paramref name="name"/> as its "expectation" if <paramref name="parser"/> fails.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="name">The name given to <paramref name="parser"/>.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T> Named<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, string name)
+        public static TokenListParser<TKind, T> Named<TKind, T>(this TokenListParser<TKind, T> parser, string name)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (name == null) throw new ArgumentNullException(nameof(name));
@@ -401,10 +401,10 @@ namespace Superpower
                 // result.IsSubTokenError?
                 if (result.ErrorPosition.HasValue)
                 {
-                    return TokenResult.Empty<TTokenKind, T>(result.Remainder, result.ErrorPosition, result.FormatErrorMessageFragment());
+                    return TokenListParserResult.Empty<TKind, T>(result.Remainder, result.ErrorPosition, result.FormatErrorMessageFragment());
                 }
 
-                return TokenResult.Empty<TTokenKind, T>(result.Remainder, new[] { name });
+                return TokenListParserResult.Empty<TKind, T>(result.Remainder, new[] { name });
             };
         }
 
@@ -415,7 +415,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="name">The name given to <paramref name="parser"/>.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T> Named<T>(this CharParser<T> parser, string name)
+        public static TextParser<T> Named<T>(this TextParser<T> parser, string name)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (name == null) throw new ArgumentNullException(nameof(name));
@@ -426,23 +426,23 @@ namespace Superpower
                 if (result.HasValue || result.Remainder != input)
                     return result;
 
-                return CharResult.Empty<T>(result.Remainder, new[] { name });
+                return Result.Empty<T>(result.Remainder, new[] { name });
             };
         }
 
         /// <summary>
         /// Construct a parser that matches zero or one instance of <paramref name="parser"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T?> Optional<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        public static TokenListParser<TKind, T?> Optional<TKind, T>(this TokenListParser<TKind, T> parser)
             where T : struct
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Select(t => (T?)t).Or(Parse.Return<TTokenKind, T?>(null));
+            return parser.Select(t => (T?)t).Or(Parse.Return<TKind, T?>(null));
         }
 
         /// <summary>
@@ -451,7 +451,7 @@ namespace Superpower
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T?> Optional<T>(this CharParser<T> parser)
+        public static TextParser<T?> Optional<T>(this TextParser<T> parser)
             where T : struct
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
@@ -463,16 +463,16 @@ namespace Superpower
         /// Construct a parser that matches zero or one instance of <paramref name="parser"/>, returning <paramref name="defaultValue"/> when
         /// no match is possible.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="defaultValue">The default value</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T> OptionalOrDefault<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, T defaultValue = default(T))
+        public static TokenListParser<TKind, T> OptionalOrDefault<TKind, T>(this TokenListParser<TKind, T> parser, T defaultValue = default(T))
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Or(Parse.Return<TTokenKind, T>(defaultValue));
+            return parser.Or(Parse.Return<TKind, T>(defaultValue));
         }
 
         /// <summary>
@@ -483,7 +483,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T> OptionalOrDefault<T>(this CharParser<T> parser, T defaultValue = default(T))
+        public static TextParser<T> OptionalOrDefault<T>(this TextParser<T> parser, T defaultValue = default(T))
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -493,13 +493,13 @@ namespace Superpower
         /// <summary>
         /// Construct a parser that tries first the <paramref name="lhs"/> parser, and if it fails, applies <paramref name="rhs"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="lhs">The first parser to try.</param>
         /// <param name="rhs">The second parser to try.</param>
         /// <returns>The resulting parser.</returns>
-        /// <remarks>Or will fail if the first item partially matches this. To modify this behavior use <see cref="Try{TTokenKind,T}(TokenParser{TTokenKind,T})"/>.</remarks>
-        public static TokenParser<TTokenKind, T> Or<TTokenKind, T>(this TokenParser<TTokenKind, T> lhs, TokenParser<TTokenKind, T> rhs)
+        /// <remarks>Or will fail if the first item partially matches this. To modify this behavior use <see cref="Try{TKind,T}(TokenListParser{TKind,T})"/>.</remarks>
+        public static TokenListParser<TKind, T> Or<TKind, T>(this TokenListParser<TKind, T> lhs, TokenListParser<TKind, T> rhs)
         {
             if (lhs == null) throw new ArgumentNullException(nameof(lhs));
             if (rhs == null) throw new ArgumentNullException(nameof(rhs));
@@ -514,7 +514,7 @@ namespace Superpower
                 if (second.HasValue)
                     return second;
 
-                return TokenResult.CombineEmpty(first, second);
+                return TokenListParserResult.CombineEmpty(first, second);
             };
         }
 
@@ -525,8 +525,8 @@ namespace Superpower
         /// <param name="lhs">The first parser to try.</param>
         /// <param name="rhs">The second parser to try.</param>
         /// <returns>The resulting parser.</returns>
-        /// <remarks>Or will fail if the first item partially matches this. To modify this behavior use <see cref="Try{T}(CharParser{T})"/>.</remarks>
-        public static CharParser<T> Or<T>(this CharParser<T> lhs, CharParser<T> rhs)
+        /// <remarks>Or will fail if the first item partially matches this. To modify this behavior use <see cref="Try{T}(TextParser{T})"/>.</remarks>
+        public static TextParser<T> Or<T>(this TextParser<T> lhs, TextParser<T> rhs)
         {
             if (lhs == null) throw new ArgumentNullException(nameof(lhs));
             if (rhs == null) throw new ArgumentNullException(nameof(rhs));
@@ -541,25 +541,25 @@ namespace Superpower
                 if (second.HasValue)
                     return second;
 
-                return CharResult.CombineEmpty(first, second);
+                return Result.CombineEmpty(first, second);
             };
         }
 
         /// <summary>
         /// Construct a parser that takes the result of <paramref name="parser"/> and converts it value using <paramref name="selector"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="selector">A mapping from the first result to the second.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, U> Select<TTokenKind, T, U>(this TokenParser<TTokenKind, T> parser, Func<T, U> selector)
+        public static TokenListParser<TKind, U> Select<TKind, T, U>(this TokenListParser<TKind, T> parser, Func<T, U> selector)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (selector == null) throw new ArgumentNullException(nameof(selector));
 
-            return parser.Then(rt => Parse.Return<TTokenKind, U>(selector(rt)));
+            return parser.Then(rt => Parse.Return<TKind, U>(selector(rt)));
         }
 
         /// <summary>
@@ -570,7 +570,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="selector">A mapping from the first result to the second.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<U> Select<T, U>(this CharParser<T> parser, Func<T, U> selector)
+        public static TextParser<U> Select<T, U>(this TextParser<T> parser, Func<T, U> selector)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (selector == null) throw new ArgumentNullException(nameof(selector));
@@ -588,9 +588,9 @@ namespace Superpower
         /// <param name="selector">A mapping from the first result to the second parser.</param>
         /// <param name="projector">Function mapping the results of the first two parsers onto the final result.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<V> SelectMany<T, U, V>(
-            this CharParser<T> parser,
-            Func<T, CharParser<U>> selector,
+        public static TextParser<V> SelectMany<T, U, V>(
+            this TextParser<T> parser,
+            Func<T, TextParser<U>> selector,
             Func<T, U, V> projector)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
@@ -603,7 +603,7 @@ namespace Superpower
         /// <summary>
         /// The LINQ query comprehension pattern.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <typeparam name="V"></typeparam>
@@ -611,9 +611,9 @@ namespace Superpower
         /// <param name="selector">A mapping from the first result to the second parser.</param>
         /// <param name="projector">Function mapping the results of the first two parsers onto the final result.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, V> SelectMany<TTokenKind, T, U, V>(
-            this TokenParser<TTokenKind, T> parser,
-            Func<T, TokenParser<TTokenKind, U>> selector,
+        public static TokenListParser<TKind, V> SelectMany<TKind, T, U, V>(
+            this TokenListParser<TKind, T> parser,
+            Func<T, TokenListParser<TKind, U>> selector,
             Func<T, U, V> projector)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
@@ -626,13 +626,13 @@ namespace Superpower
         /// <summary>
         /// Construct a parser that applies <paramref name="first"/>, provides the value to <paramref name="second"/> and returns the result.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="first">The first parser.</param>
         /// <param name="second">The second parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, U> Then<TTokenKind, T, U>(this TokenParser<TTokenKind, T> first, Func<T, TokenParser<TTokenKind, U>> second)
+        public static TokenListParser<TKind, U> Then<TKind, T, U>(this TokenListParser<TKind, T> first, Func<T, TokenListParser<TKind, U>> second)
         {
             if (first == null) throw new ArgumentNullException(nameof(first));
             if (second == null) throw new ArgumentNullException(nameof(second));
@@ -641,13 +641,13 @@ namespace Superpower
             {
                 var rt = first(input);
                 if (!rt.HasValue)
-                    return TokenResult.CastEmpty<TTokenKind, T, U>(rt);
+                    return TokenListParserResult.CastEmpty<TKind, T, U>(rt);
 
                 var ru = second(rt.Value)(rt.Remainder);
                 if (!ru.HasValue)
                     return ru;
 
-                return TokenResult.Value(ru.Value, input, ru.Remainder);
+                return TokenListParserResult.Value(ru.Value, input, ru.Remainder);
             };
         }
 
@@ -659,7 +659,7 @@ namespace Superpower
         /// <param name="first">The first parser.</param>
         /// <param name="second">The second parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<U> Then<T, U>(this CharParser<T> first, Func<T, CharParser<U>> second)
+        public static TextParser<U> Then<T, U>(this TextParser<T> first, Func<T, TextParser<U>> second)
         {
             if (first == null) throw new ArgumentNullException(nameof(first));
             if (second == null) throw new ArgumentNullException(nameof(second));
@@ -668,13 +668,13 @@ namespace Superpower
             {
                 var rt = first(input);
                 if (!rt.HasValue)
-                    return CharResult.CastEmpty<T, U>(rt);
+                    return Result.CastEmpty<T, U>(rt);
 
                 var ru = second(rt.Value)(rt.Remainder);
                 if (!ru.HasValue)
                     return ru;
 
-                return CharResult.Value(ru.Value, input, ru.Remainder);
+                return Result.Value(ru.Value, input, ru.Remainder);
             };
         }
 
@@ -682,11 +682,11 @@ namespace Superpower
         /// Construct a parser that tries one parser, and backtracks if unsuccessful so that no input
         /// appears to have been consumed by subsequent checks against the result.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T> Try<TTokenKind, T>(this TokenParser<TTokenKind, T> parser)
+        public static TokenListParser<TKind, T> Try<TKind, T>(this TokenListParser<TKind, T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -697,7 +697,7 @@ namespace Superpower
                     return rt;
 
                 // Need to preserve expecations iff there was no match.
-                return TokenResult.Empty<TTokenKind, T>(input);
+                return TokenListParserResult.Empty<TKind, T>(input);
             };
         }
 
@@ -708,7 +708,7 @@ namespace Superpower
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T> Try<T>(this CharParser<T> parser)
+        public static TextParser<T> Try<T>(this TextParser<T> parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -719,24 +719,24 @@ namespace Superpower
                     return rt;
 
                 // Need to preserve expecations iff there was no match.
-                return CharResult.Empty<T>(input);
+                return Result.Empty<T>(input);
             };
         }
 
         /// <summary>
         /// Construct a parser that applies the first, and returns <paramref name="value"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="value">The value to return.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, U> Value<TTokenKind, T, U>(this TokenParser<TTokenKind, T> parser, U value)
+        public static TokenListParser<TKind, U> Value<TKind, T, U>(this TokenListParser<TKind, T> parser, U value)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.IgnoreThen(Parse.Return<TTokenKind, U>(value));
+            return parser.IgnoreThen(Parse.Return<TKind, U>(value));
         }
 
         /// <summary>
@@ -747,7 +747,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="value">The value to return.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<U> Value<T, U>(this CharParser<T> parser, U value)
+        public static TextParser<U> Value<T, U>(this TextParser<T> parser, U value)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -758,12 +758,12 @@ namespace Superpower
         /// Construct a parser that evaluates the result of a previous parser and fails if <paramref name="predicate"/> returns false
         /// for the result.
         /// </summary>
-        /// <typeparam name="TTokenKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="predicate">The predicate to apply.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenParser<TTokenKind, T> Where<TTokenKind, T>(this TokenParser<TTokenKind, T> parser, Func<T, bool> predicate)
+        public static TokenListParser<TKind, T> Where<TKind, T>(this TokenListParser<TKind, T> parser, Func<T, bool> predicate)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -777,7 +777,7 @@ namespace Superpower
                 if (predicate(rt.Value))
                     return rt;
 
-                return TokenResult.Empty<TTokenKind, T>(input, "unsatisfied condition");
+                return TokenListParserResult.Empty<TKind, T>(input, "unsatisfied condition");
             };
         }
 
@@ -789,7 +789,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="predicate">The predicate to apply.</param>
         /// <returns>The resulting parser.</returns>
-        public static CharParser<T> Where<T>(this CharParser<T> parser, Func<T, bool> predicate)
+        public static TextParser<T> Where<T>(this TextParser<T> parser, Func<T, bool> predicate)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -803,7 +803,7 @@ namespace Superpower
                 if (predicate(rt.Value))
                     return rt;
 
-                return CharResult.Empty<T>(input, "unsatisfied condition");
+                return Result.Empty<T>(input, "unsatisfied condition");
             };
         }
     }

@@ -14,5 +14,5 @@ Type=ArithmeticExpressionBenchmark  Mode=Throughput
 ```
           Method |      Median |     StdDev | Scaled | Scaled-SD |
 ---------------- |------------ |----------- |------- |---------- |
-         Sprache | 283.8618 us | 10.0276 us |   1.00 |      0.00 |
- SuperpowerToken |  81.1563 us |  2.8775 us |   0.29 |      0.01 |
+         Sprache | 283.7834 us | 43.3691 us |   1.00 |      0.00 |
+ SuperpowerToken |  80.8096 us |  1.0225 us |   0.27 |      0.03 |

@@ -17,18 +17,18 @@ namespace Superpower.Model
     /// <summary>
     /// A token.
     /// </summary>
-    /// <typeparam name="TTokenKind">The type of the token's kind.</typeparam>
-    public struct Token<TTokenKind>
+    /// <typeparam name="TKind">The type of the token's kind.</typeparam>
+    public struct Token<TKind>
     {
         /// <summary>
         /// The kind of the token.
         /// </summary>
-        public TTokenKind Kind { get; }
+        public TKind Kind { get; }
 
         /// <summary>
         /// The string span containing the value of the token.
         /// </summary>
-        public StringSpan Span { get; }
+        public TextSpan Span { get; }
 
         /// <summary>
         /// Get the string value of the token.
@@ -44,14 +44,14 @@ namespace Superpower.Model
         /// <summary>
         /// True if the token has a value.
         /// </summary>
-        public bool HasValue => Span != StringSpan.None;
+        public bool HasValue => Span != TextSpan.None;
 
         /// <summary>
         /// Construct a token.
         /// </summary>
         /// <param name="kind">The kind of the token.</param>
         /// <param name="span">The span holding the token's value.</param>
-        public Token(TTokenKind kind, StringSpan span)
+        public Token(TKind kind, TextSpan span)
         {
             Kind = kind;
             Span = span;
@@ -60,7 +60,7 @@ namespace Superpower.Model
         /// <summary>
         /// A token with no value.
         /// </summary>
-        public static Token<TTokenKind> Empty { get; } = default(Token<TTokenKind>);
+        public static Token<TKind> Empty { get; } = default(Token<TKind>);
 
         /// <inheritdoc/>
         public override string ToString()

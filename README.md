@@ -10,7 +10,7 @@ A [parser combinator](https://en.wikipedia.org/wiki/Parser_combinator) library b
 
 Superpower is embedded directly into your program code, without the need for any additional tools or build-time code generation tasks.
 
-The simplest parsers are character-based: 
+The simplest parsers consume characters directly from the source text: 
 
 ```csharp
 // Parse any number of capital 'A's in a row
@@ -22,10 +22,10 @@ The `Character.EqualTo()` method is a built-in parser. The `AtLeastOnce()` metho
 Superpower includes a library of simple parsers and combinators from which sophisticated parsers can be built:
 
 ```csharp
-CharParser<string> identifier =
+TextParser<string> identifier =
     from first in Character.Letter
     from rest in Character.LetterOrDigit.Or(Character.EqualTo('_')).Many()
-    select first + new string(rest.ToArray());
+    select first + new string(rest);
 
 var id = identifier.Parse("abc123");
 
@@ -36,7 +36,7 @@ Parsers are highly modular, so smaller parsers can be built and tested independe
 
 ### Tokenization
 
-A token-driven parser is based on a stream of tokens. The type used to represent the tokens is generic, but currently Superpower has deeper support for `Enum` tokens and using them is recommended.
+A token-driven parser consumes elements from a list of tokens. The type used to represent the kinds of tokens consumed by a parser is generic, but currently Superpower has deeper support for `enum` tokens and using them is recommended.
 
 ```csharp
 public enum ArithmeticExpressionToken
@@ -48,8 +48,8 @@ public enum ArithmeticExpressionToken
 
 Token-driven parsing occurs in two distinct steps:
 
- 1. Tokenization, using a class derived from `Tokenizer<TTokenKind>`, then
- 2. Parsing, using a function of type `TokenParser<TTokenKind>`.
+ 1. Tokenization, using a class derived from `Tokenizer<TKind>`, then
+ 2. Parsing, using a function of type `TokenListParser<TKind>`.
 
 ```csharp
 var expression = "1 * (2 + 3)";
@@ -85,7 +85,7 @@ class ArithmeticExpressionTokenizer : Tokenizer<ArithmeticExpressionToken>
             [')'] = ArithmeticExpressionToken.RParen,
         };
 
-    protected override IEnumerable<CharResult<ArithmeticExpressionToken>> Tokenize(StringSpan span)
+    protected override IEnumerable<Result<ArithmeticExpressionToken>> Tokenize(TextSpan span)
     {
         var next = SkipWhiteSpace(span);
         if (!next.HasValue)
@@ -99,17 +99,17 @@ class ArithmeticExpressionTokenizer : Tokenizer<ArithmeticExpressionToken>
             {
                 var integer = Numerics.Integer(next.Location);
                 next = integer.Remainder.ConsumeChar();
-                yield return CharResult.Value(ArithmeticExpressionToken.Number,
+                yield return Result.Value(ArithmeticExpressionToken.Number,
                     integer.Location, integer.Remainder);
             }
             else if (_operators.TryGetValue(next.Value, out charToken))
             {
-                yield return CharResult.Value(charToken, next.Location, next.Remainder);
+                yield return Result.Value(charToken, next.Location, next.Remainder);
                 next = next.Remainder.ConsumeChar();
             }
             else
             {
-                yield return CharResult.Empty<ArithmeticExpressionToken>(next.Location,
+                yield return Result.Empty<ArithmeticExpressionToken>(next.Location,
                     new[] { "number", "operator" });
             }
 
@@ -119,58 +119,58 @@ class ArithmeticExpressionTokenizer : Tokenizer<ArithmeticExpressionToken>
 }
 ```
 
-The tokenizer itself can use `CharParser<T>` parsers as recognizers, as in the `Numerics.Integer` example above.
+The tokenizer itself can use `TextParser<T>` parsers as recognizers, as in the `Numerics.Integer` example above.
 
-#### Writing token parsers
+#### Writing token list parsers
 
-Token parsers are defined in the same manner as character parsers, but consume tokens from a token list rather than characters from a string:
+Token parsers are defined in the same manner as text parsers, but consume tokens from a token list rather than characters from a string:
 
 ```csharp
 class ArithmeticExpressionParser
 {
-    static TokenParser<ArithmeticExpressionToken, ExpressionType> Operator(
+    static TokenListParser<ArithmeticExpressionToken, ExpressionType> Operator(
         ArithmeticExpressionToken op, ExpressionType opType)
     {
         return Token.EqualTo(op).Value(opType);
     }
 
-    static readonly TokenParser<ArithmeticExpressionToken, ExpressionType> Add =
+    static readonly TokenListParser<ArithmeticExpressionToken, ExpressionType> Add =
         Operator(ArithmeticExpressionToken.Plus, ExpressionType.AddChecked);
         
-    static readonly TokenParser<ArithmeticExpressionToken, ExpressionType> Subtract =
+    static readonly TokenListParser<ArithmeticExpressionToken, ExpressionType> Subtract =
         Operator(ArithmeticExpressionToken.Minus, ExpressionType.SubtractChecked);
         
-    static readonly TokenParser<ArithmeticExpressionToken, ExpressionType> Multiply =
+    static readonly TokenListParser<ArithmeticExpressionToken, ExpressionType> Multiply =
         Operator(ArithmeticExpressionToken.Times, ExpressionType.MultiplyChecked);
         
-    static readonly TokenParser<ArithmeticExpressionToken, ExpressionType> Divide = 
+    static readonly TokenListParser<ArithmeticExpressionToken, ExpressionType> Divide = 
         Operator(ArithmeticExpressionToken.Divide, ExpressionType.Divide);
 
-    static readonly TokenParser<ArithmeticExpressionToken, Expression> Constant =
+    static readonly TokenListParser<ArithmeticExpressionToken, Expression> Constant =
             Token.EqualTo(ArithmeticExpressionToken.Number)
             .Apply(Numerics.IntegerInt32)
             .Select(n => (Expression)Expression.Constant(n));
 
-    static readonly TokenParser<ArithmeticExpressionToken, Expression> Factor =
+    static readonly TokenListParser<ArithmeticExpressionToken, Expression> Factor =
         (from lparen in Token.EqualTo(ArithmeticExpressionToken.LParen)
             from expr in Parse.Ref(() => Expr)
             from rparen in Token.EqualTo(ArithmeticExpressionToken.RParen)
             select expr)
         .Or(Constant);
 
-    static readonly TokenParser<ArithmeticExpressionToken, Expression> Operand =
+    static readonly TokenListParser<ArithmeticExpressionToken, Expression> Operand =
         (from sign in Token.EqualTo(ArithmeticExpressionToken.Minus)
             from factor in Factor
             select (Expression)Expression.Negate(factor))
         .Or(Factor).Named("expression");
 
-    static readonly TokenParser<ArithmeticExpressionToken, Expression> Term =
+    static readonly TokenListParser<ArithmeticExpressionToken, Expression> Term =
         Parse.Chain(Multiply.Or(Divide), Operand, Expression.MakeBinary);
 
-    static readonly TokenParser<ArithmeticExpressionToken, Expression> Expr =
+    static readonly TokenListParser<ArithmeticExpressionToken, Expression> Expr =
         Parse.Chain(Add.Or(Subtract), Term, Expression.MakeBinary);
 
-    public static readonly TokenParser<ArithmeticExpressionToken, Expression<Func<int>>> Lambda =
+    public static readonly TokenListParser<ArithmeticExpressionToken, Expression<Func<int>>> Lambda =
         Expr.AtEnd().Select(body => Expression.Lambda<Func<int>>(body));
 }
 ```

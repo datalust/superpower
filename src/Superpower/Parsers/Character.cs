@@ -25,7 +25,7 @@ namespace Superpower.Parsers
     /// </summary>
     public static class Character
     {
-        static CharParser<char> Matching(Func<char, bool> predicate, string[] expectations)
+        static TextParser<char> Matching(Func<char, bool> predicate, string[] expectations)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             if (expectations == null) throw new ArgumentNullException(nameof(expectations));
@@ -34,7 +34,7 @@ namespace Superpower.Parsers
             {
                 var next = input.ConsumeChar();
                 if (!next.HasValue || !predicate(next.Value))
-                    return CharResult.Empty<char>(input, expectations);
+                    return Result.Empty<char>(input, expectations);
 
                 return next;
             };
@@ -43,7 +43,7 @@ namespace Superpower.Parsers
         /// <summary>
         /// Parse a single character matching <paramref name="predicate"/>.
         /// </summary>
-        public static CharParser<char> Matching(Func<char, bool> predicate, string name)
+        public static TextParser<char> Matching(Func<char, bool> predicate, string name)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             if (name == null) throw new ArgumentNullException(nameof(name));
@@ -57,7 +57,7 @@ namespace Superpower.Parsers
         /// <param name="predicate">Characters not to match.</param>
         /// <param name="description">Description of characters that don't match.</param>
         /// <returns>A parser for characters except those matching <paramref name="predicate"/>.</returns>
-        public static CharParser<char> Except(Func<char, bool> predicate, string description)
+        public static TextParser<char> Except(Func<char, bool> predicate, string description)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             if (description == null) throw new ArgumentNullException(nameof(description));
@@ -68,7 +68,7 @@ namespace Superpower.Parsers
         /// <summary>
         /// Parse a single specified character.
         /// </summary>
-        public static CharParser<char> EqualTo(char ch)
+        public static TextParser<char> EqualTo(char ch)
         {
             return Matching(parsed => parsed == ch, Presentation.FormatLiteral(ch));
         }
@@ -76,7 +76,7 @@ namespace Superpower.Parsers
         /// <summary>
         /// Parse a single specified character, ignoring case differences.
         /// </summary>
-        public static CharParser<char> EqualToIgnoreCase(char ch)
+        public static TextParser<char> EqualToIgnoreCase(char ch)
         {
             return Matching(parsed => char.ToUpper(parsed) == char.ToUpperInvariant(ch), Presentation.FormatLiteral(ch));
         }
@@ -84,7 +84,7 @@ namespace Superpower.Parsers
         /// <summary>
         /// Parse any single character in <paramref name="chars"/>.
         /// </summary>
-        public static CharParser<char> In(params char[] chars)
+        public static TextParser<char> In(params char[] chars)
         {
             return Matching(chars.Contains, chars.Select(Presentation.FormatLiteral).ToArray());
         }
@@ -92,7 +92,7 @@ namespace Superpower.Parsers
         /// <summary>
         /// Parse a single character except <paramref name="ch"/>.
         /// </summary>
-        public static CharParser<char> Except(char ch)
+        public static TextParser<char> Except(char ch)
         {
             return Except(parsed => parsed == ch, Presentation.FormatLiteral(ch));
         }
@@ -100,7 +100,7 @@ namespace Superpower.Parsers
         /// <summary>
         /// Parse any single character except those in <paramref name="chars"/>.
         /// </summary>
-        public static CharParser<char> ExceptIn(params char[] chars)
+        public static TextParser<char> ExceptIn(params char[] chars)
         {
             return Matching(c => !chars.Contains(c), "any character except " + Friendly.List(chars.Select(Presentation.FormatLiteral)));
         }
@@ -108,42 +108,42 @@ namespace Superpower.Parsers
         /// <summary>
         /// Parse any character.
         /// </summary>
-        public static CharParser<char> AnyChar { get; } = Matching(c => true, "any character");
+        public static TextParser<char> AnyChar { get; } = Matching(c => true, "any character");
 
         /// <summary>
         /// Parse a whitespace character.
         /// </summary>
-        public static CharParser<char> WhiteSpace { get; } = Matching(char.IsWhiteSpace, "whitespace");
+        public static TextParser<char> WhiteSpace { get; } = Matching(char.IsWhiteSpace, "whitespace");
 
         /// <summary>
         /// Parse a digit.
         /// </summary>
-        public static CharParser<char> Digit { get; } = Matching(char.IsDigit, "digit");
+        public static TextParser<char> Digit { get; } = Matching(char.IsDigit, "digit");
 
         /// <summary>
         /// Parse a letter.
         /// </summary>
-        public static CharParser<char> Letter { get; } = Matching(char.IsLetter, "letter");
+        public static TextParser<char> Letter { get; } = Matching(char.IsLetter, "letter");
 
         /// <summary>
         /// Parse a letter or digit.
         /// </summary>
-        public static CharParser<char> LetterOrDigit { get; } = Matching(char.IsLetterOrDigit, new[] { "letter", "digit" });
+        public static TextParser<char> LetterOrDigit { get; } = Matching(char.IsLetterOrDigit, new[] { "letter", "digit" });
 
         /// <summary>
         /// Parse a lowercase letter.
         /// </summary>
-        public static CharParser<char> Lower { get; } = Matching(char.IsLower, "lowercase letter");
+        public static TextParser<char> Lower { get; } = Matching(char.IsLower, "lowercase letter");
 
         /// <summary>
         /// Parse an uppercase letter.
         /// </summary>
-        public static CharParser<char> Upper { get; } = Matching(char.IsUpper, "uppercase letter");
+        public static TextParser<char> Upper { get; } = Matching(char.IsUpper, "uppercase letter");
 
         /// <summary>
         /// Parse a numeric character.
         /// </summary>
-        public static CharParser<char> Numeric { get; } = Matching(char.IsNumber, "numeric character");
+        public static TextParser<char> Numeric { get; } = Matching(char.IsNumber, "numeric character");
     }
 }
 

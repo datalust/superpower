@@ -15,9 +15,9 @@
 namespace Superpower.Model
 {
     /// <summary>
-    /// Helper methods for working with <see cref="CharResult{T}"/>.
+    /// Helper methods for working with <see cref="Result{T}"/>.
     /// </summary>
-    public static class CharResult
+    public static class Result
     {
         /// <summary>
         /// An empty result indicating no value could be parsed.
@@ -25,9 +25,9 @@ namespace Superpower.Model
         /// <typeparam name="T">The result type.</typeparam>
         /// <param name="remainder">The start of un-parsed input.</param>
         /// <returns>A result.</returns>
-        public static CharResult<T> Empty<T>(StringSpan remainder)
+        public static Result<T> Empty<T>(TextSpan remainder)
         {
-            return new CharResult<T>(remainder, null, null);
+            return new Result<T>(remainder, null, null);
         }
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace Superpower.Model
         /// <param name="remainder">The start of un-parsed input.</param>
         /// <param name="expectations">Literal descriptions of expectations not met.</param>
         /// <returns>A result.</returns>
-        public static CharResult<T> Empty<T>(StringSpan remainder, string[] expectations)
+        public static Result<T> Empty<T>(TextSpan remainder, string[] expectations)
         {
-            return new CharResult<T>(remainder, null, expectations);
+            return new Result<T>(remainder, null, expectations);
         }
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace Superpower.Model
         /// <param name="remainder">The start of un-parsed input.</param>
         /// <param name="errorMessage">Error message to present.</param>
         /// <returns>A result.</returns>
-        public static CharResult<T> Empty<T>(StringSpan remainder, string errorMessage)
+        public static Result<T> Empty<T>(TextSpan remainder, string errorMessage)
         {
-            return new CharResult<T>(remainder, errorMessage, null);
+            return new Result<T>(remainder, errorMessage, null);
         }
 
         /// <summary>
@@ -62,9 +62,9 @@ namespace Superpower.Model
         /// <param name="location">The location corresponding to the beginning of the parsed span.</param>
         /// <param name="remainder">The start of un-parsed input.</param>
         /// <returns>A result.</returns>
-        public static CharResult<T> Value<T>(T value, StringSpan location, StringSpan remainder)
+        public static Result<T> Value<T>(T value, TextSpan location, TextSpan remainder)
         {
-            return new CharResult<T>(value, location, remainder);
+            return new Result<T>(value, location, remainder);
         }
 
         /// <summary>
@@ -74,9 +74,9 @@ namespace Superpower.Model
         /// <typeparam name="U">The target type.</typeparam>
         /// <param name="result">The value to convert.</param>
         /// <returns>A result of type <typeparamref name="U"/> carrying the same information as <paramref name="result"/>.</returns>
-        public static CharResult<U> CastEmpty<T, U>(CharResult<T> result)
+        public static Result<U> CastEmpty<T, U>(Result<T> result)
         {
-            return new CharResult<U>(result.Remainder, result.ErrorMessage, result.Expectations);
+            return new Result<U>(result.Remainder, result.ErrorMessage, result.Expectations);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Superpower.Model
         /// <param name="first">The first value to combine.</param>
         /// <param name="second">The second value to combine.</param>
         /// <returns>A result of type <typeparamref name="T"/> carrying information from both results.</returns>
-        public static CharResult<T> CombineEmpty<T>(CharResult<T> first, CharResult<T> second)
+        public static Result<T> CombineEmpty<T>(Result<T> first, Result<T> second)
         {
             if (first.Remainder != second.Remainder)
                 return second;
@@ -104,7 +104,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new CharResult<T>(second.Remainder, second.ErrorMessage, expectations);
+            return new Result<T>(second.Remainder, second.ErrorMessage, expectations);
         }
     }
 }

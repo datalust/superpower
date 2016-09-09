@@ -19,12 +19,12 @@ using System.Collections.Generic;
 namespace Superpower.Model
 {
     /// <summary>
-    /// A list of <see cref="Token{TTokenKind}"/>
+    /// A list of <see cref="Token{TKind}"/>
     /// </summary>
-    /// <typeparam name="TTokenKind">The kind of tokens held in the list.</typeparam>
-    public struct TokenList<TTokenKind> : IEquatable<TokenList<TTokenKind>>, IEnumerable<Token<TTokenKind>>
+    /// <typeparam name="TKind">The kind of tokens held in the list.</typeparam>
+    public struct TokenList<TKind> : IEquatable<TokenList<TKind>>, IEnumerable<Token<TKind>>
     {
-        readonly Token<TTokenKind>[] _tokens;
+        readonly Token<TKind>[] _tokens;
 
         /// <summary>
         /// The position of the token list in the token stream.
@@ -35,13 +35,13 @@ namespace Superpower.Model
         /// Construct a token list containing <paramref name="tokens"/>.
         /// </summary>
         /// <param name="tokens">The tokens in the list.</param>
-        public TokenList(Token<TTokenKind>[] tokens)
+        public TokenList(Token<TKind>[] tokens)
             : this(tokens, 0)
         {
             if (tokens == null) throw new ArgumentNullException(nameof(tokens));
         }
 
-        TokenList(Token<TTokenKind>[] tokens, int position)
+        TokenList(Token<TKind>[] tokens, int position)
         {
 #if CHECKED // Called on every advance or backtrack
             if (tokens == null) throw new ArgumentNullException(nameof(tokens));
@@ -55,7 +55,7 @@ namespace Superpower.Model
         /// <summary>
         /// A token list with no value.
         /// </summary>
-        public static TokenList<TTokenKind> Empty { get; } = default(TokenList<TTokenKind>);
+        public static TokenList<TKind> Empty { get; } = default(TokenList<TKind>);
 
         /// <summary>
         /// True if the token list contains no tokens.
@@ -79,19 +79,19 @@ namespace Superpower.Model
         /// Consume a token from the start of the list, returning a result with the token and remainder.
         /// </summary>
         /// <returns></returns>
-        public TokenResult<TTokenKind, Token<TTokenKind>> ConsumeToken()
+        public TokenListParserResult<TKind, Token<TKind>> ConsumeToken()
         {
             EnsureHasValue();
 
             if (IsAtEnd)
-                return TokenResult.Empty<TTokenKind, Token<TTokenKind>>(this);
+                return TokenListParserResult.Empty<TKind, Token<TKind>>(this);
 
             var token = _tokens[Position];
-            return TokenResult.Value(token, this, new TokenList<TTokenKind>(_tokens, Position + 1));
+            return TokenListParserResult.Value(token, this, new TokenList<TKind>(_tokens, Position + 1));
         }
 
         /// <inheritdoc/>
-        public IEnumerator<Token<TTokenKind>> GetEnumerator()
+        public IEnumerator<Token<TKind>> GetEnumerator()
         {
             EnsureHasValue();
 
@@ -107,10 +107,10 @@ namespace Superpower.Model
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (!(obj is TokenList<TTokenKind>))
+            if (!(obj is TokenList<TKind>))
                 return false;
 
-            return Equals((TokenList<TTokenKind>)obj);
+            return Equals((TokenList<TKind>)obj);
         }
 
         /// <inheritdoc/>
@@ -127,7 +127,7 @@ namespace Superpower.Model
         /// </summary>
         /// <param name="other">The other token list.</param>
         /// <returns>True if the token lists are the same.</returns>
-        public bool Equals(TokenList<TTokenKind> other)
+        public bool Equals(TokenList<TKind> other)
         {
             return Equals(_tokens, other._tokens) && Position == other.Position;
         }
@@ -138,7 +138,7 @@ namespace Superpower.Model
         /// <param name="lhs">The first token list.</param>
         /// <param name="rhs">The second token list.</param>
         /// <returns>True if the token lists are the same.</returns>
-        public static bool operator ==(TokenList<TTokenKind> lhs, TokenList<TTokenKind> rhs)
+        public static bool operator ==(TokenList<TKind> lhs, TokenList<TKind> rhs)
         {
             return lhs.Equals(rhs);
         }
@@ -149,7 +149,7 @@ namespace Superpower.Model
         /// <param name="lhs">The first token list.</param>
         /// <param name="rhs">The second token list.</param>
         /// <returns>True if the token lists are the different.</returns>
-        public static bool operator !=(TokenList<TTokenKind> lhs, TokenList<TTokenKind> rhs)
+        public static bool operator !=(TokenList<TKind> lhs, TokenList<TKind> rhs)
         {
             return !(lhs == rhs);
         }

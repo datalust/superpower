@@ -9,7 +9,7 @@ namespace Superpower.Tests
         [Fact]
         public void ADefaultSpanHasNoValue()
         {
-            var span = default(StringSpan);
+            var span = default(TextSpan);
             Assert.Throws<InvalidOperationException>(() => span.ToStringValue());
         }
 
@@ -20,7 +20,7 @@ namespace Superpower.Tests
         [InlineData("Hello", 0, 0, "")]
         public void ASpanIsEqualInValueToAMatchingString(string str, int offset, int length, string value)
         {
-            var span = new StringSpan(str, new Position(offset, 1, offset + 1), length);
+            var span = new TextSpan(str, new Position(offset, 1, offset + 1), length);
             Assert.True(span.EqualsValue(value));
         }
 
@@ -31,7 +31,7 @@ namespace Superpower.Tests
         [InlineData("Hello", 0, 0, "")]
         public void ASpanIsEqualInValueIgnoringCaseToAMatchingUppsercaseString(string str, int offset, int length, string value)
         {
-            var span = new StringSpan(str, new Position(offset, 1, offset + 1), length);
+            var span = new TextSpan(str, new Position(offset, 1, offset + 1), length);
             Assert.True(span.EqualsValueIgnoreCase(value));
         }
 
@@ -41,7 +41,7 @@ namespace Superpower.Tests
         [InlineData("Hello", 1, 3, "fll")]
         public void ASpanIsNotEqualToADifferentString(string str, int offset, int length, string value)
         {
-            var span = new StringSpan(str, new Position(offset, 1, offset + 1), length);
+            var span = new TextSpan(str, new Position(offset, 1, offset + 1), length);
             Assert.False(span.EqualsValue(value));
         }
     }

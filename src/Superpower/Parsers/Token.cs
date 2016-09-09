@@ -24,12 +24,12 @@ namespace Superpower.Parsers
     public static class Token
     {
         /// <summary>
-        /// Parse a token of the kind <typeparamref name="TTokenKind"/>.
+        /// Parse a token of the kind <typeparamref name="TKind"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The type of the token being matched.</typeparam>
+        /// <typeparam name="TKind">The type of the token being matched.</typeparam>
         /// <param name="kind">The kind of token to match.</param>
         /// <returns>The matched token.</returns>
-        public static TokenParser<TTokenKind, Token<TTokenKind>> EqualTo<TTokenKind>(TTokenKind kind)
+        public static TokenListParser<TKind, Token<TKind>> EqualTo<TKind>(TKind kind)
         {
             var expectations = new[] { Presentation.FormatExpectation(kind) };
 
@@ -37,23 +37,23 @@ namespace Superpower.Parsers
             {
                 var next = input.ConsumeToken();
                 if (!next.HasValue || !next.Value.Kind.Equals(kind))
-                    return TokenResult.Empty<TTokenKind, Token<TTokenKind>>(input, expectations);
+                    return TokenListParserResult.Empty<TKind, Token<TKind>>(input, expectations);
 
                 return next;
             };
         }
 
         /// <summary>
-        /// Parse a sequence of tokens of the kind <typeparamref name="TTokenKind"/>.
+        /// Parse a sequence of tokens of the kind <typeparamref name="TKind"/>.
         /// </summary>
-        /// <typeparam name="TTokenKind">The type of the tokens being matched.</typeparam>
+        /// <typeparam name="TKind">The type of the tokens being matched.</typeparam>
         /// <param name="kinds">The kinds of token to match, once each in order.</param>
         /// <returns>The matched tokens.</returns>
-        public static TokenParser<TTokenKind, Token<TTokenKind>[]> Sequence<TTokenKind>(params TTokenKind[] kinds)
+        public static TokenListParser<TKind, Token<TKind>[]> Sequence<TKind>(params TKind[] kinds)
         {
             if (kinds == null) throw new ArgumentNullException(nameof(kinds));
 
-            TokenParser<TTokenKind, Token<TTokenKind>[]> result = input => TokenResult.Value(new Token<TTokenKind>[kinds.Length], input, input);
+            TokenListParser<TKind, Token<TKind>[]> result = input => TokenListParserResult.Value(new Token<TKind>[kinds.Length], input, input);
             for (var i = 0; i < kinds.Length; ++i)
             {
                 var token = EqualTo(kinds[i]);
@@ -68,9 +68,9 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="kind">The kind of token to match.</param>
         /// <param name="value">The string value to compare against the token's underlying span.</param>
-        /// <typeparam name="TTokenKind">The type of the token being matched.</typeparam>
+        /// <typeparam name="TKind">The type of the token being matched.</typeparam>
         /// <returns>A parser that will match tokens with the specified kind and value.</returns>
-        public static TokenParser<TTokenKind, Token<TTokenKind>> EqualToValue<TTokenKind>(TTokenKind kind, string value)
+        public static TokenListParser<TKind, Token<TKind>> EqualToValue<TKind>(TKind kind, string value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             
@@ -82,9 +82,9 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="kind">The kind of token to match.</param>
         /// <param name="value">The string value to compare against the token's underlying span.</param>
-        /// <typeparam name="TTokenKind">The type of the token being matched.</typeparam>
+        /// <typeparam name="TKind">The type of the token being matched.</typeparam>
         /// <returns>A parser that will match tokens with the specified kind and value.</returns>
-        public static TokenParser<TTokenKind, Token<TTokenKind>> EqualToValueIgnoreCase<TTokenKind>(TTokenKind kind, string value)
+        public static TokenListParser<TKind, Token<TKind>> EqualToValueIgnoreCase<TKind>(TKind kind, string value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
 

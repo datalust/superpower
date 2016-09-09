@@ -22,5 +22,5 @@ namespace Superpower
     /// <typeparam name="T">The type of values produced by the parser.</typeparam>
     /// <param name="input">The span of text to parse.</param>
     /// <returns>A result with a parsed value, or an empty result indicating error.</returns>
-    public delegate CharResult<T> CharParser<T>(StringSpan input);
+    public delegate Result<T> TextParser<T>(TextSpan input);
 }

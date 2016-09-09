@@ -29,7 +29,7 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="length">The number of characters to parse.</param>
         /// <returns>The parsed span.</returns>
-        public static CharParser<StringSpan> Length(int length)
+        public static TextParser<TextSpan> Length(int length)
         {
             if (length < 0) throw new ArgumentOutOfRangeException(nameof(length));
 
@@ -43,14 +43,14 @@ namespace Superpower.Parsers
                     if (!ch.HasValue)
                     {
                         if (ch.Remainder == input)
-                            return CharResult.Empty<StringSpan>(ch.Location, expectations);
+                            return Result.Empty<TextSpan>(ch.Location, expectations);
 
                         var remaining = length - i;
-                        return CharResult.Empty<StringSpan>(ch.Location, new[] { $"{remaining} more {Friendly.Pluralize("character", remaining)}" });
+                        return Result.Empty<TextSpan>(ch.Location, new[] { $"{remaining} more {Friendly.Pluralize("character", remaining)}" });
                     }
                     remainder = ch.Remainder;
                 }
-                return CharResult.Value(input.Until(remainder), input, remainder);
+                return Result.Value(input.Until(remainder), input, remainder);
             };
         }
 
@@ -59,7 +59,7 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="text">The text to match.</param>
         /// <returns>The matched text.</returns>
-        public static CharParser<StringSpan> EqualTo(string text)
+        public static TextParser<TextSpan> EqualTo(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
 
@@ -73,13 +73,13 @@ namespace Superpower.Parsers
                     if (!ch.HasValue || ch.Value != text[i])
                     {
                         if (ch.Remainder == input)
-                            return CharResult.Empty<StringSpan>(ch.Location, expectations);
+                            return Result.Empty<TextSpan>(ch.Location, expectations);
 
-                        return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
+                        return Result.Empty<TextSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
                     }
                     remainder = ch.Remainder;
                 }
-                return CharResult.Value(input.Until(remainder), input, remainder);
+                return Result.Value(input.Until(remainder), input, remainder);
             };
         }
 
@@ -88,7 +88,7 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="text">The text to match.</param>
         /// <returns>The matched text.</returns>
-        public static CharParser<StringSpan> EqualToIgnoreCase(string text)
+        public static TextParser<TextSpan> EqualToIgnoreCase(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
             var textUpper = text.ToUpperInvariant();
@@ -103,13 +103,13 @@ namespace Superpower.Parsers
                     if (!ch.HasValue || char.ToUpperInvariant(ch.Value) != textUpper[i])
                     {
                         if (ch.Remainder == input)
-                            return CharResult.Empty<StringSpan>(ch.Location, expectations);
+                            return Result.Empty<TextSpan>(ch.Location, expectations);
                         else
-                            return CharResult.Empty<StringSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
+                            return Result.Empty<TextSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
                     }
                     remainder = ch.Remainder;
                 }
-                return CharResult.Value(input.Until(remainder), input, remainder);
+                return Result.Value(input.Until(remainder), input, remainder);
             };
         }
 
@@ -118,17 +118,17 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="ch">The character to match.</param>
         /// <returns>The matched text.</returns>
-        public static CharParser<StringSpan> EqualTo(char ch)
+        public static TextParser<TextSpan> EqualTo(char ch)
         {
             var expectations = new[] { Presentation.FormatLiteral(ch) };
             return input =>
             {
                 var result = input.ConsumeChar();
                 if (!result.HasValue)
-                    return CharResult.CastEmpty<char, StringSpan>(result);
+                    return Result.CastEmpty<char, TextSpan>(result);
                 if (result.Value == ch)
-                    return CharResult.Value(input.Until(result.Remainder), input, result.Remainder);
-                return CharResult.Empty<StringSpan>(input, expectations);
+                    return Result.Value(input.Until(result.Remainder), input, result.Remainder);
+                return Result.Empty<TextSpan>(input, expectations);
             };
         }
 
@@ -137,7 +137,7 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="ch">The character to match.</param>
         /// <returns>The matched text.</returns>
-        public static CharParser<StringSpan> EqualToIgnoreCase(char ch)
+        public static TextParser<TextSpan> EqualToIgnoreCase(char ch)
         {
             var chToUpper = char.ToUpperInvariant(ch);
             var expectations = new[] { Presentation.FormatLiteral(ch) };
@@ -145,10 +145,10 @@ namespace Superpower.Parsers
             {
                 var result = input.ConsumeChar();
                 if (!result.HasValue)
-                    return CharResult.CastEmpty<char, StringSpan>(result);
+                    return Result.CastEmpty<char, TextSpan>(result);
                 if (char.ToUpperInvariant(result.Value) == chToUpper)
-                   return CharResult.Value(input.Until(result.Remainder), input, result.Remainder);
-                return CharResult.Empty<StringSpan>(input, expectations);
+                   return Result.Value(input.Until(result.Remainder), input, result.Remainder);
+                return Result.Empty<TextSpan>(input, expectations);
             };
         }
 
@@ -157,7 +157,7 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="predicate">A predicate.</param>
         /// <returns>The matched text.</returns>
-        public static CharParser<StringSpan> Until(Func<char, bool> predicate)
+        public static TextParser<TextSpan> Until(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
@@ -170,7 +170,7 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="predicate">A predicate.</param>
         /// <returns>The matched text.</returns>
-        public static CharParser<StringSpan> While(Func<char, bool> predicate)
+        public static TextParser<TextSpan> While(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
@@ -182,14 +182,14 @@ namespace Superpower.Parsers
                     next = next.Remainder.ConsumeChar();
                 }
 
-                return CharResult.Value(input.Until(next.Location), input, next.Location);
+                return Result.Value(input.Until(next.Location), input, next.Location);
             };
         }
 
         /// <summary>
         /// Parse until a non-whitespace character is encountered, returning the matched span of whitespace.
         /// </summary>
-        public static CharParser<StringSpan> WhiteSpace { get; } = input =>
+        public static TextParser<TextSpan> WhiteSpace { get; } = input =>
         {
             var next = input.ConsumeChar();
             while (next.HasValue && char.IsWhiteSpace(next.Value))
@@ -197,7 +197,7 @@ namespace Superpower.Parsers
                 next = next.Remainder.ConsumeChar();
             }
 
-            return CharResult.Value(input.Until(next.Location), input, next.Location);
+            return Result.Value(input.Until(next.Location), input, next.Location);
         };
     }
 }

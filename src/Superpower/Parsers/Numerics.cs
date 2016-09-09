@@ -26,32 +26,32 @@ namespace Superpower.Parsers
         /// <summary>
         /// A string of digits.
         /// </summary>
-        public static CharParser<StringSpan> Integer { get; } = input =>
+        public static TextParser<TextSpan> Integer { get; } = input =>
         {
             var next = input.ConsumeChar();
             if (!next.HasValue || !char.IsDigit(next.Value))
-                return CharResult.Empty<StringSpan>(input, ExpectedDigit);
+                return Result.Empty<TextSpan>(input, ExpectedDigit);
 
-            StringSpan remainder;
+            TextSpan remainder;
             do
             {
                 remainder = next.Remainder;
                 next = remainder.ConsumeChar();
             } while (next.HasValue && char.IsDigit(next.Value));
 
-            return CharResult.Value(input.Until(remainder), input, remainder);
+            return Result.Value(input.Until(remainder), input, remainder);
         };
 
         /// <summary>
         /// A string of digits, converted into an <see cref="int"/>.
         /// </summary>
-        public static CharParser<int> IntegerInt32 { get; } = input =>
+        public static TextParser<int> IntegerInt32 { get; } = input =>
         {
             var next = input.ConsumeChar();
             if (!next.HasValue || !char.IsDigit(next.Value))
-                return CharResult.Empty<int>(input, ExpectedDigit);
+                return Result.Empty<int>(input, ExpectedDigit);
 
-            StringSpan remainder;
+            TextSpan remainder;
             var val = 0;
             do
             {
@@ -60,7 +60,7 @@ namespace Superpower.Parsers
                 next = remainder.ConsumeChar();
             } while (next.HasValue && char.IsDigit(next.Value));
 
-            return CharResult.Value(val, input, remainder);
+            return Result.Value(val, input, remainder);
         };
     }
 }

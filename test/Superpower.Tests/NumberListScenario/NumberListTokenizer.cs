@@ -14,7 +14,7 @@ namespace Superpower.Tests.NumberListScenario
             _useCustomErrors = useCustomErrors;
         }
 
-        protected override IEnumerable<CharResult<NumberListToken>> Tokenize(StringSpan span)
+        protected override IEnumerable<Result<NumberListToken>> Tokenize(TextSpan span)
         {
             var next = SkipWhiteSpace(span);
             if (!next.HasValue)
@@ -26,17 +26,17 @@ namespace Superpower.Tests.NumberListScenario
                 {
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.ConsumeChar();
-                    yield return CharResult.Value(NumberListToken.Number, integer.Location, integer.Remainder);
+                    yield return Result.Value(NumberListToken.Number, integer.Location, integer.Remainder);
                 }
                 else
                 {
                     if (_useCustomErrors)
                     {
-                        yield return CharResult.Empty<NumberListToken>(next.Location, "list must contain only numbers");
+                        yield return Result.Empty<NumberListToken>(next.Location, "list must contain only numbers");
                     }
                     else
                     {
-                        yield return CharResult.Empty<NumberListToken>(next.Location, new[] { "digit" });
+                        yield return Result.Empty<NumberListToken>(next.Location, new[] { "digit" });
                     }
                 }
 

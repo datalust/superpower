@@ -18,22 +18,22 @@ using System;
 namespace Superpower.Model
 {
     /// <summary>
-    /// The result of parsing a character stream.
+    /// The result of parsing from a text span.
     /// </summary>
     /// <typeparam name="T">The type of the value being parsed.</typeparam>
-    public struct CharResult<T>
+    public struct Result<T>
     {
         readonly T _value;
 
         /// <summary>
-        /// The location in the stream where the parsing began.
+        /// The location in the stream where the parsing began (== the input).
         /// </summary>
-        public StringSpan Location { get; }
+        public TextSpan Location { get; }
 
         /// <summary>
         /// The first un-parsed location in the stream.
         /// </summary>
-        public StringSpan Remainder { get; }
+        public TextSpan Remainder { get; }
 
         /// <summary>
         /// True if the result carries a successfully-parsed value; otherwise, false.
@@ -55,7 +55,7 @@ namespace Superpower.Model
         /// </summary>
         public string[] Expectations { get; }
 
-        internal bool IsPartial(StringSpan @from) => @from != Remainder;
+        internal bool IsPartial(TextSpan @from) => @from != Remainder;
 
         /// <summary>
         /// The parsed value.
@@ -70,7 +70,7 @@ namespace Superpower.Model
             }
         }
 
-        internal CharResult(T value, StringSpan location, StringSpan remainder)
+        internal Result(T value, TextSpan location, TextSpan remainder)
         {
             Location = location;
             Remainder = remainder;
@@ -80,7 +80,7 @@ namespace Superpower.Model
             Expectations = null;
         }
 
-        internal CharResult(StringSpan remainder, string errorMessage, string[] expectations)
+        internal Result(TextSpan remainder, string errorMessage, string[] expectations)
         {
             Location = Remainder = remainder;
             _value = default(T);
@@ -92,7 +92,7 @@ namespace Superpower.Model
         /// <inheritdoc />
         public override string ToString()
         {
-            if (Remainder == StringSpan.None)
+            if (Remainder == TextSpan.None)
                 return "(Empty result.)";
 
             if (HasValue)

@@ -24,9 +24,9 @@ namespace Superpower.Display
             return kind.ToString().ToLower();
         }
 
-        static TokenAttribute TryGetTokenAttribute<TTokenKind>(TTokenKind kind)
+        static TokenAttribute TryGetTokenAttribute<TKind>(TKind kind)
         {
-            var kindTypeInfo = typeof(TTokenKind).GetTypeInfo();
+            var kindTypeInfo = typeof(TKind).GetTypeInfo();
             if (kindTypeInfo.IsEnum)
             {
                 var field = kindTypeInfo.GetDeclaredField(kind.ToString());
@@ -39,7 +39,7 @@ namespace Superpower.Display
             return null;
         }
 
-        public static string FormatExpectation<TTokenKind>(TTokenKind kind)
+        public static string FormatExpectation<TKind>(TKind kind)
         {
             var description = TryGetTokenAttribute(kind);
             if (description != null)
@@ -53,7 +53,7 @@ namespace Superpower.Display
             return FormatKind(kind);
         }
 
-        public static string FormatAppearance<TTokenKind>(TTokenKind kind, string value)
+        public static string FormatAppearance<TKind>(TKind kind, string value)
         {
             var clipped = FormatLiteral(Friendly.Clip(value, 12));
 
