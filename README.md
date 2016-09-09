@@ -218,7 +218,7 @@ Type=ArithmeticExpressionBenchmark  Mode=Throughput
 ```
 
           Method |      Median |     StdDev | Scaled | Scaled-SD |
----------------- |------------ |----------- |------- |---------- |
+---------------- |-----------: |----------: |------: |---------: |
          Sprache | 283.8618 &micro;s | 10.0276 &micro;s |   1.00 |      0.00 |
  Superpower (Token) |  81.1563 &micro;s |  2.8775 &micro;s |   0.29 |      0.01 |
 
