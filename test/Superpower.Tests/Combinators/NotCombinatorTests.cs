@@ -16,7 +16,7 @@ namespace Superpower.Tests.Combinators
         public void NotFailsIfLookaheadSucceeds()
         {
             AssertParser.FailsWithMessage(Parse.Not(Span.EqualTo("ab")).Then(_ => Character.EqualTo('a')), "ab", 
-                "Parsing failure (line 1, column 1): unexpected successful parsing of `ab`.");
+                "Syntax error (line 1, column 1): unexpected successful parsing of `ab`.");
         }
 
         [Fact]
@@ -29,7 +29,7 @@ namespace Superpower.Tests.Combinators
         public void TokenNotFailsIfLookaheadSucceeds()
         {
             AssertParser.FailsWithMessage(Parse.Not(Token.Sequence('a', 'b')).Then(_ => Token.EqualTo('a')), "ab",
-                "Parsing failure (line 1, column 1): unexpected successful parsing of `ab`.");
+                "Syntax error (line 1, column 1): unexpected successful parsing of `ab`.");
         }
     }
 }

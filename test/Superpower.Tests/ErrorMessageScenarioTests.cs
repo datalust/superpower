@@ -17,7 +17,7 @@ namespace Superpower.Tests
             var numbers = number.AtEnd();
             
             AssertParser.FailsWithMessage(numbers, "123", new SExpressionTokenizer(),
-                "Parsing failure (line 1, column 2): invalid number, unexpected `2`, expected `x`.");
+                "Syntax error (line 1, column 2): invalid number, unexpected `2`, expected `x`.");
         }
 
         [Fact]
@@ -29,7 +29,7 @@ namespace Superpower.Tests
             var alternating = number.Then(n => atom).AtEnd();
 
             AssertParser.FailsWithMessage(alternating, "123 123", new SExpressionTokenizer(),
-                "Parsing failure (line 1, column 5): unexpected number `123`, expected atom.");
+                "Syntax error (line 1, column 5): unexpected number `123`, expected atom.");
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace Superpower.Tests
             var alternating = number.Then(n => atom).Many().AtEnd();
 
             AssertParser.FailsWithMessage(alternating, "123 abc 123 123", new SExpressionTokenizer(),
-                "Parsing failure (line 1, column 13): unexpected number `123`, expected atom.");
+                "Syntax error (line 1, column 13): unexpected number `123`, expected atom.");
         }
 
         [Fact]
@@ -53,21 +53,21 @@ namespace Superpower.Tests
             var alternating = number.Then(n => atom).AtEnd();
 
             AssertParser.FailsWithMessage(alternating, "123", new SExpressionTokenizer(),
-                "Parsing failure: unexpected end of input, expected atom.");
+                "Syntax error: unexpected end of input, expected atom.");
         }
 
         [Fact]
         public void DroppedClosingParenthesisProducesMeaningfulError()
         {
             AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + (2 * 3", new ArithmeticExpressionTokenizer(),
-                "Parsing failure: unexpected end of input, expected `)`.");
+                "Syntax error: unexpected end of input, expected `)`.");
         }
 
         [Fact]
         public void MissingOperandProducesMeaningfulError()
         {
             AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + * 3", new ArithmeticExpressionTokenizer(),
-                 "Parsing failure (line 1, column 5): unexpected operator `*`, expected expression.");
+                 "Syntax error (line 1, column 5): unexpected operator `*`, expected expression.");
         }
     }
 }

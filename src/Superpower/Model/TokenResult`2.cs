@@ -113,7 +113,7 @@ namespace Superpower.Model
                 location = $" (line {sourcePosition.Line}, column {sourcePosition.Column})";
             }
 
-            return $"Parsing failure{location}: {message}.";
+            return $"Syntax error{location}: {message}.";
         }
 
         /// <summary>

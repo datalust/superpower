@@ -181,7 +181,7 @@ The [error scenario tests](https://github.com/datalust/superpower/blob/dev/test/
 
 ```csharp
 ArithmeticExpressionParser.Lambda.Parse(new ArithmeticExpressionTokenizer().Tokenize("1 + * 3"));
-     // -> Parsing failure (line 1, column 5): unexpected operator `*`, expected expression.
+     // -> Syntax error (line 1, column 5): unexpected operator `*`, expected expression.
 ```
 
 To improve the error reporting for a particular token type, apply the `[Token]` attribute:

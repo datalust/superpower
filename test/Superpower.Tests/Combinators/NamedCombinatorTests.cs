@@ -9,13 +9,13 @@ namespace Superpower.Tests.Combinators
         [Fact]
         public void FailedParsingProducesMessage()
         {
-            AssertParser.FailsWithMessage(Character.EqualTo('a').Named("hello"), "b", "Parsing failure (line 1, column 1): unexpected `b`, expected hello.");
+            AssertParser.FailsWithMessage(Character.EqualTo('a').Named("hello"), "b", "Syntax error (line 1, column 1): unexpected `b`, expected hello.");
         }
 
         [Fact]
         public void TokenFailedParsingProducesMessage()
         {
-            AssertParser.FailsWithMessage(Token.EqualTo('a').Named("hello"), "b", "Parsing failure (line 1, column 1): unexpected b `b`, expected hello.");
+            AssertParser.FailsWithMessage(Token.EqualTo('a').Named("hello"), "b", "Syntax error (line 1, column 1): unexpected b `b`, expected hello.");
         }
     }
 }
