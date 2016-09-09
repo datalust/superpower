@@ -69,5 +69,12 @@ namespace Superpower.Tests
             AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + * 3", new ArithmeticExpressionTokenizer(),
                  "Syntax error (line 1, column 5): unexpected operator `*`, expected expression.");
         }
+
+        [Fact]
+        public void MissingOperatorProducesMeaningfulError()
+        {
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 3", new ArithmeticExpressionTokenizer(),
+                 "Syntax error (line 1, column 3): unexpected number `3`.");
+        }
     }
 }
