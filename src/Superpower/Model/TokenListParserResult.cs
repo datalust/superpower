@@ -28,7 +28,7 @@ namespace Superpower.Model
         /// <returns>An empty result.</returns>
         public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder)
         {
-            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, null, null);
+            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, null, null, false);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Superpower.Model
         /// <returns>An empty result.</returns>
         public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder, string[] expectations)
         {
-            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, null, expectations);
+            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, null, expectations, false);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Superpower.Model
         /// <returns>An empty result.</returns>
         public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder, string errorMessage)
         {
-            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, errorMessage, null);
+            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, errorMessage, null, false);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Superpower.Model
         /// <returns>An empty result.</returns>
         public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder, Position errorPosition, string errorMessage)
         {
-            return new TokenListParserResult<TKind, T>(remainder, errorPosition, errorMessage, null);
+            return new TokenListParserResult<TKind, T>(remainder, errorPosition, errorMessage, null, false);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Superpower.Model
         /// <returns></returns>
         public static TokenListParserResult<TKind, T> Value<TKind, T>(T value, TokenList<TKind> location, TokenList<TKind> remainder)
         {
-            return new TokenListParserResult<TKind, T>(value, location, remainder);
+            return new TokenListParserResult<TKind, T>(value, location, remainder, false);
         }
 
         /// <summary>
@@ -92,11 +92,11 @@ namespace Superpower.Model
         /// <typeparam name="TKind">The kind of token.</typeparam>
         /// <typeparam name="T">The source type.</typeparam>
         /// <typeparam name="U">The destination type.</typeparam>
-        /// <param name="tokenListParserResult">The result to convert.</param>
+        /// <param name="result">The result to convert.</param>
         /// <returns>The converted result.</returns>
-        public static TokenListParserResult<TKind,U> CastEmpty<TKind, T, U>(TokenListParserResult<TKind, T> tokenListParserResult)
+        public static TokenListParserResult<TKind,U> CastEmpty<TKind, T, U>(TokenListParserResult<TKind, T> result)
         {
-            return new TokenListParserResult<TKind, U>(tokenListParserResult.Remainder, tokenListParserResult.ErrorPosition, tokenListParserResult.ErrorMessage, tokenListParserResult.Expectations);
+            return new TokenListParserResult<TKind, U>(result.Remainder, result.ErrorPosition, result.ErrorMessage, result.Expectations, result.Backtrack);
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new TokenListParserResult<TKind, T>(second.Remainder, second.ErrorPosition, first.ErrorMessage, expectations);
+            return new TokenListParserResult<TKind, T>(second.Remainder, second.ErrorPosition, first.ErrorMessage, expectations, second.Backtrack);
         }
     }
 }

@@ -72,7 +72,9 @@ namespace Superpower.Model
 
         internal bool IsPartial(TokenList<TKind> @from) => ErrorPosition.HasValue || @from != Remainder;
 
-        internal TokenListParserResult(T value, TokenList<TKind> location, TokenList<TKind> remainder)
+        internal bool Backtrack { get; set; }
+
+        internal TokenListParserResult(T value, TokenList<TKind> location, TokenList<TKind> remainder, bool backtrack)
         {
             Location = location;
             Remainder = remainder;
@@ -81,9 +83,10 @@ namespace Superpower.Model
             ErrorPosition = Position.Empty;
             ErrorMessage = null;
             Expectations = null;
+            Backtrack = backtrack;
         }
 
-        internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string errorMessage, string[] expectations)
+        internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string errorMessage, string[] expectations, bool backtrack)
         {
             // Errors don't really carry a location - it's always the remainder, which is the first item unable to
             // be successfully parsed.
@@ -93,6 +96,7 @@ namespace Superpower.Model
             ErrorPosition = errorPosition;
             ErrorMessage = errorMessage;
             Expectations = expectations;
+            Backtrack = backtrack;
         }
 
         /// <inheritdoc />

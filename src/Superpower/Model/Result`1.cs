@@ -57,6 +57,8 @@ namespace Superpower.Model
 
         internal bool IsPartial(TextSpan @from) => @from != Remainder;
 
+        internal bool Backtrack { get; set; }
+
         /// <summary>
         /// The parsed value.
         /// </summary>
@@ -70,7 +72,7 @@ namespace Superpower.Model
             }
         }
 
-        internal Result(T value, TextSpan location, TextSpan remainder)
+        internal Result(T value, TextSpan location, TextSpan remainder, bool backtrack)
         {
             Location = location;
             Remainder = remainder;
@@ -78,15 +80,17 @@ namespace Superpower.Model
             HasValue = true;
             ErrorMessage = null;
             Expectations = null;
+            Backtrack = backtrack;
         }
 
-        internal Result(TextSpan remainder, string errorMessage, string[] expectations)
+        internal Result(TextSpan remainder, string errorMessage, string[] expectations, bool backtrack)
         {
             Location = Remainder = remainder;
             _value = default(T);
             HasValue = false;
             Expectations = expectations;
             ErrorMessage = errorMessage;
+            Backtrack = backtrack;
         }
 
         /// <inheritdoc />

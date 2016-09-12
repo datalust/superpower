@@ -48,7 +48,7 @@ namespace Superpower
                 if (!uResult.HasValue)
                 {
                     var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
-                    return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null);
+                    return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null, uResult.Backtrack);
                 }
 
                 return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
@@ -258,7 +258,7 @@ namespace Superpower
                     r = parser(r.Remainder);
                 }
 
-                if (r.IsPartial(@from))
+                if (!r.Backtrack && r.IsPartial(@from))
                     return TokenListParserResult.CastEmpty<TKind, T, T[]>(r);
 
                 return TokenListParserResult.Value(result.ToArray(), input, r.Remainder);
@@ -292,7 +292,7 @@ namespace Superpower
                     r = parser(r.Remainder);
                 }
 
-                if (r.IsPartial(@from))
+                if (!r.Backtrack && r.IsPartial(@from))
                     return Result.CastEmpty<T, T[]>(r);
 
                 return Result.Value(result.ToArray(), input, r.Remainder);
@@ -507,7 +507,7 @@ namespace Superpower
             return input =>
             {
                 var first = lhs(input);
-                if (first.HasValue || first.IsPartial(input))
+                if (first.HasValue || !first.Backtrack && first.IsPartial(input))
                     return first;
 
                 var second = rhs(input);
@@ -534,7 +534,7 @@ namespace Superpower
             return input =>
             {
                 var first = lhs(input);
-                if (first.HasValue || first.IsPartial(input))
+                if (first.HasValue || !first.Backtrack && first.IsPartial(input))
                     return first;
 
                 var second = rhs(input);
@@ -696,8 +696,8 @@ namespace Superpower
                 if (rt.HasValue)
                     return rt;
 
-                // Need to preserve expecations iff there was no match.
-                return TokenListParserResult.Empty<TKind, T>(input);
+                rt.Backtrack = true;
+                return rt;
             };
         }
 
@@ -718,8 +718,8 @@ namespace Superpower
                 if (rt.HasValue)
                     return rt;
 
-                // Need to preserve expecations iff there was no match.
-                return Result.Empty<T>(input);
+                rt.Backtrack = true;
+                return rt;
             };
         }
 

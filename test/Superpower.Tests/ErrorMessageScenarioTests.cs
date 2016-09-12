@@ -76,5 +76,29 @@ namespace Superpower.Tests
             AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 3", new ArithmeticExpressionTokenizer(),
                  "Syntax error (line 1, column 3): unexpected number `3`.");
         }
+
+        [Fact]
+        public void AmbiguousMatchesFailWithoutTry()
+        {
+            var abc = Span.EqualTo("ab").Or(Span.EqualTo("ac"));
+            AssertParser.FailsWithMessage(abc, "ac",
+                 "Syntax error (line 1, column 2): unexpected `c`, expected `b`.");
+        }
+
+        [Fact]
+        public void AmbiguousMatchesProducePreciseErrors()
+        {
+            var abc = Span.EqualTo("ab").Try().Or(Span.EqualTo("ac"));
+            AssertParser.FailsWithMessage(abc, "bb",
+                 "Syntax error (line 1, column 1): unexpected `b`, expected `ab` or `ac`.");
+        }
+
+        [Fact]
+        public void AmbiguousPrefixMatchesProducePreciseErrors()
+        {
+            var abc = Span.EqualTo("ab").Try().Or(Span.EqualTo("ac"));
+            AssertParser.FailsWithMessage(abc, "ad",
+                 "Syntax error (line 1, column 2): unexpected `d`, expected `b` or `c`.");
+        }
     }
 }

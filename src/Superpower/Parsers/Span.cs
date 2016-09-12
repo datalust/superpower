@@ -42,7 +42,7 @@ namespace Superpower.Parsers
                     var ch = remainder.ConsumeChar();
                     if (!ch.HasValue)
                     {
-                        if (ch.Remainder == input)
+                        if (ch.Location == input)
                             return Result.Empty<TextSpan>(ch.Location, expectations);
 
                         var remaining = length - i;
@@ -63,7 +63,7 @@ namespace Superpower.Parsers
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
 
-            var expectations = new[] { text };
+            var expectations = new[] { Presentation.FormatLiteral(text) };
             return input =>
             {
                 var remainder = input;
@@ -72,7 +72,7 @@ namespace Superpower.Parsers
                     var ch = remainder.ConsumeChar();
                     if (!ch.HasValue || ch.Value != text[i])
                     {
-                        if (ch.Remainder == input)
+                        if (ch.Location == input)
                             return Result.Empty<TextSpan>(ch.Location, expectations);
 
                         return Result.Empty<TextSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
@@ -93,7 +93,7 @@ namespace Superpower.Parsers
             if (text == null) throw new ArgumentNullException(nameof(text));
             var textUpper = text.ToUpperInvariant();
 
-            var expectations = new[] { text };
+            var expectations = new[] { Presentation.FormatLiteral(text) };
             return input =>
             {
                 var remainder = input;
@@ -102,10 +102,10 @@ namespace Superpower.Parsers
                     var ch = remainder.ConsumeChar();
                     if (!ch.HasValue || char.ToUpperInvariant(ch.Value) != textUpper[i])
                     {
-                        if (ch.Remainder == input)
+                        if (ch.Location == input)
                             return Result.Empty<TextSpan>(ch.Location, expectations);
-                        else
-                            return Result.Empty<TextSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
+
+                        return Result.Empty<TextSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
                     }
                     remainder = ch.Remainder;
                 }

@@ -27,7 +27,7 @@ namespace Superpower.Model
         /// <returns>A result.</returns>
         public static Result<T> Empty<T>(TextSpan remainder)
         {
-            return new Result<T>(remainder, null, null);
+            return new Result<T>(remainder, null, null, false);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Superpower.Model
         /// <returns>A result.</returns>
         public static Result<T> Empty<T>(TextSpan remainder, string[] expectations)
         {
-            return new Result<T>(remainder, null, expectations);
+            return new Result<T>(remainder, null, expectations, false);
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Superpower.Model
         /// <returns>A result.</returns>
         public static Result<T> Empty<T>(TextSpan remainder, string errorMessage)
         {
-            return new Result<T>(remainder, errorMessage, null);
+            return new Result<T>(remainder, errorMessage, null, false);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Superpower.Model
         /// <returns>A result.</returns>
         public static Result<T> Value<T>(T value, TextSpan location, TextSpan remainder)
         {
-            return new Result<T>(value, location, remainder);
+            return new Result<T>(value, location, remainder, false);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Superpower.Model
         /// <returns>A result of type <typeparamref name="U"/> carrying the same information as <paramref name="result"/>.</returns>
         public static Result<U> CastEmpty<T, U>(Result<T> result)
         {
-            return new Result<U>(result.Remainder, result.ErrorMessage, result.Expectations);
+            return new Result<U>(result.Remainder, result.ErrorMessage, result.Expectations, result.Backtrack);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new Result<T>(second.Remainder, second.ErrorMessage, expectations);
+            return new Result<T>(second.Remainder, second.ErrorMessage, expectations, second.Backtrack);
         }
     }
 }

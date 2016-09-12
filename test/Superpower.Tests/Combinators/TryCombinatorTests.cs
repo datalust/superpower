@@ -12,7 +12,7 @@ namespace Superpower.Tests.Combinators
             var tryAb = Character.EqualTo('a').Then(_ => Character.EqualTo('b')).Try();
             var result = tryAb.TryParse("ac");
             Assert.False(result.HasValue);
-            Assert.Equal(0, result.Remainder.Position.Absolute);
+            Assert.True(result.Backtrack);
         }
 
         [Fact]
@@ -40,12 +40,12 @@ namespace Superpower.Tests.Combinators
         }
 
         [Fact]
-        public void TokenTryFailureConsumesNoInput()
+        public void TokenTryFailureBacktracks()
         {
             var tryAb = Token.EqualTo('a').Then(_ => Token.EqualTo('b')).Try();
             var result = tryAb.TryParse(StringAsCharTokenList.Tokenize("ac"));
             Assert.False(result.HasValue);
-            Assert.Equal(0, result.Remainder.Position);
+            Assert.True(result.Backtrack);
         }
 
         [Fact]
