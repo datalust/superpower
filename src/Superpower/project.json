@@ -1,7 +1,7 @@
 ﻿{
   "version": "1.0.0-*",
 
-  "description": "Experimental, work-in-progress parser combinator library",
+  "description": "A parser combinator library for C#",
   "authors": [ "Datalust", "Superpower Contributors", "Sprache Contributors" ],
 
   "packOptions": {
