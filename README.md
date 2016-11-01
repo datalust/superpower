@@ -128,23 +128,17 @@ Token parsers are defined in the same manner as text parsers, but consume tokens
 ```csharp
 class ArithmeticExpressionParser
 {
-    static TokenListParser<ArithmeticExpressionToken, ExpressionType> Operator(
-        ArithmeticExpressionToken op, ExpressionType opType)
-    {
-        return Token.EqualTo(op).Value(opType);
-    }
-
     static readonly TokenListParser<ArithmeticExpressionToken, ExpressionType> Add =
-        Operator(ArithmeticExpressionToken.Plus, ExpressionType.AddChecked);
+        Token.EqualTo(ArithmeticExpressionToken.Plus).Value(ExpressionType.AddChecked);
         
     static readonly TokenListParser<ArithmeticExpressionToken, ExpressionType> Subtract =
-        Operator(ArithmeticExpressionToken.Minus, ExpressionType.SubtractChecked);
+        Token.EqualTo(ArithmeticExpressionToken.Minus).Value(ExpressionType.SubtractChecked);
         
     static readonly TokenListParser<ArithmeticExpressionToken, ExpressionType> Multiply =
-        Operator(ArithmeticExpressionToken.Times, ExpressionType.MultiplyChecked);
+        Token.EqualTo(ArithmeticExpressionToken.Times).Value(ExpressionType.MultiplyChecked);
         
     static readonly TokenListParser<ArithmeticExpressionToken, ExpressionType> Divide = 
-        Operator(ArithmeticExpressionToken.Divide, ExpressionType.Divide);
+        Token.EqualTo(ArithmeticExpressionToken.Divide).Value(ExpressionType.Divide);
 
     static readonly TokenListParser<ArithmeticExpressionToken, Expression> Constant =
             Token.EqualTo(ArithmeticExpressionToken.Number)
