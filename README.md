@@ -58,7 +58,7 @@ var expression = "1 * (2 + 3)";
 var tokenizer = new ArithmeticExpressionTokenizer();
 var tokenList = tokenizer.Tokenize(expresssion);
 
-//2.
+// 2.
 var parser = ArithmeticExpressionParser.Lambda; // parser built with combinators
 var expressionTree = parser.Parse(tokenList);
 
