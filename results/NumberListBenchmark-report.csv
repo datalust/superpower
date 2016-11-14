@@ -1,0 +1,6 @@
+Type;Method;Mode;Platform;Jit;Toolchain;Runtime;GcMode;LaunchCount;WarmupCount;TargetCount;Affinity;Median;StdDev;Scaled;Scaled-SD
+NumberListBenchmark;StringSplitAndInt32Parse;Throughput;Host;Host;Host;Host;Host;Auto;Auto;Auto;Auto;138.7217 us;5.7115 us;1.00;0.00
+NumberListBenchmark;SpracheSimple;Throughput;Host;Host;Host;Host;Host;Auto;Auto;Auto;Auto;2,740.3251 us;11.9340 us;19.40;0.72
+NumberListBenchmark;SuperpowerSimple;Throughput;Host;Host;Host;Host;Host;Auto;Auto;Auto;Auto;937.1593 us;43.9867 us;6.64;0.39
+NumberListBenchmark;SuperpowerChar;Throughput;Host;Host;Host;Host;Host;Auto;Auto;Auto;Auto;691.5509 us;9.9246 us;4.89;0.19
+NumberListBenchmark;SuperpowerToken;Throughput;Host;Host;Host;Host;Host;Auto;Auto;Auto;Auto;1,189.8622 us;15.9538 us;8.46;0.33
