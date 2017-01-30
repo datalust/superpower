@@ -4,8 +4,6 @@ A [parser combinator](https://en.wikipedia.org/wiki/Parser_combinator) library b
 
 ![Logo](https://raw.githubusercontent.com/datalust/superpower/dev/asset/Superpower-White-200px.png)
 
-**Superpower is new and rapidly evolving. It's expected to stabilize fairly quickly as it's being built for use in a real-world product, but if you need stability/predictability today we suggest starting with [Sprache](https://github.com/sprache/Sprache) and watching this repository to track our progress.**
-
 ### Usage
 
 Superpower is embedded directly into your program code, without the need for any additional tools or build-time code generation tasks.
