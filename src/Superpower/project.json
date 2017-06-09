@@ -6,7 +6,7 @@
 
   "packOptions": {
     "tags": [ "superpower", "parser" ],
-    "projectUrl": "https://github.com/nblumhardt/superpower",
+    "projectUrl": "https://github.com/datalust/superpower",
     "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
     "iconUrl": "https://raw.githubusercontent.com/datalust/superpower/dev/asset/Superpower-White-400px.png"
   },
