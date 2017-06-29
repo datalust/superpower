@@ -6,20 +6,20 @@ namespace DateTimeTextParser
 {
     static public class DateTimeTextParser 
     {
-        private static TextParser<string> TwoDigits =
+        static TextParser<string> TwoDigits =
             from d1 in Character.Digit
             from d2 in Character.Digit
             select new string(new char[] {d1, d2});
 
-        private static TextParser<string> YearOfDate = 
+        static TextParser<string> YearOfDate = 
             from y1 in Character.Digit
             from y2 in Character.Digit
             from y3 in Character.Digit
             from y4 in Character.Digit
             select new string(new char[] {y1, y2, y3, y4});
-        private static TextParser<string> MonthOfDate = 
+        static TextParser<string> MonthOfDate = 
             TwoDigits;
-        private static TextParser<string> DayOfDate = 
+        static TextParser<string> DayOfDate = 
             TwoDigits;
 
         public static TextParser<DateTime> Date = 
@@ -30,7 +30,7 @@ namespace DateTimeTextParser
             from day in DayOfDate.Select(_ => Int32.Parse(_))
             select new DateTime(year, mon, day);
 
-        private static TextParser<int> secondWithSep = 
+        static TextParser<int> secondWithSep = 
             from sep in Character.EqualTo(':')
             from second in TwoDigits.Select(_ => Int32.Parse(_))
             select second;
