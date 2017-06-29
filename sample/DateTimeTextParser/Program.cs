@@ -15,6 +15,7 @@ namespace DateTimeTextParser
             catch (System.Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Input: '{0}'", input);
                 Console.WriteLine(ex.ToString());
                 Console.ForegroundColor = ConsoleColor.White;
             }
