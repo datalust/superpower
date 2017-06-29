@@ -46,7 +46,7 @@ namespace DateTimeTextParser
         static TextParser<string> DayOfDate = 
             TwoDigits;
 
-        public static TextParser<DateTime> Date = 
+        static TextParser<DateTime> Date = 
             from year in YearOfDate.Select(Int32.Parse)
             from sep1 in Character.EqualTo('-')
             from mon in MonthOfDate.Select(Int32.Parse)
@@ -59,7 +59,7 @@ namespace DateTimeTextParser
             from second in TwoDigits.Select(Int32.Parse)
             select second;
 
-        public static TextParser<TimeSpan> Time =
+        static TextParser<TimeSpan> Time =
             from hour in TwoDigits.Select(Int32.Parse)
             from sep1 in Character.EqualTo(':')
             from minute in TwoDigits.Select(Int32.Parse)
