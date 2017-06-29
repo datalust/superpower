@@ -17,8 +17,10 @@ namespace DateTimeTextParser
             from y3 in Character.Digit
             from y4 in Character.Digit
             select new string(new char[] {y1, y2, y3, y4});
+
         static TextParser<string> MonthOfDate = 
             TwoDigits;
+            
         static TextParser<string> DayOfDate = 
             TwoDigits;
 
