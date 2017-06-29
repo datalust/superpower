@@ -1,7 +1,7 @@
 ﻿using System;
 using Superpower;
 
-namespace DateTimeParser
+namespace DateTimeTextParser
 {
     class Program
     {
@@ -9,7 +9,7 @@ namespace DateTimeParser
         {
             try
             {
-                var dt = DateTimeParser.DateTime.Parse(input);
+                var dt = DateTimeTextParser.DateTime.Parse(input);
                 Console.WriteLine("Input: '{0}', ParsedValue: '{1}'", input, dt.ToString("o"));
             }
             catch (System.Exception ex)

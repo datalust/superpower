@@ -2,9 +2,9 @@ using System;
 using Superpower;
 using Superpower.Parsers;
 
-namespace DateTimeParser
+namespace DateTimeTextParser
 {
-    static public class DateTimeParser 
+    static public class DateTimeTextParser 
     {
         private static TextParser<string> _2DigitParser =
             from d1 in Character.Digit
