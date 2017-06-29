@@ -69,12 +69,12 @@ namespace DateTimeTextParser
         public static TextParser<DateTime> DateTime = 
             from q1 in Character.EqualTo('"').Optional()
             from date in (from date in Date
-                            from s in Character.In('T', ' ')
-                            from time in Time
-                            select date + time).Try()
-                            .Or(from time in Time
-                                select System.DateTime.Now.Date + time).Try()
-                            .Or(Date)
+                          from s in Character.In('T', ' ')
+                          from time in Time
+                          select date + time).Try()
+                          .Or(from time in Time
+                              select System.DateTime.Now.Date + time).Try()
+                          .Or(Date)
             from q2 in Character.EqualTo('"').Optional().AtEnd()
             where (q1 == null && q2 == null) || (q1 != null && q2 != null)
             select date;
