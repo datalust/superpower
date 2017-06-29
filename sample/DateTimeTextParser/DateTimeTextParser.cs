@@ -6,7 +6,7 @@ namespace DateTimeTextParser
 {
     static public class DateTimeTextParser 
     {
-        private static TextParser<string> _2DigitParser =
+        private static TextParser<string> TwoDigits =
             from d1 in Character.Digit
             from d2 in Character.Digit
             select new string(new char[] {d1, d2});
@@ -18,9 +18,9 @@ namespace DateTimeTextParser
             from y4 in Character.Digit
             select new string(new char[] {y1, y2, y3, y4});
         private static TextParser<string> MonthOfDate = 
-            _2DigitParser;
+            TwoDigits;
         private static TextParser<string> DayOfDate = 
-            _2DigitParser;
+            TwoDigits;
 
         public static TextParser<DateTime> Date = 
             from year in YearOfDate.Select(_ => Int32.Parse(_))
@@ -32,13 +32,13 @@ namespace DateTimeTextParser
 
         private static TextParser<int> secondWithSep = 
             from sep in Character.EqualTo(':')
-            from second in _2DigitParser.Select(_ => Int32.Parse(_))
+            from second in TwoDigits.Select(_ => Int32.Parse(_))
             select second;
 
         public static TextParser<TimeSpan> Time =
-            from hour in _2DigitParser.Select(_ => Int32.Parse(_))
+            from hour in TwoDigits.Select(_ => Int32.Parse(_))
             from sep1 in Character.EqualTo(':')
-            from minute in _2DigitParser.Select(_ => Int32.Parse(_))
+            from minute in TwoDigits.Select(_ => Int32.Parse(_))
             from second in secondWithSep.OptionalOrDefault()
             select new TimeSpan(hour, minute, second);
 
