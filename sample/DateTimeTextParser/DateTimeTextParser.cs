@@ -1,22 +1,44 @@
 using System;
+using System.Collections.Generic;
 using Superpower;
+using Superpower.Model;
 using Superpower.Parsers;
 
 namespace DateTimeTextParser
 {
     static public class DateTimeTextParser 
     {
+        static TextParser<char[]> Repeat(this TextParser<char> parser, int count)
+        {
+            return input =>
+            {
+                List<char> result = new List<char>();
+
+                Result<char> next = input.ConsumeChar();
+                var beginning = next.Location;
+
+                for (int i = 0; i < count; i++)
+                {
+                    var parserResult = parser.Invoke(next.Location);
+                    if (parserResult.HasValue) 
+                    {
+                        result.Add(parserResult.Value);
+                        next = next.Remainder.ConsumeChar();
+                    }
+                    else
+                        return Result.Empty<char[]>(input);
+                }
+
+                return Result.Value(result.ToArray(), beginning, next.Location);
+            };
+        }
+
+
         static TextParser<string> TwoDigits =
-            from d1 in Character.Digit
-            from d2 in Character.Digit
-            select new string(new char[] {d1, d2});
+            Character.Digit.Repeat(2).Select(chs => new String(chs));
 
         static TextParser<string> YearOfDate = 
-            from y1 in Character.Digit
-            from y2 in Character.Digit
-            from y3 in Character.Digit
-            from y4 in Character.Digit
-            select new string(new char[] {y1, y2, y3, y4});
+            Character.Digit.Repeat(4).Select(chs => new String(chs));
 
         static TextParser<string> MonthOfDate = 
             TwoDigits;
