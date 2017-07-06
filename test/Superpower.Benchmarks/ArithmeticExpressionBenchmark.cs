@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
 using Sprache;
-using Superpower;
-using Superpower.Parsers;
-using Superpower.Model;
 using Superpower.Benchmarks.ArithmeticExpressionScenario;
 
 namespace Superpower.Benchmarks
