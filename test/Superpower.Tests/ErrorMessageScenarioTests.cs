@@ -100,5 +100,21 @@ namespace Superpower.Tests
             AssertParser.FailsWithMessage(abc, "ad",
                  "Syntax error (line 1, column 2): unexpected `d`, expected `b` or `c`.");
         }
+
+        [Fact]
+        public void EmptySpanEqualToCharProducesCorrectExpectations()
+        {
+            var equalToA = Span.EqualTo('a');
+            AssertParser.FailsWithMessage(equalToA, "",
+                "Syntax error: unexpected end of input, expected `a`.");
+        }
+
+        [Fact]
+        public void EmptySpanEqualToCharProducesCorrectExpectationsIgnoreCase()
+        {
+            var equalToA = Span.EqualToIgnoreCase('a');
+            AssertParser.FailsWithMessage(equalToA, "",
+                "Syntax error: unexpected end of input, expected `a`.");
+        }
     }
 }
