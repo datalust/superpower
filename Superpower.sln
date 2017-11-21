@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AC295EEA-D319-4146-97E0-B978DF6F2557}"
 EndProject
@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superpower.Benchmarks", "te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntCalc", "sample\IntCalc\IntCalc.csproj", "{34BBD428-8297-484E-B771-0B72C172C264}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DateTimeParser", "sample\DateTimeTextParser\DateTimeParser.csproj", "{A842DA99-4EAB-423D-B532-7902FED0D8F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{34BBD428-8297-484E-B771-0B72C172C264}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34BBD428-8297-484E-B771-0B72C172C264}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34BBD428-8297-484E-B771-0B72C172C264}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,5 +78,9 @@ Global
 		{CD473266-4AED-4207-89FD-0B185239F1C7} = {2ED926D3-7AC8-4BFD-A16B-74D942602968}
 		{1A9C8D7E-4DFC-48CD-99B0-63612197E95F} = {2ED926D3-7AC8-4BFD-A16B-74D942602968}
 		{34BBD428-8297-484E-B771-0B72C172C264} = {7533E145-1C93-4348-A70D-E68746C5438C}
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1} = {7533E145-1C93-4348-A70D-E68746C5438C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F3941419-6499-4871-BEAA-861F4FE5D2D4}
 	EndGlobalSection
 EndGlobal
