@@ -1,10 +1,10 @@
 ﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
-//  
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at  
+// You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0  
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -124,9 +124,7 @@ namespace Superpower.Parsers
             return input =>
             {
                 var result = input.ConsumeChar();
-                if (!result.HasValue)
-                    return Result.CastEmpty<char, TextSpan>(result);
-                if (result.Value == ch)
+                if (result.HasValue && result.Value == ch)
                     return Result.Value(input.Until(result.Remainder), input, result.Remainder);
                 return Result.Empty<TextSpan>(input, expectations);
             };
@@ -144,9 +142,7 @@ namespace Superpower.Parsers
             return input =>
             {
                 var result = input.ConsumeChar();
-                if (!result.HasValue)
-                    return Result.CastEmpty<char, TextSpan>(result);
-                if (char.ToUpperInvariant(result.Value) == chToUpper)
+                if (result.HasValue && char.ToUpperInvariant(result.Value) == chToUpper)
                    return Result.Value(input.Until(result.Remainder), input, result.Remainder);
                 return Result.Empty<TextSpan>(input, expectations);
             };
