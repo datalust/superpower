@@ -124,9 +124,7 @@ namespace Superpower.Parsers
             return input =>
             {
                 var result = input.ConsumeChar();
-                if (!result.HasValue)
-                    return Result.CastEmpty<char, TextSpan>(result);
-                if (result.Value == ch)
+                if (result.HasValue && result.Value == ch)
                     return Result.Value(input.Until(result.Remainder), input, result.Remainder);
                 return Result.Empty<TextSpan>(input, expectations);
             };
@@ -144,9 +142,7 @@ namespace Superpower.Parsers
             return input =>
             {
                 var result = input.ConsumeChar();
-                if (!result.HasValue)
-                    return Result.CastEmpty<char, TextSpan>(result);
-                if (char.ToUpperInvariant(result.Value) == chToUpper)
+                if (result.HasValue && char.ToUpperInvariant(result.Value) == chToUpper)
                    return Result.Value(input.Until(result.Remainder), input, result.Remainder);
                 return Result.Empty<TextSpan>(input, expectations);
             };
