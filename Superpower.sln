@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AC295EEA-D319-4146-97E0-B978DF6F2557}"
 EndProject
@@ -10,12 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{66B005
 		appveyor.yml = appveyor.yml
 		Benchmark.ps1 = Benchmark.ps1
 		Build.ps1 = Build.ps1
-		global.json = global.json
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Superpower", "src\Superpower\Superpower.xproj", "{D4E037DE-9778-4E48-A4A7-E8C1751E637C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2ED926D3-7AC8-4BFD-A16B-74D942602968}"
 EndProject
@@ -25,10 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "asset", "asset", "{69238E6E
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{7533E145-1C93-4348-A70D-E68746C5438C}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Superpower.Tests", "test\Superpower.Tests\Superpower.Tests.xproj", "{CD473266-4AED-4207-89FD-0B185239F1C7}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Superpower.Benchmarks", "test\Superpower.Benchmarks\Superpower.Benchmarks.xproj", "{1A9C8D7E-4DFC-48CD-99B0-63612197E95F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "results", "results", "{D8D9BA69-4FD8-4F31-9ECC-227D85733D15}"
 	ProjectSection(SolutionItems) = preProject
@@ -40,7 +33,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "results", "results", "{D8D9
 		results\NumberListBenchmark-report.html = results\NumberListBenchmark-report.html
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IntCalc", "sample\IntCalc\IntCalc.xproj", "{34BBD428-8297-484E-B771-0B72C172C264}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superpower", "src\Superpower\Superpower.csproj", "{D4E037DE-9778-4E48-A4A7-E8C1751E637C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superpower.Tests", "test\Superpower.Tests\Superpower.Tests.csproj", "{CD473266-4AED-4207-89FD-0B185239F1C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Superpower.Benchmarks", "test\Superpower.Benchmarks\Superpower.Benchmarks.csproj", "{1A9C8D7E-4DFC-48CD-99B0-63612197E95F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntCalc", "sample\IntCalc\IntCalc.csproj", "{34BBD428-8297-484E-B771-0B72C172C264}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DateTimeParser", "sample\DateTimeTextParser\DateTimeParser.csproj", "{A842DA99-4EAB-423D-B532-7902FED0D8F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +65,10 @@ Global
 		{34BBD428-8297-484E-B771-0B72C172C264}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34BBD428-8297-484E-B771-0B72C172C264}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34BBD428-8297-484E-B771-0B72C172C264}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,5 +78,9 @@ Global
 		{CD473266-4AED-4207-89FD-0B185239F1C7} = {2ED926D3-7AC8-4BFD-A16B-74D942602968}
 		{1A9C8D7E-4DFC-48CD-99B0-63612197E95F} = {2ED926D3-7AC8-4BFD-A16B-74D942602968}
 		{34BBD428-8297-484E-B771-0B72C172C264} = {7533E145-1C93-4348-A70D-E68746C5438C}
+		{A842DA99-4EAB-423D-B532-7902FED0D8F1} = {7533E145-1C93-4348-A70D-E68746C5438C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F3941419-6499-4871-BEAA-861F4FE5D2D4}
 	EndGlobalSection
 EndGlobal
