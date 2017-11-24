@@ -1,4 +1,4 @@
-# Superpower sample / DateTimeTextParser
+# Superpower sample / `DateTimeTextParser`
 
 This example should shows how to build a simple text parser with Superpower.
 It uses a simple and well known requirement: parsing date and time values 
@@ -6,7 +6,7 @@ according to ISO-8601 format.
 
 ## The requirement
 
-In a simple, custom query language a user enter multiple conditions where a
+In a simple, custom query language a user enters multiple conditions where a
 property is compared to a static value. The property identifier the
 comparison operator and the static value had to be separated with spaces.
 There are text properties and datetime properties to query.
