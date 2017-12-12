@@ -25,27 +25,32 @@ namespace Superpower.Tests.Combinators
         }
 
         [Fact]
-        public void BetweenSucceedsIfAllParsersSucceed() {
+        public void BetweenSucceedsIfAllParsersSucceed()
+        {
             AssertParser.SucceedsWith( Character.EqualTo( 'a' ).Between( Character.EqualTo( '(' ), Character.EqualTo( ')' ) ), "(a)", 'a' );
         }
 
         [Fact]
-        public void TokenBetweenFailsIfLeftParserFails() {
+        public void TokenBetweenFailsIfLeftParserFails()
+        {
             AssertParser.Fails( Token.EqualTo( 'a' ).Between( Token.EqualTo( '(' ), Token.EqualTo( ')' ) ), "{a)" );
         }
 
         [Fact]
-        public void TokenBetweenFailsIfRightParserFails() {
+        public void TokenBetweenFailsIfRightParserFails()
+        {
             AssertParser.Fails( Token.EqualTo( 'a' ).Between( Token.EqualTo( '(' ), Token.EqualTo( ')' ) ), "(a}" );
         }
 
         [Fact]
-        public void TokenBetweenFailsIfMiddleParserFails() {
+        public void TokenBetweenFailsIfMiddleParserFails()
+        {
             AssertParser.Fails( Token.EqualTo( 'a' ).Between( Token.EqualTo( '(' ), Token.EqualTo( ')' ) ), "(b)" );
         }
 
         [Fact]
-        public void TokenBetweenSucceedsIfAllParsersSucceed() {
+        public void TokenBetweenSucceedsIfAllParsersSucceed()
+        {
             AssertParser.SucceedsWith( Token.EqualTo( 'a' ).Between( Token.EqualTo( '(' ), Token.EqualTo( ')' ) ), "(a)", 'a' );
         }
     }
