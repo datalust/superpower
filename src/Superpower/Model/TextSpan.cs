@@ -109,6 +109,32 @@ namespace Superpower.Model
             return Result.Value(ch, this, new TextSpan(Source, Position.Advance(ch), Length - 1));
         }
 
+        /// <summary>
+        /// Consume the charcters that match a regex
+        /// </summary>
+        /// <param name="regex"></param>
+        /// <returns></returns>
+        internal Result<string> ConsumeRegex(string regex)
+        {
+            EnsureHasValue();
+            if (IsAtEnd)
+                return Result.Empty<string>(this);
+
+            var re = new System.Text.RegularExpressions.Regex($"\\G({regex})");
+            var match = re.Match(this.Source, this.Position.Absolute);
+
+            if (match.Success)
+            {
+                var value = match.Value;
+                return Result.Value(value, this, new TextSpan(Source, Position.Advance(value), Length - value.Length));
+            }
+            else
+            {
+                return Result.Empty<string>(this);
+            }
+        }
+
+
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {

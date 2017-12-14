@@ -44,5 +44,30 @@ namespace Superpower.Tests
             var span = new TextSpan(str, new Position(offset, 1, offset + 1), length);
             Assert.False(span.EqualsValue(value));
         }
+
+
+        [Theory]
+        [InlineData("Hello World", 0, 11, "Hello|World", "Hello")]
+        [InlineData("Hello World", 6, 5, "Hello|World", "World")]
+        public void ASpanReturnsExpectedWhenConsumingRegex(string str, int offset, int length, string regex, string expected)
+        {
+            var span = new TextSpan(str, new Position(offset, 1, offset + 1), length);
+
+            var actual = span.ConsumeRegex(regex);
+
+            Assert.Equal(expected, actual.Value);
+        }
+
+        [Theory]
+        [InlineData("Hello World", 0, 11, "Help|Stop")] // Help partially matches but should fail nonetheless
+        [InlineData("Prefix Hello World", 0, 11, "Hello|World")] // Would only match if prefix gets skiped (i.e. regex is not anchored on current position)
+        public void ASpanReturnsExpectedFailureWhenRegexDoesNotMatch(string str, int offset, int length, string regex)
+        {
+            var span = new TextSpan(str, new Position(offset, 1, offset + 1), length);
+
+            var actual = span.ConsumeRegex(regex);
+
+            Assert.False(actual.HasValue);
+        }
     }
 }
