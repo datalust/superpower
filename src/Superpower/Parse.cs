@@ -41,22 +41,29 @@ namespace Superpower
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
             if (operand == null) throw new ArgumentNullException(nameof(operand));
             if (apply == null) throw new ArgumentNullException(nameof(apply));
-            return operand.Then(first => ChainOperatorRest(first, @operator, operand, apply));
-        }
 
-        static TextParser<T> ChainOperatorRest<T, TOperator>(
-            T firstOperand,
-            TextParser<TOperator> @operator,
-            TextParser<T> operand,
-            Func<TOperator, T, T, T> apply)
-        {
-            if (@operator == null) throw new ArgumentNullException(nameof(@operator));
-            if (operand == null) throw new ArgumentNullException(nameof(operand));
-            if (apply == null) throw new ArgumentNullException(nameof(apply));
-            return @operator.Then(opvalue =>
-                operand.Then(operandValue =>
-                    ChainOperatorRest(apply(opvalue, firstOperand, operandValue), @operator, operand, apply)))
-                    .Or(Return(firstOperand));
+            return input => {
+                var parseResult = operand(input);
+                if (!parseResult.HasValue) {
+                    return parseResult;
+                }
+
+                var result = parseResult.Value;
+
+                var operatorResult = @operator(parseResult.Remainder);
+                while (operatorResult.HasValue) {
+                    parseResult = operand(operatorResult.Remainder);
+
+                    if (!parseResult.HasValue) {
+                        return Result.CastEmpty<T, T>(parseResult);
+                    }
+
+                    result = apply(operatorResult.Value, result, parseResult.Value);
+                    operatorResult = @operator(parseResult.Remainder);
+                }
+
+                return Result.Value(result, input, parseResult.Remainder);
+            };
         }
 
         /// <summary>
@@ -112,22 +119,30 @@ namespace Superpower
             if (@operator == null) throw new ArgumentNullException(nameof(@operator));
             if (operand == null) throw new ArgumentNullException(nameof(operand));
             if (apply == null) throw new ArgumentNullException(nameof(apply));
-            return operand.Then(first => ChainOperatorRest(first, @operator, operand, apply));
-        }
 
-        static TokenListParser<TKind, T> ChainOperatorRest<TKind, T, TOperator>(
-            T firstOperand,
-            TokenListParser<TKind, TOperator> @operator,
-            TokenListParser<TKind, T> operand,
-            Func<TOperator, T, T, T> apply)
-        {
-            if (@operator == null) throw new ArgumentNullException(nameof(@operator));
-            if (operand == null) throw new ArgumentNullException(nameof(operand));
-            if (apply == null) throw new ArgumentNullException(nameof(apply));
-            return @operator.Then(opvalue =>
-                operand.Then(operandValue =>
-                    ChainOperatorRest(apply(opvalue, firstOperand, operandValue), @operator, operand, apply)))
-                    .Or(Return<TKind, T>(firstOperand));
+            return input =>
+            {
+                var parseResult = operand(input);
+                if ( !parseResult.HasValue ) {
+                    return parseResult;
+                }
+
+                var result = parseResult.Value;
+
+                var operatorResult = @operator(parseResult.Remainder);
+                while (operatorResult.HasValue) {
+                    parseResult = operand(operatorResult.Remainder);
+
+                    if (!parseResult.HasValue) {
+                        return TokenListParserResult.CastEmpty<TKind, T, T>(parseResult);
+                    }
+
+                    result = apply(operatorResult.Value, result, parseResult.Value);
+                    operatorResult = @operator(parseResult.Remainder);
+                }
+
+                return TokenListParserResult.Value(result, input, parseResult.Remainder);
+            };
         }
 
         /// <summary>
