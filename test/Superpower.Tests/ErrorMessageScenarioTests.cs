@@ -1,4 +1,5 @@
-﻿using Superpower.Parsers;
+﻿using Superpower.Model;
+using Superpower.Parsers;
 using Superpower.Tests.ArithmeticExpressionScenario;
 using Superpower.Tests.SExpressionScenario;
 using Superpower.Tests.Support;
@@ -13,9 +14,9 @@ namespace Superpower.Tests
         {
             var number = Token.EqualTo(SExpressionToken.Number)
                   .Apply(t => Character.EqualTo('1').Then(_ => Character.EqualTo('x')));
-            
+
             var numbers = number.AtEnd();
-            
+
             AssertParser.FailsWithMessage(numbers, "123", new SExpressionTokenizer(),
                 "Syntax error (line 1, column 2): invalid number, unexpected `2`, expected `x`.");
         }
@@ -115,6 +116,26 @@ namespace Superpower.Tests
             var equalToA = Span.EqualToIgnoreCase('a');
             AssertParser.FailsWithMessage(equalToA, "",
                 "Syntax error: unexpected end of input, expected `a`.");
+        }
+
+        [Fact]
+        public void MessageWithExpectedTokensUsesTokenPresentation()
+        {
+            // Composing a complex parser which does not fit a LALR(1) grammar, one might need
+            // to have multiple look-ahead tokens. While it is possible to compose parsers with back-tracking,
+            // manual generated parsers are some times easier to construct. These parsers would like
+            // to report expectations using tokens, but still benefit from the annotations put on
+            // the tokens, to generated nicely formatted error messages. The following construct
+            // shows how to generate an empty result, which indicates which tokens are expected.
+            var emptyParseResult = TokenListParserResult.Empty<ArithmeticExpressionToken, string>(
+                new TokenList<ArithmeticExpressionToken>(),
+                new []{ ArithmeticExpressionToken.Times, ArithmeticExpressionToken.Zero});
+
+            // Empty result represent expectations using nice string representation taken from
+            // annotations of enum values of tokens
+            Assert.Equal(2, emptyParseResult.Expectations.Length);
+            Assert.Equal( "`*`", emptyParseResult.Expectations[0]);
+            Assert.Equal("`zero`", emptyParseResult.Expectations[1]);
         }
     }
 }
