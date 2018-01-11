@@ -51,11 +51,17 @@ namespace Superpower
                 var result = parseResult.Value;
 
                 var operatorResult = @operator(parseResult.Remainder);
-                while (operatorResult.HasValue) {
+                while (operatorResult.HasValue || operatorResult.IsPartial(parseResult.Remainder)) {
+                    // If operator read any input, but failed to read complete input, we return error
+                    if (!operatorResult.HasValue) {
+                        return Result.CastEmpty<TOperator,T>(operatorResult);
+                    }
+
+
                     parseResult = operand(operatorResult.Remainder);
 
                     if (!parseResult.HasValue) {
-                        return Result.CastEmpty<T, T>(parseResult);
+                        return parseResult;
                     }
 
                     result = apply(operatorResult.Value, result, parseResult.Value);
@@ -130,7 +136,12 @@ namespace Superpower
                 var result = parseResult.Value;
 
                 var operatorResult = @operator(parseResult.Remainder);
-                while (operatorResult.HasValue) {
+                while (operatorResult.HasValue || operatorResult.IsPartial(parseResult.Remainder)) {
+                    // If operator read any input, but failed to read complete input, we return error
+                    if (!operatorResult.HasValue) {
+                        return TokenListParserResult.CastEmpty<TKind, TOperator, T>(operatorResult);
+                    }
+
                     parseResult = operand(operatorResult.Remainder);
 
                     if (!parseResult.HasValue) {
