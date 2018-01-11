@@ -216,6 +216,23 @@ Type=ArithmeticExpressionBenchmark  Mode=Throughput
 
 Benchmarks and results are included in the repository.
 
+### Examples
+
+Superpower is introduced, with a worked example, in [this blog post](https://nblumhardt.com/2016/09/superpower/).
+
+**Example** parsers to learn from:
+
+* [_DateTimeTextParser_](https://github.com/datalust/superpower/tree/dev/sample/DateTimeTextParser) shows how Superpower's text parsers work, parsing ISO-8601 date-times
+* [_IntCalc_](https://github.com/datalust/superpower/tree/dev/sample/IntCalc) is a simple arithmetic expresion parser (`1 + 2 * 3`) included in the repository, demonstrating how Superpower token parsing works
+* [_Plotty_](https://github.com/SuperJMN/Plotty) implements a logo-like drawing language
+
+**Real-world** projects built with Superpower:
+
+* [_Serilog.Filters.Expressions_](https://github.com/serilog/serilog-filters-expressions) uses Superpower to implement a filtering language for structured log events
+* The query language of [Seq](https://getseq.net) is implemented using Superpower
+
+_Have an example we can add to this list? [Let us know](https://github.com/datalust/superpower/issues/new)._
+
 ### Getting help
 
 Please post issues [to the issue tracker](https://github.com/datalust/superpower/issues), visit our [Gitter chat](https://gitter.im/datalust/superpower), or tag your [question on StackOverflow](http://stackoverflow.com/questions/tagged/superpower) with `superpower`.
