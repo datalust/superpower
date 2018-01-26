@@ -88,5 +88,15 @@ namespace Superpower.Model
         {
             return $"{Absolute} (line {Line}, column {Column})";
         }
+
+        internal Position Advance(string overString)
+        {
+            // TODO: avoid creating intermediate Position object 
+            // by folding the logic of Advance(char) into the loop
+            var current = this;
+            foreach (var chr in overString)
+                current = current.Advance(chr);
+            return current;
+        }
     }
 }
