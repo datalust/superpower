@@ -22,7 +22,7 @@ namespace Superpower.Parsers
     /// <summary>
     /// Parsers for spans of characters.
     /// </summary>
-    public class Span
+    public static class Span
     {
         /// <summary>
         /// Parse a span of length <paramref name="length"/>/>.

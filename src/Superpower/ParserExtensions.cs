@@ -29,6 +29,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="input">The input.</param>
         /// <returns>The result of the parser</returns>
+        /// <exception cref="ArgumentNullException">The parser or input is null.</exception>
         public static Result<T> TryParse<T>(this TextParser<T> parser, string input)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
@@ -45,6 +46,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="input">The input.</param>
         /// <returns>The result of the parser</returns>
+        /// <exception cref="ArgumentNullException">The parser or input is null.</exception>
         public static TokenListParserResult<TKind, T> TryParse<TKind, T>(this TokenListParser<TKind, T> parser, TokenList<TKind> input)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
@@ -60,6 +62,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="input">The input.</param>
         /// <returns>The result of the parser.</returns>
+        /// <exception cref="ArgumentNullException">The parser or input is null.</exception>
         /// <exception cref="ParseException">It contains the details of the parsing error.</exception>
         public static T Parse<T>(this TextParser<T> parser, string input)
         {
@@ -82,6 +85,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="input">The input.</param>
         /// <returns>The result of the parser.</returns>
+        /// <exception cref="ArgumentNullException">The parser or input is null.</exception>
         /// <exception cref="ParseException">It contains the details of the parsing error.</exception>
         public static T Parse<TKind, T>(this TokenListParser<TKind, T> parser, TokenList<TKind> input)
         {
@@ -94,6 +98,24 @@ namespace Superpower
                 return result.Value;
 
             throw new ParseException(result.ToString());
+        }
+
+        /// <summary>
+        /// Tests whether the parser matches the entire provided <see cref="TextSpan"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the parser's result.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="input">The input.</param>
+        /// <returns>True if the parser is a complete match for the input; otherwise, false.</returns>
+        /// <exception cref="ArgumentNullException">The parser is null.</exception>
+        /// <exception cref="ArgumentException">The input is <see cref="TextSpan.Empty"/>empty.</exception>
+        public static bool IsMatch<T>(this TextParser<T> parser, TextSpan input)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (input == TextSpan.Empty) throw new ArgumentException("Input text span is empty.", nameof(input));
+
+            var result = parser(input);
+            return result.HasValue && result.Remainder.IsAtEnd;
         }
     }
 }

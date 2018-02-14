@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Superpower.Tests.NumberListScenario;
 using Xunit;
 
@@ -48,6 +46,12 @@ namespace Superpower.Tests
             var tokenizer = new NumberListTokenizer();
             var result = tokenizer.Tokenize("1 23 456");
             Assert.Equal(3, result.Count());
+        }
+
+        [Fact]
+        public void TokenizationStateTracksTheLastProducedToken()
+        {
+            throw new NotImplementedException();
         }
     }
 }
