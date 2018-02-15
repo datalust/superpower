@@ -37,6 +37,11 @@ namespace Superpower.Tests.Support
             Succeeds(parser, input, t => Assert.True(t.SequenceEqual(expectedResult)));
         }
 
+        public static void SucceedsWithAll(TextParser<TextSpan> parser, string input)
+        {
+            SucceedsWithAll(parser.Select(s => s.ToStringValue().ToCharArray()), input);
+        }
+        
         public static void SucceedsWithAll(TextParser<char[]> parser, string input)
         {
             SucceedsWithMany(parser, input, input.ToCharArray());

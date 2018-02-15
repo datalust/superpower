@@ -1,8 +1,10 @@
-﻿using Superpower.Model;
+﻿using System.Collections.Generic;
+using Superpower.Model;
 using Superpower.Parsers;
 using Superpower.Tests.ArithmeticExpressionScenario;
 using Superpower.Tests.SExpressionScenario;
 using Superpower.Tests.Support;
+using Superpower.Tokenizers;
 using Xunit;
 
 namespace Superpower.Tests
@@ -57,24 +59,43 @@ namespace Superpower.Tests
                 "Syntax error: unexpected end of input, expected atom.");
         }
 
-        [Fact]
-        public void DroppedClosingParenthesisProducesMeaningfulError()
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static IEnumerable<object[]> ArithmeticExpressionTokenizers()
         {
-            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + (2 * 3", new ArithmeticExpressionTokenizer(),
+            yield return new object[] { new ArithmeticExpressionTokenizer() };
+
+            yield return new object[] { 
+                new TokenizerBuilder<ArithmeticExpressionToken>()
+                    .Ignore(Span.WhiteSpace)
+                    .Match(Character.EqualTo('+'), ArithmeticExpressionToken.Plus)
+                    .Match(Character.EqualTo('-'), ArithmeticExpressionToken.Minus)
+                    .Match(Character.EqualTo('*'), ArithmeticExpressionToken.Times)
+                    .Match(Character.EqualTo('/'), ArithmeticExpressionToken.Divide)
+                    .Match(Character.EqualTo('('), ArithmeticExpressionToken.LParen)
+                    .Match(Character.EqualTo(')'), ArithmeticExpressionToken.RParen)
+                    .Match(Numerics.Natural, ArithmeticExpressionToken.Number, requireDelimiters: true)
+                    .Build()                
+            };
+        }
+
+        [Theory, MemberData(nameof(ArithmeticExpressionTokenizers))]
+        public void DroppedClosingParenthesisProducesMeaningfulError(Tokenizer<ArithmeticExpressionToken> tokenizer)
+        {
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + (2 * 3", tokenizer,
                 "Syntax error: unexpected end of input, expected `)`.");
         }
 
-        [Fact]
-        public void MissingOperandProducesMeaningfulError()
+        [Theory, MemberData(nameof(ArithmeticExpressionTokenizers))]
+        public void MissingOperandProducesMeaningfulError(Tokenizer<ArithmeticExpressionToken> tokenizer)
         {
-            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + * 3", new ArithmeticExpressionTokenizer(),
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + * 3", tokenizer,
                  "Syntax error (line 1, column 5): unexpected operator `*`, expected expression.");
         }
 
-        [Fact]
-        public void MissingOperatorProducesMeaningfulError()
+        [Theory, MemberData(nameof(ArithmeticExpressionTokenizers))]
+        public void MissingOperatorProducesMeaningfulError(Tokenizer<ArithmeticExpressionToken> tokenizer)
         {
-            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 3", new ArithmeticExpressionTokenizer(),
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 3", tokenizer,
                  "Syntax error (line 1, column 3): unexpected number `3`.");
         }
 

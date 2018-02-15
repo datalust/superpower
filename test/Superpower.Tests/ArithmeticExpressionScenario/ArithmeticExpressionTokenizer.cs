@@ -24,15 +24,13 @@ namespace Superpower.Tests.ArithmeticExpressionScenario
 
             do
             {
-                ArithmeticExpressionToken charToken;
-
                 if (char.IsDigit(next.Value))
                 {
-                    var integer = Numerics.Integer(next.Location);
-                    next = integer.Remainder.ConsumeChar();
-                    yield return Result.Value(ArithmeticExpressionToken.Number, integer.Location, integer.Remainder);
+                    var natural = Numerics.Natural(next.Location);
+                    next = natural.Remainder.ConsumeChar();
+                    yield return Result.Value(ArithmeticExpressionToken.Number, natural.Location, natural.Remainder);
                 }
-                else if (_operators.TryGetValue(next.Value, out charToken))
+                else if (_operators.TryGetValue(next.Value, out var charToken))
                 {
                     yield return Result.Value(charToken, next.Location, next.Remainder);
                     next = next.Remainder.ConsumeChar();

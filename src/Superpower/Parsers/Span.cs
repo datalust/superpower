@@ -15,6 +15,7 @@
 using Superpower.Model;
 using Superpower.Util;
 using System;
+using System.Text.RegularExpressions;
 using Superpower.Display;
 
 namespace Superpower.Parsers
@@ -199,5 +200,32 @@ namespace Superpower.Parsers
                 Result.Empty<TextSpan>(input) :
                 Result.Value(input.Until(next.Location), input, next.Location);
         };
+
+        /// <summary>
+        /// Parse as much of the input as matches <paramref name="regex" />.
+        /// </summary>
+        /// <param name="regex">A regular expression. The expression should not be anchored with `^` (beginning of input), `$` (end of input) etc.</param>
+        /// <param name="options">Options to apply to the expression. Specifying `RegexOptions.Compiled` may speed up some cases.</param>
+        /// <returns>A parser that will match text matching the expression.</returns>
+        /// <exception cref="ArgumentNullException">The expression is null.</exception>
+        public static TextParser<TextSpan> Regex(string regex, RegexOptions options = RegexOptions.None)
+        {
+            if (regex == null) throw new ArgumentNullException(nameof(regex));
+            var re = new Regex($"^{regex}");
+            var expectations = new[] { "match for `regex`" };
+
+            return i =>
+            {
+                var m = re.Match(i.Source, i.Position.Absolute, i.Length);
+                if (!m.Success || m.Length == 0)
+                    return Result.Empty<TextSpan>(i, expectations);
+
+                var remainder = i;
+                for (var skip = 0; skip < m.Length; skip++)
+                    remainder = remainder.ConsumeChar().Remainder;
+
+                return Result.Value(i.First(m.Length), i, remainder);
+            };
+        }
     }
 }

@@ -170,7 +170,7 @@ namespace Superpower.Model
             next.EnsureHasValue();
             if (next.Source != Source) throw new ArgumentException("The spans are on different source strings.", nameof(next));
 #endif
-                var charCount = Length - next.Length;
+            var charCount = Length - next.Length;
             return First(charCount);
         }
 
@@ -187,6 +187,28 @@ namespace Superpower.Model
 #endif
 
             return new TextSpan(Source, Position, length);
+        }
+        
+        /// <summary>
+        /// Skip a specified number of characters. Note, this is an O(N) operation.
+        /// </summary>
+        /// <param name="count"></param>
+        public TextSpan Skip(int count)
+        {
+            EnsureHasValue();
+            
+#if CHECKED
+            if (count > Length)
+                throw new ArgumentOutOfRangeException(nameof(count), "Count exceeds the source span's length.");
+#endif
+
+            var p = Position;
+            for (var i = 0; i < count; ++i)
+            {
+                p = p.Advance(Source[p.Absolute]);
+            }
+
+            return new TextSpan(Source, p, Length - count);
         }
 
         /// <inheritdoc/>
