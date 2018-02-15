@@ -153,11 +153,11 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="predicate">A predicate.</param>
         /// <returns>The matched text.</returns>
-        public static TextParser<TextSpan> Until(Func<char, bool> predicate)
+        public static TextParser<TextSpan> WithoutAny(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-            return While(ch => !predicate(ch));
+            return WithAll(ch => !predicate(ch));
         }
 
 
@@ -166,7 +166,7 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="predicate">A predicate.</param>
         /// <returns>The matched text.</returns>
-        public static TextParser<TextSpan> While(Func<char, bool> predicate)
+        public static TextParser<TextSpan> WithAll(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
@@ -177,8 +177,10 @@ namespace Superpower.Parsers
                 {
                     next = next.Remainder.ConsumeChar();
                 }
-
-                return Result.Value(input.Until(next.Location), input, next.Location);
+                
+                return  next.Location == input ?
+                    Result.Empty<TextSpan>(input) :
+                    Result.Value(input.Until(next.Location), input, next.Location);
             };
         }
 
@@ -193,7 +195,9 @@ namespace Superpower.Parsers
                 next = next.Remainder.ConsumeChar();
             }
 
-            return Result.Value(input.Until(next.Location), input, next.Location);
+            return next.Location == input ?
+                Result.Empty<TextSpan>(input) :
+                Result.Value(input.Until(next.Location), input, next.Location);
         };
     }
 }

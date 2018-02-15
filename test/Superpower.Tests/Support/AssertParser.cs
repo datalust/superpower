@@ -27,7 +27,7 @@ namespace Superpower.Tests.Support
         {
             Succeeds(parser, input, t =>
             {
-                Assert.Equal(1, t.Count());
+                Assert.Single(t);
                 Assert.Equal(expectedResult, t.Single());
             });
         }
@@ -83,7 +83,7 @@ namespace Superpower.Tests.Support
         {
             Succeeds(parser, input, t =>
             {
-                Assert.Equal(1, t.Count());
+                Assert.Single(t);
                 Assert.Equal(expectedResult, t.Single());
             });
         }

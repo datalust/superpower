@@ -15,13 +15,29 @@ namespace Superpower.Tests.Tokenizers
                 .Ignore(Span.WhiteSpace)
                 .Match(Character.EqualTo('('), SExpressionToken.LParen)
                 .Match(Character.EqualTo(')'), SExpressionToken.RParen)
-                .Match(Numerics.Integer, SExpressionToken.Number)
-                .Match(Span.While(char.IsLetterOrDigit), SExpressionToken.Atom)
+                .Match(Numerics.Integer, SExpressionToken.Number, requireDelimiters: true)
+                .Match(Character.Letter.IgnoreThen(Character.LetterOrDigit.AtLeastOnce()), SExpressionToken.Atom, requireDelimiters: true)
+                .Ignore(Comment.ShellStyle)
                 .Build();
 
-            var tokens = tokenizer.TryTokenize("abc (123 def)");
+            var tokens = tokenizer.TryTokenize("abc (123 def) # this is a comment");
             Assert.True(tokens.HasValue);
             Assert.Equal(5, tokens.Value.Count());
+        }
+
+        [Fact]
+        public void KeywordsRequireDelimiters()
+        {
+            var tokenizer = new TokenizerBuilder<bool>()
+                .Ignore(Span.WhiteSpace)
+                .Match(Span.EqualTo("is"), true, requireDelimiters: true)
+                .Match(Character.Letter.AtLeastOnce(), false, requireDelimiters: true)
+                .Build();
+
+            var tokens = tokenizer.TryTokenize("is isnot is notis ins not is");
+            Assert.True(tokens.HasValue);
+            Assert.Equal(7, tokens.Value.Count());
+            Assert.Equal(3, tokens.Value.Count(v => v.Kind));
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.CodeDom;
 using System.Linq;
 using Superpower.Tests.NumberListScenario;
+using Superpower.Tests.Support;
 using Xunit;
 
 namespace Superpower.Tests
@@ -13,7 +15,7 @@ namespace Superpower.Tests
             var tokenizer = new NumberListTokenizer();
             var result = tokenizer.TryTokenize("1 a");
             Assert.False(result.HasValue);
-            Assert.Equal(result.FormatErrorMessageFragment(), "unexpected `a`, expected digit");
+            Assert.Equal("unexpected `a`, expected digit", result.FormatErrorMessageFragment());
         }
 
         [Fact]
@@ -22,7 +24,7 @@ namespace Superpower.Tests
             var tokenizer = new NumberListTokenizer(useCustomErrors: true);
             var result = tokenizer.TryTokenize("1 a");
             Assert.False(result.HasValue);
-            Assert.Equal(result.FormatErrorMessageFragment(), "list must contain only numbers");
+            Assert.Equal("list must contain only numbers", result.FormatErrorMessageFragment());
         }
 
         [Fact]
@@ -51,7 +53,10 @@ namespace Superpower.Tests
         [Fact]
         public void TokenizationStateTracksTheLastProducedToken()
         {
-            throw new NotImplementedException();
+            var tokenizer = new PreviousCheckingTokenizer();
+            var input = new string('_', 6);
+            var result = tokenizer.Tokenize(input);
+            Assert.Equal(input.Length, result.Count());
         }
     }
 }

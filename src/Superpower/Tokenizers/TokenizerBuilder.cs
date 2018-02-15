@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Superpower.Display;
 using Superpower.Model;
 
 namespace Superpower.Tokenizers
@@ -104,27 +105,30 @@ namespace Superpower.Tokenizers
 
             protected override IEnumerable<Result<TKind>> Tokenize(TextSpan span)
             {
+                var remainder = span;
                 var current = default(Result<TKind>);
+                var recognizerSearchStart = 0;
                 var recognizerIndex = -1;
                 var hasCurrent = false;
-                var searchStart = 0;
                 
-                while (hasCurrent || TryMatch(span, searchStart, out current, out recognizerIndex))
+                while (hasCurrent || TryMatch(remainder, recognizerSearchStart, out current, out recognizerIndex))
                 {
                     var recognizer = _recognizers[recognizerIndex];
                     if (recognizer.IsIgnored)
                     {
+                        remainder = current.Remainder;
                         hasCurrent = false;
                         current = default(Result<TKind>);
-                        searchStart = 0;
+                        recognizerSearchStart = 0;
                         recognizerIndex = -1;
                     }
                     else if (recognizer.IsDelimiter || current.Remainder.IsAtEnd)
                     {
                         yield return current;
+                        remainder = current.Remainder;
                         hasCurrent = false;
                         current = default(Result<TKind>);
-                        searchStart = 0;
+                        recognizerSearchStart = 0;
                         recognizerIndex = -1;
                     }
                     else if (TryMatch(current.Remainder, 0, out var next, out var nextRecognizerIndex) &&
@@ -133,14 +137,15 @@ namespace Superpower.Tokenizers
                         yield return current;
                         hasCurrent = true;
                         current = next;
-                        searchStart = 0;
+                        remainder = current.Remainder;
+                        recognizerSearchStart = 0;
                         recognizerIndex = nextRecognizerIndex;
                     }
                     else if (recognizerIndex < _recognizers.Length - 1)
                     {
                         hasCurrent = false;
                         current = default(Result<TKind>);
-                        searchStart = recognizerIndex + 1;
+                        recognizerSearchStart = recognizerIndex + 1;
                         recognizerIndex = -1;
                     }
                     else
@@ -149,7 +154,7 @@ namespace Superpower.Tokenizers
                     }
                 }
 
-                if (!span.IsAtEnd)
+                if (!remainder.IsAtEnd)
                 {
                     yield return Result.Empty<TKind>(span);
                 }
@@ -163,8 +168,11 @@ namespace Superpower.Tokenizers
                     {
                         var recognizer = _recognizers[searchStart];
                         var attempt = recognizer.Parser(span);
-                        if (attempt.HasValue && attempt.Remainder != span)
+                        if (attempt.HasValue)
                         {
+                            if (attempt.Remainder == span) // Broken parser, not a failed parsing.
+                                throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatExpectation(recognizer.Kind)} at position {attempt.Location.Position}.");
+                            
                             match = Result.Value(recognizer.Kind, span, attempt.Remainder);
                             recognizerIndex = searchStart;
                             return true;
