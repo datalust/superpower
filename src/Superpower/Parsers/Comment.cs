@@ -17,7 +17,7 @@ using Superpower.Model;
 namespace Superpower.Parsers
 {
     /// <summary>
-    /// Parsers for matching comments in various styles
+    /// Parsers for matching comments in various styles.
     /// </summary>
     public static class Comment
     {

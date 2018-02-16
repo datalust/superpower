@@ -190,7 +190,7 @@ namespace Superpower.Model
         }
         
         /// <summary>
-        /// Skip a specified number of characters. Note, this is an O(N) operation.
+        /// Skip a specified number of characters. Note, this is an O(count) operation.
         /// </summary>
         /// <param name="count"></param>
         public TextSpan Skip(int count)

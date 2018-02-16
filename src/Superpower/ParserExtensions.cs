@@ -108,7 +108,7 @@ namespace Superpower
         /// <param name="input">The input.</param>
         /// <returns>True if the parser is a complete match for the input; otherwise, false.</returns>
         /// <exception cref="ArgumentNullException">The parser is null.</exception>
-        /// <exception cref="ArgumentException">The input is <see cref="TextSpan.Empty"/>empty.</exception>
+        /// <exception cref="ArgumentException">The input is <see cref="TextSpan.Empty"/>.</exception>
         public static bool IsMatch<T>(this TextParser<T> parser, TextSpan input)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
