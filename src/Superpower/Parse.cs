@@ -42,27 +42,25 @@ namespace Superpower
             if (operand == null) throw new ArgumentNullException(nameof(operand));
             if (apply == null) throw new ArgumentNullException(nameof(apply));
 
-            return input => {
+            return input =>
+            {
                 var parseResult = operand(input);
-                if (!parseResult.HasValue) {
+                if (!parseResult.HasValue)
                     return parseResult;
-                }
 
                 var result = parseResult.Value;
 
                 var operatorResult = @operator(parseResult.Remainder);
-                while (operatorResult.HasValue || operatorResult.IsPartial(parseResult.Remainder)) {
+                while (operatorResult.HasValue || operatorResult.IsPartial(parseResult.Remainder))
+                {
                     // If operator read any input, but failed to read complete input, we return error
-                    if (!operatorResult.HasValue) {
+                    if (!operatorResult.HasValue)
                         return Result.CastEmpty<TOperator,T>(operatorResult);
-                    }
-
 
                     parseResult = operand(operatorResult.Remainder);
 
-                    if (!parseResult.HasValue) {
+                    if (!parseResult.HasValue)
                         return parseResult;
-                    }
 
                     result = apply(operatorResult.Value, result, parseResult.Value);
                     operatorResult = @operator(parseResult.Remainder);
@@ -129,24 +127,22 @@ namespace Superpower
             return input =>
             {
                 var parseResult = operand(input);
-                if ( !parseResult.HasValue ) {
+                if ( !parseResult.HasValue )
                     return parseResult;
-                }
 
                 var result = parseResult.Value;
 
                 var operatorResult = @operator(parseResult.Remainder);
-                while (operatorResult.HasValue || operatorResult.IsPartial(parseResult.Remainder)) {
+                while (operatorResult.HasValue || operatorResult.IsPartial(parseResult.Remainder))
+                {
                     // If operator read any input, but failed to read complete input, we return error
-                    if (!operatorResult.HasValue) {
+                    if (!operatorResult.HasValue) 
                         return TokenListParserResult.CastEmpty<TKind, TOperator, T>(operatorResult);
-                    }
 
                     parseResult = operand(operatorResult.Remainder);
 
-                    if (!parseResult.HasValue) {
+                    if (!parseResult.HasValue)
                         return TokenListParserResult.CastEmpty<TKind, T, T>(parseResult);
-                    }
 
                     result = apply(operatorResult.Value, result, parseResult.Value);
                     operatorResult = @operator(parseResult.Remainder);
@@ -191,6 +187,7 @@ namespace Superpower
                     ChainRightOperatorRest(operandValue, @operator, operand, apply)).Then(r => Return<TKind, T>(apply(opvalue, lastOperand, r))))
                     .Or(Return<TKind, T>(lastOperand));
         }
+        
         /// <summary>
         /// Constructs a parser that will fail if the given parser succeeds,
         /// and will succeed if the given parser fails. In any case, it won't
