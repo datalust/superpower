@@ -115,7 +115,7 @@ namespace Superpower.Parsers
         }
 
         /// <summary>
-        /// Match a span equal to a singe character <paramref name="ch"/>.
+        /// Match a span equal to a single character <paramref name="ch"/>.
         /// </summary>
         /// <param name="ch">The character to match.</param>
         /// <returns>The matched text.</returns>
@@ -132,7 +132,7 @@ namespace Superpower.Parsers
         }
 
         /// <summary>
-        /// Match a span equal to a singe character <paramref name="ch"/>, ignoring invariant character case.
+        /// Match a span equal to a single character <paramref name="ch"/>, ignoring invariant character case.
         /// </summary>
         /// <param name="ch">The character to match.</param>
         /// <returns>The matched text.</returns>
