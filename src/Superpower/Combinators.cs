@@ -612,6 +612,37 @@ namespace Superpower
         }
 
         /// <summary>
+        /// Construct a parser that takes the result of <paramref name="parser"/> and casts it to <typeparamref name="U"/>.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <typeparam name="U">The type of the resulting value.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TokenListParser<TKind, U> Cast<TKind, T, U>(this TokenListParser<TKind, T> parser)
+            where T: U
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return parser.Then(rt => Parse.Return<TKind, U>((U)rt));
+        }
+        
+        /// <summary>
+        /// Construct a parser that takes the result of <paramref name="parser"/> and casts it to <typeparamref name="U"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <typeparam name="U">The type of the resulting value.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TextParser<U> Cast<T, U>(this TextParser<T> parser)
+            where T: U
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return parser.Then(rt => Parse.Return((U)rt));
+        }
+
+        /// <summary>
         /// The LINQ query comprehension pattern.
         /// </summary>
         /// <typeparam name="T">The type of value being parsed.</typeparam>

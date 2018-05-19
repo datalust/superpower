@@ -200,6 +200,11 @@ namespace Superpower.Parsers
                 Result.Empty<TextSpan>(input) :
                 Result.Value(input.Until(next.Location), input, next.Location);
         };
+       
+        /// <summary>
+        /// Parse until a whitespace character is encountered, returning the matched span of non-whitespace characters.
+        /// </summary>
+        public static TextParser<TextSpan> NonWhiteSpace { get; } = WithoutAny(char.IsWhiteSpace);
 
         /// <summary>
         /// Parse as much of the input as matches <paramref name="regex" />.
@@ -225,6 +230,29 @@ namespace Superpower.Parsers
                     remainder = remainder.ConsumeChar().Remainder;
 
                 return Result.Value(i.First(m.Length), i, remainder);
+            };
+        }
+        
+        /// <summary>
+        /// A handy adapter that takes any text parser, regardless of its result
+        /// type, and returns the span consumed by that parser.
+        /// </summary>
+        /// <param name="parser">A parser to apply.</param>
+        /// <typeparam name="T">The parser's (ignored) result type.</typeparam>
+        /// <returns>A parser that will match the span covered by <paramref name="parser"/>.</returns>
+        public static TextParser<TextSpan> MatchedBy<T>(TextParser<T> parser)
+        {
+            return i =>
+            {
+                var result = parser(i);
+                
+                if (!result.HasValue)
+                    return Result.CastEmpty<T, TextSpan>(result);
+              
+                return Result.Value(
+                    i.Until(result.Remainder),
+                    i,
+                    result.Remainder);
             };
         }
     }

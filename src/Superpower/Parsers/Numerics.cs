@@ -194,5 +194,23 @@ namespace Superpower.Parsers
             
             return Result.Value(val, input, remainder);
         };
+        
+        /// <summary>
+        /// Matches decimal numbers, for example <code>-1.23</code>.
+        /// </summary>
+        public static TextParser<TextSpan> Decimal { get; } =
+            Integer
+                .Then(n => Character.EqualTo('.').IgnoreThen(Natural).OptionalOrDefault()
+                    .Select(f => f == TextSpan.None ? n : new TextSpan(n.Source, n.Position, n.Length + f.Length + 1)));
+
+        /// <summary>
+        /// Matches <code>0x</code>-prefixed hexadecimal numbers.
+        /// </summary>
+        public static TextParser<TextSpan> HexNatural { get; } =
+            Span.MatchedBy(Span.EqualTo("0x")
+                .IgnoreThen(Character.Digit
+                    .Or(Character.Matching(ch => ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F', "a-f"))
+                    .Named("hex digit")
+                    .AtLeastOnce()));
     }
 }
