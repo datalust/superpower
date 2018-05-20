@@ -144,6 +144,73 @@ namespace Superpower
         }
 
         /// <summary>
+        /// Construct a parser that matches a specified number of instances of applying <paramref name="parser"/>.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="count">The number of times to apply <paramref name="parser"/>.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TokenListParser<TKind, T[]> Repeat<TKind, T>(this TokenListParser<TKind, T> parser, int count)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+
+            return input =>
+            {
+                // Assuming we'll try the parser and fail quite often, allocating the result
+                // array lazily should save some allocs for not much effort here.
+                T[] result = null;
+                var remainder = input;
+                for (var i = 0; i < count; ++i)
+                {
+                    var r = parser(remainder);
+                    if (!r.HasValue)
+                        return TokenListParserResult.CastEmpty<TKind, T, T[]>(r);
+
+                    result = result ?? new T[count];
+                    result[i] = r.Value;
+                    remainder = r.Remainder;
+                }
+
+                return TokenListParserResult.Value(result ?? new T[0], input, remainder);
+            };
+        }
+
+        /// <summary>
+        /// Construct a parser that matches a specified number of instances of applying <paramref name="parser"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="count">The number of times to apply <paramref name="parser"/>.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TextParser<T[]> Repeat<T>(this TextParser<T> parser, int count)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+
+            return input =>
+            {
+                // Assuming we'll try the parser and fail quite often, allocating the result
+                // array lazily should save some allocs for not much effort here.
+                T[] result = null;
+                var remainder = input;
+                for (var i = 0; i < count; ++i)
+                {
+                    var r = parser(remainder);
+                    if (!r.HasValue)
+                        return Result.CastEmpty<T, T[]>(r);
+
+                    result = result ?? new T[count];
+                    result[i] = r.Value;
+                    remainder = r.Remainder;
+                }
+
+                return Result.Value(result ?? new T[0], input, remainder);
+            };
+        }
+
+        /// <summary>
         /// Construct a parser that matches one or more instances of applying <paramref name="parser"/>, delimited by <paramref name="delimiter"/>.
         /// </summary>
         /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
@@ -312,20 +379,20 @@ namespace Superpower
             return input =>
             {
                 var result = new List<T>();
-                var @from = input;
+                var from = input;
                 var r = parser(input);
                 while (r.HasValue)
                 {
-                    if (@from == r.Remainder) // Broken parser, not a failed parsing.
+                    if (from == r.Remainder) // Broken parser, not a failed parsing.
                         throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
 
                     result.Add(r.Value);
 
-                    @from = r.Remainder;
+                    from = r.Remainder;
                     r = parser(r.Remainder);
                 }
 
-                if (!r.Backtrack && r.IsPartial(@from))
+                if (!r.Backtrack && r.IsPartial(from))
                     return Result.CastEmpty<T, T[]>(r);
 
                 return Result.Value(result.ToArray(), input, r.Remainder);

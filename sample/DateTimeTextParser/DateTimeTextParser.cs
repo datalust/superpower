@@ -4,79 +4,51 @@ using Superpower;
 using Superpower.Model;
 using Superpower.Parsers;
 
-namespace DateTimeTextParser
+namespace DateTimeParser
 {
-    static public class DateTimeTextParser 
-    {
-        static TextParser<char[]> Repeat(this TextParser<char> parser, int count)
-        {
-            return input =>
-            {
-                List<char> result = new List<char>();
+    public static class DateTimeTextParser
+    {        
+        static TextParser<int> IntDigits(int count) =>
+            Character.Digit
+                .Repeat(count)
+                .Select(chars => int.Parse(new string(chars)));
 
-                Result<char> next = input.ConsumeChar();
-                var beginning = next.Location;
+        static TextParser<int> TwoDigits { get; } = IntDigits(2);
+        static TextParser<int> FourDigits { get; } = IntDigits(4);
 
-                for (int i = 0; i < count; i++)
-                {
-                    var parserResult = parser.Invoke(next.Location);
-                    if (parserResult.HasValue) 
-                    {
-                        result.Add(parserResult.Value);
-                        next = next.Remainder.ConsumeChar();
-                    }
-                    else
-                        return Result.Empty<char[]>(input);
-                }
+        static TextParser<char> Dash { get; } = Character.EqualTo('-');
+        static TextParser<char> Colon { get; } = Character.EqualTo(':');
+        static TextParser<char> TimeSeparator { get; } = Character.In('T', ' ');
 
-                return Result.Value(result.ToArray(), beginning, next.Location);
-            };
-        }
+        static TextParser<DateTime> Date { get; } = 
+            from year in FourDigits
+            from _ in Dash
+            from month in TwoDigits
+            from __ in Dash
+            from day in TwoDigits
+            select new DateTime(year, month, day);
 
-
-        static TextParser<string> TwoDigits =
-            Character.Digit.Repeat(2).Select(chs => new String(chs));
-
-        static TextParser<string> YearOfDate = 
-            Character.Digit.Repeat(4).Select(chs => new String(chs));
-
-        static TextParser<string> MonthOfDate = 
-            TwoDigits;
-
-        static TextParser<string> DayOfDate = 
-            TwoDigits;
-
-        static TextParser<DateTime> Date = 
-            from year in YearOfDate.Select(Int32.Parse)
-            from sep1 in Character.EqualTo('-')
-            from mon in MonthOfDate.Select(Int32.Parse)
-            from sep2 in Character.EqualTo('-')
-            from day in DayOfDate.Select(Int32.Parse)
-            select new DateTime(year, mon, day);
-
-        static TextParser<int> secondWithSep = 
-            from sep in Character.EqualTo(':')
-            from second in TwoDigits.Select(Int32.Parse)
-            select second;
-
-        static TextParser<TimeSpan> Time =
-            from hour in TwoDigits.Select(Int32.Parse)
-            from sep1 in Character.EqualTo(':')
-            from minute in TwoDigits.Select(Int32.Parse)
-            from second in secondWithSep.OptionalOrDefault()
+        static TextParser<TimeSpan> Time { get; } =
+            from hour in TwoDigits
+            from _ in Colon
+            from minute in TwoDigits
+            from second in Colon
+                .IgnoreThen(TwoDigits)
+                .OptionalOrDefault()
             select new TimeSpan(hour, minute, second);
 
-        public static TextParser<DateTime> DateTime = 
-            from q1 in Character.EqualTo('"').Optional()
-            from date in (from date in Date
-                          from s in Character.In('T', ' ')
-                          from time in Time
-                          select date + time).Try()
-                          .Or(from time in Time
-                              select System.DateTime.Now.Date + time).Try()
-                          .Or(Date)
-            from q2 in Character.EqualTo('"').Optional().AtEnd()
-            where (q1 == null && q2 == null) || (q1 != null && q2 != null)
-            select date;
+        static TextParser<DateTime> DateTime { get; } =
+            from date in Date
+            from time in TimeSeparator
+                .IgnoreThen(Time)
+                .OptionalOrDefault()
+            select date + time;
+
+        static TextParser<DateTime> DateTimeOnly { get; } = DateTime.AtEnd();
+
+        public static DateTime Parse(string input)
+        {
+            return DateTimeOnly.Parse(input);
+        }
     }
 }
