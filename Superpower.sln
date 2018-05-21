@@ -43,6 +43,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntCalc", "sample\IntCalc\I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DateTimeParser", "sample\DateTimeTextParser\DateTimeParser.csproj", "{A842DA99-4EAB-423D-B532-7902FED0D8F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonParser", "sample\JsonParser\JsonParser.csproj", "{5C9AB721-559A-4617-B990-2D9EE85BEB7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A842DA99-4EAB-423D-B532-7902FED0D8F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C9AB721-559A-4617-B990-2D9EE85BEB7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C9AB721-559A-4617-B990-2D9EE85BEB7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C9AB721-559A-4617-B990-2D9EE85BEB7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C9AB721-559A-4617-B990-2D9EE85BEB7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +85,7 @@ Global
 		{1A9C8D7E-4DFC-48CD-99B0-63612197E95F} = {2ED926D3-7AC8-4BFD-A16B-74D942602968}
 		{34BBD428-8297-484E-B771-0B72C172C264} = {7533E145-1C93-4348-A70D-E68746C5438C}
 		{A842DA99-4EAB-423D-B532-7902FED0D8F1} = {7533E145-1C93-4348-A70D-E68746C5438C}
+		{5C9AB721-559A-4617-B990-2D9EE85BEB7C} = {7533E145-1C93-4348-A70D-E68746C5438C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F3941419-6499-4871-BEAA-861F4FE5D2D4}
