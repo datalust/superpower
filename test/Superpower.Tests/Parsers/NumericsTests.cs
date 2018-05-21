@@ -35,21 +35,33 @@ namespace Superpower.Tests.Parsers
         }
         
         [Theory]
-        [InlineData("0", false)]
-        [InlineData("a", false)]
-        [InlineData("0x-1", false)]
-        [InlineData("0x910", true)]
-        [InlineData("0x0", true)]
-        [InlineData("0xa", true)]
-        [InlineData("0xA", true)]
-        [InlineData("0x0123456789abcdef", true)]
-        [InlineData("0xg", false)]
+        [InlineData("0", true)]
+        [InlineData("-1", false)]
+        [InlineData("910", true)]
+        [InlineData("0x123", false)]
+        [InlineData("a", true)]
+        [InlineData("A", true)]
+        [InlineData("0123456789abcdef", true)]
+        [InlineData("g", false)]
         [InlineData("", false)]
-        public void HexNaturalNumbersAreRecognized(string input, bool isMatch)
+        public void HexDigitsAreRecognized(string input, bool isMatch)
         {
-            AssertParser.FitsTheory(Numerics.HexNatural, input, isMatch);
+            AssertParser.FitsTheory(Numerics.HexDigits, input, isMatch);
         }
         
+        [Theory]
+        [InlineData("0", 0)]
+        [InlineData("a", 0xa)]
+        [InlineData("910", 0x910)]
+        [InlineData("A", 0xA)]
+        [InlineData("012345678", 0x12345678)]
+        [InlineData("9abcdef", 0x9abcdef)]
+        public void HexDigitsAreParsed(string input, uint value)
+        {
+            var parsed = Numerics.HexDigitsUInt32.Parse(input);
+            Assert.Equal(value, parsed);
+        }
+
         [Theory]
         [InlineData("0", true)]
         [InlineData("01", true)]
