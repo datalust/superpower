@@ -39,5 +39,20 @@ namespace Superpower.Tests.Tokenizers
             Assert.Equal(7, tokens.Value.Count());
             Assert.Equal(3, tokens.Value.Count(v => v.Kind));
         }
+
+        [Fact]
+        public void PartiallyFailedTokenizationIsReported()
+        {
+            var tokenizer = new TokenizerBuilder<string>()
+                .Ignore(Span.WhiteSpace)
+                .Match(Span.EqualTo("abc"), "abc")
+                .Match(Span.EqualTo("def"), "def")
+                .Build();
+
+            var tokens = tokenizer.TryTokenize(" abd");
+            Assert.False(tokens.HasValue);
+            var msg = tokens.ToString();
+            Assert.Equal("Syntax error (line 1, column 4): invalid abc, unexpected `d`, expected `c`.", msg);
+        }
     }
 }

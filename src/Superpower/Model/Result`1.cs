@@ -43,6 +43,7 @@ namespace Superpower.Model
         /// <summary>
         /// The position of the first un-parsed location.
         /// </summary>
+        // ReSharper disable once UnusedMember.Global
         public Position ErrorPosition => Remainder.Position;
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace Superpower.Model
         /// </summary>
         public string[] Expectations { get; }
 
-        internal bool IsPartial(TextSpan @from) => @from != Remainder;
+        internal bool IsPartial(TextSpan from) => from != Remainder;
 
         internal bool Backtrack { get; set; }
 

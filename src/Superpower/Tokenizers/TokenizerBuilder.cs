@@ -103,6 +103,14 @@ namespace Superpower.Tokenizers
                 _recognizers = recognizers.ToArray();
             }
 
+            /// <inheritdoc/>
+            /// <remarks>
+            /// The complexity in this method is due to the desire to distinguish between (e.g. in C#)
+            /// the keyworkd `null` vs the identifier `nullability`. The tokenizer, when it encounters
+            /// a non-delimiter match (like `null`), looks ahead to see whether it's immediately followed
+            /// by a delimiter or end-of-input. If not, the match is discarded and subsequent recognizers
+            /// are tested.
+            /// </remarks>
             protected override IEnumerable<Result<TKind>> Tokenize(TextSpan span)
             {
                 var remainder = span;
@@ -154,10 +162,26 @@ namespace Superpower.Tokenizers
                     }
                 }
 
-                if (!remainder.IsAtEnd)
+                if (remainder.IsAtEnd)
+                    yield break;
+
+                // Even though this re-runs all of the recognizers, it's better for performance
+                // to calculate the error here, than do all of the extra work in the hot/success path.
+                var failure = Result.Empty<TKind>(remainder);
+                foreach (var recognizer in _recognizers)
                 {
-                    yield return Result.Empty<TKind>(span);
+                    var attempt = recognizer.Parser(remainder);
+                    if (!attempt.HasValue && // <- Successful recognizers rejected because delimiters were not present
+                        attempt.ErrorPosition.Absolute > failure.ErrorPosition.Absolute)
+                    {
+                        // We know the token's kind here, so might as well included it so that we can yield more
+                        // detailed messages.
+                        var augmentedMessage = $"invalid {Presentation.FormatExpectation(recognizer.Kind)}, {attempt.FormatErrorMessageFragment()}";
+                        failure = new Result<TKind>(attempt.Remainder, augmentedMessage, attempt.Expectations, attempt.Backtrack);
+                    }
                 }
+
+                yield return failure;
             }
 
             bool TryMatch(TextSpan span, int searchStart, out Result<TKind> match, out int recognizerIndex)

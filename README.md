@@ -1,23 +1,45 @@
 # Superpower [![Build status](https://ci.appveyor.com/api/projects/status/7bj6if6tyc68urpy?svg=true)](https://ci.appveyor.com/project/datalust/superpower)  [![Join the chat at https://gitter.im/datalust/superpower](https://img.shields.io/gitter/room/datalust/superpower.svg)](https://gitter.im/datalust/superpower) [![NuGet Version](https://img.shields.io/nuget/vpre/Superpower.svg?style=flat)](https://www.nuget.org/packages/Superpower/) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-superpower-orange.svg)](http://stackoverflow.com/questions/tagged/superpower)
 
-A [parser combinator](https://en.wikipedia.org/wiki/Parser_combinator) library based on [Sprache](https://github.com/sprache/Sprache). Superpower generates friendlier error messages through its support for token-based parsers.
+A [parser combinator](https://en.wikipedia.org/wiki/Parser_combinator) library based on
+[Sprache](https://github.com/sprache/Sprache). Superpower generates friendlier error messages through its support for
+token-driven parsers.
 
 ![Logo](https://raw.githubusercontent.com/datalust/superpower/dev/asset/Superpower-White-200px.png)
 
+### What is Superpower?
+
+The job of a parser is to take a sequence of characters as input, and produce as output a data structure that's easier
+for a program to analyze, manipulate, or transform. From this point of view, a parser is just a function from `string`
+to `T` - where `T` might be anything from a simple number, a list of fields in a data format, or the abstract syntax
+tree of some kind of programming language.
+
+Just like other kinds of functions, parsers can be built by hand, from scratch. This is-or-isn't a lot of fun, depending
+on the complexity of the parser you need to build (and how you plan to spend your next few dozen nights and weekends).
+
+Superpower is a library for writing parsers in a declarative style that mirrors
+the structure of the target grammar. Parsers built with Superpower are fast, robust, and report precise and
+informative errors when malformed input is encountered.
+
 ### Usage
 
-Superpower is embedded directly into your program code, without the need for any additional tools or build-time code generation tasks.
+Superpower is embedded directly into your C# program, without the need for any additional tools or build-time code
+generation tasks.
 
-The simplest parsers consume characters directly from the source text: 
+```shell
+dotnet add package Superpower
+```
+
+The simplest _text parsers_ consume characters directly from the source text: 
 
 ```csharp
 // Parse any number of capital 'A's in a row
 var parseA = Character.EqualTo('A').AtLeastOnce();
 ```
 
-The `Character.EqualTo()` method is a built-in parser. The `AtLeastOnce()` method is a _combinator_, that builds a more complex parser for a sequence of `'A'` characters out of the simple parser for a single `'A'`.
+The `Character.EqualTo()` method is a built-in parser. The `AtLeastOnce()` method is a _combinator_, that builds a more
+complex parser for a sequence of `'A'` characters out of the simple parser for a single `'A'`.
 
-Superpower includes a library of simple parsers and combinators from which sophisticated parsers can be built:
+Superpower includes a library of simple parsers and combinators from which more sophisticated parsers can be built:
 
 ```csharp
 TextParser<string> identifier =
@@ -30,11 +52,15 @@ var id = identifier.Parse("abc123");
 Assert.Equal("abc123", id);
 ```
 
-Parsers are highly modular, so smaller parsers can be built and tested independently of the larger parsers built from them.
+Parsers are highly modular, so smaller parsers can be built and tested independently of the larger parsers that use
+them.
 
 ### Tokenization
 
-A token-driven parser consumes elements from a list of tokens. The type used to represent the kinds of tokens consumed by a parser is generic, but currently Superpower has deeper support for `enum` tokens and using them is recommended.
+Along with text parsers that consume input character-by-character, Superpower supports _token parsers_.
+
+A token parser consumes elements from a list of tokens. A token is a fragment of the input text, tagged with the
+kind of item that fragment represents - usually specified using an `enum`:
 
 ```csharp
 public enum ArithmeticExpressionToken
@@ -44,7 +70,10 @@ public enum ArithmeticExpressionToken
     Plus,
 ```
 
-Token-driven parsing occurs in two distinct steps:
+A major benefit of driving parsing from tokens, instead of individual characters, is that errors can be reported in
+terms of tokens - _unexpected identifier \`frm\`, expected keyword \`from\`_ - instead of the cryptic _unexpected `m`_.
+
+Token-driven parsing takes place in two distinct steps:
 
  1. Tokenization, using a class derived from `Tokenizer<TKind>`, then
  2. Parsing, using a function of type `TokenListParser<TKind>`.
@@ -65,63 +94,42 @@ var eval = expressionTree.Compile();
 Console.WriteLine(eval()); // -> 5
 ```
 
-#### Writing tokenizers
+#### Assembling tokenizers with `TokenizerBuilder<TKind>`
+
+The job of a _tokenizer_ is to split the input into a list of tokens - numbers, keywords, identifiers, operators -
+while discarding irrelevant trivia such as whitespace or comments.
+
+Superpower provides the `TokenizerBuilder<TKind>` class to quickly assemble tokenizers from _recognizers_,
+text parsers that match the various kinds of tokens required by the grammar.
 
 A simple arithmetic expression tokenizer is shown below:
 
 ```csharp
-class ArithmeticExpressionTokenizer : Tokenizer<ArithmeticExpressionToken>
-{
-    readonly Dictionary<char, ArithmeticExpressionToken> _operators =
-        new Dictionary<char, ArithmeticExpressionToken>
-        {
-            ['+'] = ArithmeticExpressionToken.Plus,
-            ['-'] = ArithmeticExpressionToken.Minus,
-            ['*'] = ArithmeticExpressionToken.Times,
-            ['/'] = ArithmeticExpressionToken.Divide,
-            ['('] = ArithmeticExpressionToken.LParen,
-            [')'] = ArithmeticExpressionToken.RParen,
-        };
-
-    protected override IEnumerable<Result<ArithmeticExpressionToken>> Tokenize(TextSpan span)
-    {
-        var next = SkipWhiteSpace(span);
-        if (!next.HasValue)
-            yield break;
-
-        do
-        {
-            ArithmeticExpressionToken charToken;
-
-            if (char.IsDigit(next.Value))
-            {
-                var integer = Numerics.Integer(next.Location);
-                next = integer.Remainder.ConsumeChar();
-                yield return Result.Value(ArithmeticExpressionToken.Number,
-                    integer.Location, integer.Remainder);
-            }
-            else if (_operators.TryGetValue(next.Value, out charToken))
-            {
-                yield return Result.Value(charToken, next.Location, next.Remainder);
-                next = next.Remainder.ConsumeChar();
-            }
-            else
-            {
-                yield return Result.Empty<ArithmeticExpressionToken>(next.Location,
-                    new[] { "number", "operator" });
-            }
-
-            next = SkipWhiteSpace(next.Location);
-        } while (next.HasValue);
-    }
-}
+var tokenizer = new TokenizerBuilder<ArithmeticExpressionToken>()
+    .Ignore(Span.WhiteSpace)
+    .Match(Character.EqualTo('+'), ArithmeticExpressionToken.Plus)
+    .Match(Character.EqualTo('-'), ArithmeticExpressionToken.Minus)
+    .Match(Character.EqualTo('*'), ArithmeticExpressionToken.Times)
+    .Match(Character.EqualTo('/'), ArithmeticExpressionToken.Divide)
+    .Match(Character.EqualTo('('), ArithmeticExpressionToken.LParen)
+    .Match(Character.EqualTo(')'), ArithmeticExpressionToken.RParen)
+    .Match(Numerics.Natural, ArithmeticExpressionToken.Number)
+    .Build();
 ```
 
-The tokenizer itself can use `TextParser<T>` parsers as recognizers, as in the `Numerics.Integer` example above.
+Tokenizers constructed this way produce a list of tokens by repeatedly attempting to match recognizers 
+against the input in top-to-bottom order.
+
+#### Writing tokenizers by hand
+
+Tokenizers can alternatively be written by hand; this can provide the most flexibility, performance, and control,
+at the expense of more complicated code. A handwritten arithmetic expression tokenizer is included in the test suite,
+and a more complete example can be found [here](https://github.com/serilog/serilog-filters-expressions/blob/dev/src/Serilog.Filters.Expressions/Filters/Expressions/Parsing/FilterExpressionTokenizer.cs).
 
 #### Writing token list parsers
 
-Token parsers are defined in the same manner as text parsers, but consume tokens from a token list rather than characters from a string:
+Token parsers are defined in the same manner as text parsers, using combinators to build up more sophisticated parsers
+out of simpler ones.
 
 ```csharp
 class ArithmeticExpressionParser
@@ -169,7 +177,9 @@ class ArithmeticExpressionParser
 
 ### Error messages
 
-The [error scenario tests](https://github.com/datalust/superpower/blob/dev/test/Superpower.Tests/ErrorMessageScenarioTests.cs) demonstrate some of the error message formatting capabilities of Superpower. Check out the parsers referenced in the tests for some examples.
+The [error scenario tests](https://github.com/datalust/superpower/blob/dev/test/Superpower.Tests/ErrorMessageScenarioTests.cs)
+demonstrate some of the error message formatting capabilities of Superpower. Check out the parsers referenced in the 
+tests for some examples.
 
 ```csharp
 ArithmeticExpressionParser.Lambda.Parse(new ArithmeticExpressionTokenizer().Tokenize("1 + * 3"));
@@ -191,7 +201,8 @@ public enum ArithmeticExpressionToken
 
 ### Performance
 
-Superpower is built with performance as a priority. Less frequent backtracking, combined with the avoidance of allocations and indirect dispatch, mean that Superpower can be quite a bit faster than Sprache.
+Superpower is built with performance as a priority. Less frequent backtracking, combined with the avoidance of
+allocations and indirect dispatch, mean that Superpower can be quite a bit faster than Sprache.
 
 Recent benchmark for parsing a long arithmetic expression:
 
