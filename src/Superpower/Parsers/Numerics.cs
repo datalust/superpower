@@ -25,6 +25,7 @@ namespace Superpower.Parsers
     {
         static readonly string[] ExpectedDigit = { "digit" };
         static readonly string[] ExpectedSignOrDigit = { "sign", "digit" };
+        static readonly string[] ExpectedHexDigit = { "hex digit" };
 
         /// <summary>
         /// A string of digits.
@@ -191,6 +192,82 @@ namespace Superpower.Parsers
 
             if (negative)
                 val = -val;
+            
+            return Result.Value(val, input, remainder);
+        };
+        
+        /// <summary>
+        /// Matches decimal numbers, for example <code>-1.23</code>.
+        /// </summary>
+        public static TextParser<TextSpan> Decimal { get; } =
+            Integer
+                .Then(n => Character.EqualTo('.').IgnoreThen(Natural).OptionalOrDefault()
+                    .Select(f => f == TextSpan.None ? n : new TextSpan(n.Source, n.Position, n.Length + f.Length + 1)));
+
+        static bool IsHexDigit(char ch)
+        {
+            return char.IsDigit(ch) || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F';
+        }
+
+        static int HexValue(char ch)
+        {
+            if (char.IsDigit(ch))
+                return ch - '0';
+
+            if (ch >= 'a' && ch <= 'f')
+                return 15 + ch - 'f';
+
+            return 15 + ch - 'F';
+        }
+
+        static TextParser<char> HexDigit { get; } = Character.Matching(IsHexDigit, "hex digit");
+
+        /// <summary>
+        /// Matches hexadecimal numbers.
+        /// </summary>
+        public static TextParser<TextSpan> HexDigits { get; } =
+            Span.MatchedBy(HexDigit.AtLeastOnce());  
+        
+        /// <summary>
+        /// A string of hexadecimal digits, converted into a <see cref="uint"/>.
+        /// </summary>
+        public static TextParser<uint> HexDigitsUInt32 { get; } = input =>
+        {
+            var next = input.ConsumeChar();
+            
+            if (!next.HasValue || !IsHexDigit(next.Value))
+                return Result.Empty<uint>(input, ExpectedHexDigit);
+
+            TextSpan remainder;
+            var val = 0u;
+            do
+            {
+                val = 16 * val + (uint)HexValue(next.Value);
+                remainder = next.Remainder;
+                next = remainder.ConsumeChar();
+            } while (next.HasValue && IsHexDigit(next.Value));
+            
+            return Result.Value(val, input, remainder);
+        };
+                
+        /// <summary>
+        /// A string of hexadecimal digits, converted into a <see cref="ulong"/>.
+        /// </summary>
+        public static TextParser<ulong> HexDigitsUInt64 { get; } = input =>
+        {
+            var next = input.ConsumeChar();
+            
+            if (!next.HasValue || !IsHexDigit(next.Value))
+                return Result.Empty<ulong>(input, ExpectedHexDigit);
+
+            TextSpan remainder;
+            var val = 0ul;
+            do
+            {
+                val = 16 * val + (ulong)HexValue(next.Value);
+                remainder = next.Remainder;
+                next = remainder.ConsumeChar();
+            } while (next.HasValue && IsHexDigit(next.Value));
             
             return Result.Value(val, input, remainder);
         };

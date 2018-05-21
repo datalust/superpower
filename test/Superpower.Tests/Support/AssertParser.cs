@@ -163,6 +163,14 @@ namespace Superpower.Tests.Support
             var result = parser.TryParse(StringAsCharTokenList.Tokenize(input));
             Assert.Equal(message, result.ToString());
         }
+
+        public static void FitsTheory(TextParser<TextSpan> parser, string input, bool isMatch)
+        {
+            if (isMatch)
+                SucceedsWithAll(parser, input);
+            else
+                Fails(parser.AtEnd(), input);
+        }
     }
 }
 
