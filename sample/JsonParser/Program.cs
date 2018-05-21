@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Superpower;
 using Superpower.Model;
 using Superpower.Parsers;
@@ -25,8 +24,6 @@ namespace JsonParser
 
     static class JsonTokenizer
     {
-        public static Tokenizer<JsonToken> Instance { get; } = Create();
-
         static TextParser<Unit> JsonStringToken { get; } =
             from open in Character.EqualTo('"')
             from content in Span.EqualTo("\\\"").Value(Unit.Value).Try()
@@ -41,9 +38,8 @@ namespace JsonParser
             from rest in Character.Digit.Or(Character.In('.', 'e', 'E', '+', '-')).IgnoreMany()
             select Unit.Value;
 
-        static Tokenizer<JsonToken> Create()
-        {
-            return new TokenizerBuilder<JsonToken>()
+        public static Tokenizer<JsonToken> Instance { get; } = 
+            new TokenizerBuilder<JsonToken>()
                 .Ignore(Span.WhiteSpace)
                 .Match(Character.EqualTo('{'), JsonToken.LBracket)
                 .Match(Character.EqualTo('}'), JsonToken.RBracket)
@@ -57,7 +53,6 @@ namespace JsonParser
                 .Match(Span.EqualTo("false"),  JsonToken.False, requireDelimiters: true)
                 .Match(Span.EqualTo("null"),   JsonToken.Null, requireDelimiters: true)
                 .Build();
-        }
     }
 
     static class JsonTextParsers
@@ -74,7 +69,7 @@ namespace JsonParser
                         .Or(Character.EqualTo('n').Value('\n'))
                         .Or(Character.EqualTo('r').Value('\r'))
                         .Or(Character.EqualTo('t').Value('\t'))
-                        .Or(Span.Length(4).Apply(Numerics.HexUInt32).Select(cc => (char)cc))))                
+                        .Or(Span.Length(4).Apply(Numerics.HexDigitsUInt32).Select(cc => (char)cc))))                
                 .Many()
             from close in Character.EqualTo('"')
             select new string(chars);
@@ -91,6 +86,7 @@ namespace JsonParser
                     .Or(Character.EqualTo('-').Value(-1.0))
                     .OptionalOrDefault(1.0))
                 .Then(expsign => Numerics.Natural.Select(n => double.Parse(n.ToStringValue()) * expsign))
+                .OptionalOrDefault()
             select (whole + frac) * sign * Math.Pow(10, exp);
     }
 
@@ -102,7 +98,7 @@ namespace JsonParser
                 .Select(s => (object)s);
         
         static TokenListParser<JsonToken, object> JsonNumber { get; } =
-            Token.EqualTo(JsonToken.Null)
+            Token.EqualTo(JsonToken.Number)
                 .Apply(JsonTextParsers.Number)
                 .Select(n => (object)n);
 
@@ -133,8 +129,8 @@ namespace JsonParser
             Token.EqualTo(JsonToken.Null).Value((object)null);
 
         static TokenListParser<JsonToken, object> JsonValue { get; } =
-            JsonString
-                .Or(JsonNumber)
+            JsonNumber
+                .Or(JsonString)
                 .Or(JsonObject)
                 .Or(JsonArray)
                 .Or(JsonTrue)
@@ -173,6 +169,7 @@ namespace JsonParser
             var line = Console.ReadLine();
             while (line != null)
             {
+                Console.WriteLine("Parsing");
                 if (JsonParser.TryParse(line, out var value, out var error))
                     Console.WriteLine("Parsed: " + (value ?? "<null>"));
                 else
