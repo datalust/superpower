@@ -26,12 +26,12 @@ namespace Superpower
     public static class Combinators
     {
         /// <summary>
-        /// Apply the character parser <paramref name="valueParser"/> to the span represented by the parsed token.
+        /// Apply the text parser <paramref name="valueParser"/> to the span represented by the parsed token.
         /// </summary>
         /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
-        /// <param name="valueParser">A function that determines which character parser to apply.</param>
+        /// <param name="valueParser">A function that determines which text parser to apply.</param>
         /// <returns>A parser that returns the result of parsing the token value.</returns>
         public static TokenListParser<TKind, U> Apply<TKind, U>(this TokenListParser<TKind, Token<TKind>> parser, Func<Token<TKind>, TextParser<U>> valueParser)
         {
@@ -45,30 +45,64 @@ namespace Superpower
 
                 var uParser = valueParser(rt.Value);
                 var uResult = uParser.AtEnd()(rt.Value.Span);
-                if (!uResult.HasValue)
-                {
-                    var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
-                    return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null, uResult.Backtrack);
-                }
+                if (uResult.HasValue)
+                    return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
 
-                return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
+                var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
+                return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null, uResult.Backtrack);
             };
         }
 
         /// <summary>
-        /// Apply the character parser <paramref name="valueParser"/> to the span represented by the parsed token.
+        /// Apply the text parser <paramref name="valueParser"/> to the span represented by the parsed token.
         /// </summary>
         /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
-        /// <param name="valueParser">A character parser to apply.</param>
+        /// <param name="valueParser">A text parser to apply.</param>
         /// <returns>A parser that returns the result of parsing the token value.</returns>
         public static TokenListParser<TKind, U> Apply<TKind, U>(this TokenListParser<TKind, Token<TKind>> parser, TextParser<U> valueParser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (valueParser == null) throw new ArgumentNullException(nameof(valueParser));
 
-            return parser.Apply(rt => valueParser);
+            var valueParserAtEnd = valueParser.AtEnd();
+            return input =>
+            {
+                var rt = parser(input);
+                if (!rt.HasValue)
+                    return TokenListParserResult.CastEmpty<TKind, Token<TKind>, U>(rt);
+
+                var uResult = valueParserAtEnd(rt.Value.Span);
+                if (uResult.HasValue)
+                    return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
+
+                var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
+                return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null, uResult.Backtrack);
+            };
+        }
+
+        /// <summary>
+        /// Apply the text parser <paramref name="valueParser"/> to the span
+        /// captured by the parser.
+        /// </summary>
+        /// <typeparam name="U">The type of the resulting value.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="valueParser">A text parser to apply to the span.</param>
+        /// <returns>A parser that returns the result of parsing the span value.</returns>
+        public static TextParser<U> Apply<U>(this TextParser<TextSpan> parser, TextParser<U> valueParser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (valueParser == null) throw new ArgumentNullException(nameof(valueParser));
+            var valueParserAtEnd = valueParser.AtEnd();
+            return input =>
+            {
+                var rt = parser(input);
+                if (!rt.HasValue)
+                    return Result.CastEmpty<TextSpan, U>(rt);
+
+                return valueParserAtEnd(rt.Value);
+            };
         }
 
         /// <summary>
