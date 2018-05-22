@@ -334,7 +334,6 @@ namespace JsonParser
                 {
                     if (JsonParser.TryParse(line, out var value, out var error))
                     {
-                        Console.WriteLine("Success:");
                         Print(value);
                     }
                     else
