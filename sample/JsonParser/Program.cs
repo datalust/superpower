@@ -19,7 +19,7 @@ namespace JsonParser
 {
     // The parser is token-based. This enum lists the various kinds
     // of element that make up a JSON document. Check out the
-    // the JSON spec linked above: you'll see that the tokens kinds map very
+    // the JSON spec linked above: you'll see that the token kinds map very
     // closely to what you see in the boxes of the syntax diagrams.
     enum JsonToken
     {
@@ -62,8 +62,8 @@ namespace JsonParser
         // concept that groups `true`, `false`, and `null`, it's useful
         // for the tokenizer to be very permissive - it's more informative
         // to generate an error later at the parsing stage, e.g.
-        // _unexpected identifier `flase`_, instead of failing at the
-        // tokenization stage where all we'd have is _unexpected `l`_.
+        // "unexpected identifier `flase`", instead of failing at the
+        // tokenization stage where all we'd have is "unexpected `l`".
         Identifier,
     }
 
