@@ -82,7 +82,9 @@ namespace JsonParser
                         .Or(Character.EqualTo('r').Value('\r'))
                         .Or(Character.EqualTo('t').Value('\t'))
                         .Or(Character.EqualTo('u').IgnoreThen(
-                                Span.Length(4).Apply(Numerics.HexDigitsUInt32).Select(cc => (char)cc)))
+                                Span.MatchedBy(Character.HexDigit.Repeat(4))
+                                    .Apply(Numerics.HexDigitsUInt32)
+                                    .Select(cc => (char)cc)))
                         .Named("escape sequence")))                
                 .Many()
             from close in Character.EqualTo('"')
