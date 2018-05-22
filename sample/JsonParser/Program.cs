@@ -17,9 +17,7 @@ namespace JsonParser
         Comma,
         String,
         Number,
-        True,
-        False,
-        Null,
+        Identifier,
     }
 
     static class JsonTokenizer
@@ -49,9 +47,7 @@ namespace JsonParser
                 .Match(Character.EqualTo(']'), JsonToken.RSquareBracket)
                 .Match(JsonStringToken,        JsonToken.String)
                 .Match(JsonNumberToken,        JsonToken.Number, requireDelimiters: true)
-                .Match(Span.EqualTo("true"),   JsonToken.True, requireDelimiters: true)
-                .Match(Span.EqualTo("false"),  JsonToken.False, requireDelimiters: true)
-                .Match(Span.EqualTo("null"),   JsonToken.Null, requireDelimiters: true)
+                .Match(Identifier.CStyle,      JsonToken.Identifier, requireDelimiters: true)
                 .Build();
     }
 
@@ -59,17 +55,20 @@ namespace JsonParser
     {
         public static TextParser<string> String { get; } =
             from open in Character.EqualTo('"')
-            from chars in Character.Except('\\').Try()
+            from chars in Character.ExceptIn('"', '\\')
                 .Or(Character.EqualTo('\\')
-                    .IgnoreThen(Character.EqualTo('\\')
-                        .Or(Character.EqualTo('"').Value('"'))
-                        .Or(Character.EqualTo('/').Value('/'))
+                    .IgnoreThen(
+                        Character.EqualTo('\\')
+                        .Or(Character.EqualTo('"'))
+                        .Or(Character.EqualTo('/'))
                         .Or(Character.EqualTo('b').Value('\b'))
                         .Or(Character.EqualTo('f').Value('\f'))
                         .Or(Character.EqualTo('n').Value('\n'))
                         .Or(Character.EqualTo('r').Value('\r'))
                         .Or(Character.EqualTo('t').Value('\t'))
-                        .Or(Span.Length(4).Apply(Numerics.HexDigitsUInt32).Select(cc => (char)cc))))                
+                        .Or(Character.EqualTo('u').IgnoreThen(
+                                Span.Length(4).Apply(Numerics.HexDigitsUInt32).Select(cc => (char)cc)))
+                        .Named("escape sequence")))                
                 .Many()
             from close in Character.EqualTo('"')
             select new string(chars);
@@ -120,23 +119,25 @@ namespace JsonParser
             select (object)values;
 
         static TokenListParser<JsonToken, object> JsonTrue { get; } =
-            Token.EqualTo(JsonToken.True).Value((object)true);
+            Token.EqualToValue(JsonToken.Identifier, "true").Value((object)true);
         
         static TokenListParser<JsonToken, object> JsonFalse { get; } =
-            Token.EqualTo(JsonToken.False).Value((object)false);    
+            Token.EqualToValue(JsonToken.Identifier, "false").Value((object)false);    
 
         static TokenListParser<JsonToken, object> JsonNull { get; } =
-            Token.EqualTo(JsonToken.Null).Value((object)null);
+            Token.EqualToValue(JsonToken.Identifier, "null").Value((object)null);
 
         static TokenListParser<JsonToken, object> JsonValue { get; } =
-            JsonNumber
-                .Or(JsonString)
+            JsonString
+                .Or(JsonNumber)
                 .Or(JsonObject)
                 .Or(JsonArray)
                 .Or(JsonTrue)
                 .Or(JsonFalse)
                 .Or(JsonNull)
                 .Named("JSON value");
+
+        static TokenListParser<JsonToken, object> JsonDocument { get; } = JsonValue.AtEnd();
 
         public static bool TryParse(string json, out object value, out string error)
         {
@@ -148,7 +149,7 @@ namespace JsonParser
                 return false;
             }
 
-            var parsed = JsonValue.TryParse(tokens.Value);
+            var parsed = JsonDocument.TryParse(tokens.Value);
             if (!parsed.HasValue)
             {
                 value = null;

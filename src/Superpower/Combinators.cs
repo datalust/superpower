@@ -101,7 +101,8 @@ namespace Superpower
                 if (!rt.HasValue)
                     return Result.CastEmpty<TextSpan, U>(rt);
 
-                return valueParserAtEnd(rt.Value);
+                var uResult = valueParserAtEnd(rt.Value);
+                return Result.Value(uResult.Value, rt.Location, rt.Remainder);
             };
         }
 

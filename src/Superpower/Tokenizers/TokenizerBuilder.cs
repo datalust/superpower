@@ -177,7 +177,7 @@ namespace Superpower.Tokenizers
                         // We know the token's kind here, so might as well included it so that we can yield more
                         // detailed messages.
                         var augmentedMessage = $"invalid {Presentation.FormatExpectation(recognizer.Kind)}, {attempt.FormatErrorMessageFragment()}";
-                        failure = new Result<TKind>(attempt.Remainder, augmentedMessage, attempt.Expectations, attempt.Backtrack);
+                        failure = new Result<TKind>(remainder, augmentedMessage, attempt.Expectations, attempt.Backtrack);
                     }
                 }
 
