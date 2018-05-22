@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Superpower;
+using Superpower.Display;
 using Superpower.Model;
 using Superpower.Parsers;
 using Superpower.Tokenizers;
@@ -9,14 +10,28 @@ namespace JsonParser
 {
     enum JsonToken
     {
+        [Token(Example = "{")]
         LBracket,
+
+        [Token(Example = "}")]
         RBracket,
+        
+        [Token(Example = "[")]
         LSquareBracket,
+        
+        [Token(Example = "]")]
         RSquareBracket,
+        
+        [Token(Example = ":")]
         Colon,
+        
+        [Token(Example = ",")]
         Comma,
+        
         String,
+        
         Number,
+        
         Identifier,
     }
 
@@ -78,7 +93,7 @@ namespace JsonParser
             from whole in Numerics.Natural.Select(n => double.Parse(n.ToStringValue()))
             from frac in Character.EqualTo('.')
                 .IgnoreThen(Numerics.Natural)
-                .Select(n => double.Parse("0." + n.ToStringValue()))
+                .Select(n => double.Parse(n.ToStringValue()) * Math.Pow(10, -n.Length))
                 .OptionalOrDefault()
             from exp in Character.EqualToIgnoreCase('e')
                 .IgnoreThen(Character.EqualTo('+').Value(1.0)
@@ -170,11 +185,14 @@ namespace JsonParser
             var line = Console.ReadLine();
             while (line != null)
             {
-                Console.WriteLine("Parsing");
-                if (JsonParser.TryParse(line, out var value, out var error))
-                    Console.WriteLine("Parsed: " + (value ?? "<null>"));
-                else
-                    Console.WriteLine("Error: " + error);
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    Console.WriteLine("Parsing");
+                    if (JsonParser.TryParse(line, out var value, out var error))
+                        Console.WriteLine("Parsed: " + (value ?? "<null>"));
+                    else
+                        Console.WriteLine("Error: " + error);
+                }
 
                 line = Console.ReadLine();
             }
