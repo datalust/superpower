@@ -327,6 +327,7 @@ namespace JsonParser
     {
         static void Main()
         {
+            Console.Write("json> ");
             var line = Console.ReadLine();
             while (line != null)
             {
@@ -342,6 +343,7 @@ namespace JsonParser
                     }
                 }
 
+                Console.Write("json> ");
                 line = Console.ReadLine();
             }
         }
