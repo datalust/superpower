@@ -343,7 +343,6 @@ namespace JsonParser
                     }
                 }
 
-                Console.Write("json> ");
                 line = Console.ReadLine();
             }
         }

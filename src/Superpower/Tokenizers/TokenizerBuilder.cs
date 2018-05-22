@@ -175,8 +175,14 @@ namespace Superpower.Tokenizers
                         attempt.ErrorPosition.Absolute > failure.ErrorPosition.Absolute)
                     {
                         // We know the token's kind here, so might as well included it so that we can yield more
-                        // detailed messages.
+                        // detailed messages. Reporting the failure position as the token's start position makes it
+                        // much more sensible to refer to the token by kind, and easier to figure out what's going on
+                        // in cases like missing closing delimiters (which end pulling the whole remainder into the
+                        // token). Including the actual failure position in the error message helps to further pinpoint
+                        // the problem.
                         var augmentedMessage = $"invalid {Presentation.FormatExpectation(recognizer.Kind)}, {attempt.FormatErrorMessageFragment()}";
+                        if (!attempt.Remainder.IsAtEnd)
+                            augmentedMessage += $" at line {attempt.Remainder.Position.Line}, column {attempt.Remainder.Position.Column}";
                         failure = new Result<TKind>(remainder, augmentedMessage, attempt.Expectations, attempt.Backtrack);
                     }
                 }
