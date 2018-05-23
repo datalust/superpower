@@ -70,7 +70,7 @@ namespace Superpower.Tests.Parsers
             var parser = Span.MatchedBy(Numerics.IntegerInt32);
             var input = new TextSpan("123abc");
             var r = parser(input);
-            Assert.Equal(r.Value.ToStringValue(), "123");
+            Assert.Equal("123", r.Value.ToStringValue());
         }
     }
 }

@@ -52,7 +52,22 @@ namespace Superpower.Tests.Tokenizers
             var tokens = tokenizer.TryTokenize(" abd");
             Assert.False(tokens.HasValue);
             var msg = tokens.ToString();
-            Assert.Equal("Syntax error (line 1, column 4): invalid abc, unexpected `d`, expected `c`.", msg);
+            Assert.Equal("Syntax error (line 1, column 2): invalid abc, unexpected `d`, expected `c` at line 1, column 4.", msg);
+        }
+
+        [Fact]
+        public void ShortTokenizationIsReported()
+        {
+            var tokenizer = new TokenizerBuilder<string>()
+                .Ignore(Span.WhiteSpace)
+                .Match(Span.EqualTo("abc"), "abc")
+                .Match(Span.EqualTo("def"), "def")
+                .Build();
+
+            var tokens = tokenizer.TryTokenize(" ab");
+            Assert.False(tokens.HasValue);
+            var msg = tokens.ToString();
+            Assert.Equal("Syntax error (line 1, column 2): invalid abc, unexpected end of input, expected `c`.", msg);
         }
     }
 }

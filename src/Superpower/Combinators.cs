@@ -101,7 +101,11 @@ namespace Superpower
                 if (!rt.HasValue)
                     return Result.CastEmpty<TextSpan, U>(rt);
 
-                return valueParserAtEnd(rt.Value);
+                var uResult = valueParserAtEnd(rt.Value);
+                if (!uResult.HasValue)
+                    return uResult;
+                
+                return Result.Value(uResult.Value, rt.Location, rt.Remainder);
             };
         }
 
@@ -430,6 +434,38 @@ namespace Superpower
                     return Result.CastEmpty<T, T[]>(r);
 
                 return Result.Value(result.ToArray(), input, r.Remainder);
+            };
+        }
+
+        /// <summary>
+        /// Construct a parser that matches <paramref name="parser"/> zero or more times, discarding the
+        /// result. This is useful for avoiding the array allocation performed by <see cref="Many{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        /// <remarks>IgnoreMany will fail if any item partially matches this. To modify this behavior use <see cref="Try{T}(TextParser{T})"/>.</remarks>
+        public static TextParser<Unit> IgnoreMany<T>(this TextParser<T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return input =>
+            {
+                var from = input;
+                var r = parser(input);
+                while (r.HasValue)
+                {
+                    if (from == r.Remainder) // Broken parser, not a failed parsing.
+                        throw new ParseException($"IgnoreMany() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
+
+                    from = r.Remainder;
+                    r = parser(r.Remainder);
+                }
+
+                if (!r.Backtrack && r.IsPartial(from))
+                    return Result.CastEmpty<T, Unit>(r);
+
+                return Result.Value(Unit.Value, input, r.Remainder);
             };
         }
 

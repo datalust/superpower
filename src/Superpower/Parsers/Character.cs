@@ -144,6 +144,11 @@ namespace Superpower.Parsers
         /// Parse a numeric character.
         /// </summary>
         public static TextParser<char> Numeric { get; } = Matching(char.IsNumber, "numeric character");
+
+        /// <summary>
+        /// Parse a hexadecimal digit (0-9, a-f, A-F).
+        /// </summary>
+        public static TextParser<char> HexDigit { get; } = Matching(CharInfo.IsHexDigit, "hex digit");
     }
 }
 
