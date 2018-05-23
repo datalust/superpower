@@ -22,6 +22,9 @@ namespace Superpower.Parsers
         static readonly TextParser<char> SqlStringContentChar =
             Span.EqualTo("''").Value('\'').Try().Or(Character.ExceptIn('\'', '\r', '\n'));
 
+        static readonly TextParser<char> CStringContentChar =
+            Span.EqualTo("\\\"").Value('"').Try().Or(Character.ExceptIn('"', '\\', '\r', '\n'));
+
         /// <summary>
         /// A <code>'SQL-style'</code> string. Single quote delimiters, with embedded single quotes
         /// escaped by '' doubling.
@@ -30,5 +33,14 @@ namespace Superpower.Parsers
             Character.EqualTo('\'')
                 .IgnoreThen(SqlStringContentChar.Many())
                 .Then(s => Character.EqualTo('\'').Value(new string(s)));
+
+        /// <summary>
+        /// A <code>"C-style"</code> string. Double quote delimiters, with ability to escape
+        /// characters by using <code>\"</code>.
+        /// </summary>
+        public static TextParser<string> CStyle { get; } =
+            Character.EqualTo('"')
+                .IgnoreThen(CStringContentChar.Many())
+                .Then(s => Character.EqualTo('"').Value(new string(s)));
     }
 }
