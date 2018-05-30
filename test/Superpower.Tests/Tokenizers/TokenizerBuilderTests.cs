@@ -67,7 +67,7 @@ namespace Superpower.Tests.Tokenizers
             var tokens = tokenizer.TryTokenize(" ab");
             Assert.False(tokens.HasValue);
             var msg = tokens.ToString();
-            Assert.Equal("Syntax error (line 1, column 2): invalid abc, unexpected end of input, expected `c`.", msg);
+            Assert.Equal("Syntax error (line 1, column 2): incomplete abc, unexpected end of input, expected `c`.", msg);
         }
     }
 }

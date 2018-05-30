@@ -113,7 +113,7 @@ namespace Superpower.Model
         /// <returns>The converted result.</returns>
         public static TokenListParserResult<TKind,U> CastEmpty<TKind, T, U>(TokenListParserResult<TKind, T> result)
         {
-            return new TokenListParserResult<TKind, U>(result.Remainder, result.ErrorPosition, result.ErrorMessage, result.Expectations, result.Backtrack);
+            return new TokenListParserResult<TKind, U>(result.Remainder, result.SubTokenErrorPosition, result.ErrorMessage, result.Expectations, result.Backtrack);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new TokenListParserResult<TKind, T>(second.Remainder, second.ErrorPosition, first.ErrorMessage, expectations, second.Backtrack);
+            return new TokenListParserResult<TKind, T>(second.Remainder, second.SubTokenErrorPosition, first.ErrorMessage, expectations, second.Backtrack);
         }
     }
 }

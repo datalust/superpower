@@ -180,7 +180,8 @@ namespace Superpower.Tokenizers
                         // in cases like missing closing delimiters (which end pulling the whole remainder into the
                         // token). Including the actual failure position in the error message helps to further pinpoint
                         // the problem.
-                        var augmentedMessage = $"invalid {Presentation.FormatExpectation(recognizer.Kind)}, {attempt.FormatErrorMessageFragment()}";
+                        var problem = attempt.Remainder.IsAtEnd ? "incomplete" : "invalid";
+                        var augmentedMessage = $"{problem} {Presentation.FormatExpectation(recognizer.Kind)}, {attempt.FormatErrorMessageFragment()}";
                         if (!attempt.Remainder.IsAtEnd)
                             augmentedMessage += $" at line {attempt.Remainder.Position.Line}, column {attempt.Remainder.Position.Column}";
                         failure = new Result<TKind>(remainder, augmentedMessage, attempt.Expectations, attempt.Backtrack);
