@@ -294,13 +294,14 @@ namespace JsonParser
         // the tokenization and parsing phases remain distinct, because it's often very
         // handy to place a breakpoint between the two steps to check out what the
         // token list looks like.
-        public static bool TryParse(string json, out object value, out string error)
+        public static bool TryParse(string json, out object value, out string error, out Position errorPosition)
         {
             var tokens = JsonTokenizer.Instance.TryTokenize(json);
             if (!tokens.HasValue)
             {
                 value = null;
                 error = tokens.ToString();
+                errorPosition = tokens.ErrorPosition;
                 return false;
             }
 
@@ -309,11 +310,13 @@ namespace JsonParser
             {
                 value = null;
                 error = parsed.ToString();
+                errorPosition = parsed.ErrorPosition;
                 return false;
             }
 
             value = parsed.Value;
             error = null;
+            errorPosition = Position.Empty;
             return true;
         }
     }
@@ -333,16 +336,18 @@ namespace JsonParser
             {
                 if (!string.IsNullOrWhiteSpace(line))
                 {
-                    if (JsonParser.TryParse(line, out var value, out var error))
+                    if (JsonParser.TryParse(line, out var value, out var error, out var errorPosition))
                     {
                         Print(value);
                     }
                     else
                     {
+                        Console.WriteLine($"     {new string(' ', errorPosition.Column)}^");   
                         Console.WriteLine("Error: " + error);
                     }
                 }
 
+                Console.Write("json> ");
                 line = Console.ReadLine();
             }
         }

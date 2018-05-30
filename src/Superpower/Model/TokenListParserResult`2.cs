@@ -28,12 +28,13 @@ namespace Superpower.Model
         readonly T _value;
 
         /// <summary>
-        /// The location in the stream where the parsing began.
+        /// If the result has a value, this carries the location of the value in the token
+        /// list. If the result is an error, it's the location of the error.
         /// </summary>
         public TokenList<TKind> Location { get; }
 
         /// <summary>
-        /// The first un-parsed location in the stream.
+        /// The first un-parsed location in the list.
         /// </summary>
         public TokenList<TKind> Remainder { get; }
 
@@ -43,9 +44,29 @@ namespace Superpower.Model
         public bool HasValue { get; }
 
         /// <summary>
-        /// The position of the first un-parsed location.
+        /// If the result is an error, the source-level position of the error; otherwise, <see cref="Position.Empty"/>.
         /// </summary>
-        public Position ErrorPosition { get; }
+        public Position ErrorPosition
+        {
+            get
+            {
+                if (HasValue)
+                    return Position.Empty;
+                
+                if (SubTokenErrorPosition.HasValue)
+                    return SubTokenErrorPosition;
+                
+                if (!Remainder.IsAtEnd)
+                    return Remainder.ConsumeToken().Value.Position;
+
+                return Location.ComputeEndOfInputPosition();
+            }
+        }
+
+        /// <summary>
+        /// If the result is an error, the source-level position of the error; otherwise, <see cref="Position.Empty"/>.
+        /// </summary>
+        public Position SubTokenErrorPosition { get; }
 
         /// <summary>
         /// A provided error message, or null.
@@ -70,7 +91,7 @@ namespace Superpower.Model
             }
         }
 
-        internal bool IsPartial(TokenList<TKind> @from) => ErrorPosition.HasValue || @from != Remainder;
+        internal bool IsPartial(TokenList<TKind> from) => SubTokenErrorPosition.HasValue || from != Remainder;
 
         internal bool Backtrack { get; set; }
 
@@ -80,20 +101,30 @@ namespace Superpower.Model
             Remainder = remainder;
             _value = value;
             HasValue = true;
-            ErrorPosition = Position.Empty;
+            SubTokenErrorPosition = Position.Empty;
             ErrorMessage = null;
             Expectations = null;
             Backtrack = backtrack;
         }
 
+        internal TokenListParserResult(TokenList<TKind> location, TokenList<TKind> remainder, Position errorPosition, string errorMessage, string[] expectations, bool backtrack)
+        {
+            Location = location;
+            Remainder = remainder;
+            _value = default(T);
+            HasValue = false;
+            SubTokenErrorPosition = errorPosition;
+            ErrorMessage = errorMessage;
+            Expectations = expectations;
+            Backtrack = backtrack;
+        }
+        
         internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string errorMessage, string[] expectations, bool backtrack)
         {
-            // Errors don't really carry a location - it's always the remainder, which is the first item unable to
-            // be successfully parsed.
             Location = Remainder = remainder;
             _value = default(T);
             HasValue = false;
-            ErrorPosition = errorPosition;
+            SubTokenErrorPosition = errorPosition;
             ErrorMessage = errorMessage;
             Expectations = expectations;
             Backtrack = backtrack;
@@ -112,8 +143,8 @@ namespace Superpower.Model
             var location = "";
             if (!Remainder.IsAtEnd)
             {
-                var next = Remainder.ConsumeToken().Value;
-                var sourcePosition = ErrorPosition.HasValue ? ErrorPosition : next.Position;
+                // Since the message notes `end of input`, don't report line/column here.
+                var sourcePosition = SubTokenErrorPosition.HasValue ? SubTokenErrorPosition : Remainder.ConsumeToken().Value.Position;
                 location = $" (line {sourcePosition.Line}, column {sourcePosition.Column})";
             }
 

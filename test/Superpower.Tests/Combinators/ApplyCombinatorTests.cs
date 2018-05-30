@@ -20,10 +20,10 @@ namespace Superpower.Tests.Combinators
         public void AnAppliedParserMustConsumeAllInput()
         {
             var input = new TextSpan("1234");
-            var twodigits = Span.Length(2).Apply(Character.Digit);
+            var twodigits = Character.AnyChar.IgnoreThen(Span.Length(2).Apply(Character.Digit));
             var result = twodigits(input);
             Assert.False(result.HasValue);
-            Assert.Equal("Syntax error (line 1, column 2): unexpected `2`.", result.ToString());
+            Assert.Equal("Syntax error (line 1, column 3): unexpected `3`.", result.ToString());
         }
 
         [Fact]
@@ -55,6 +55,44 @@ namespace Superpower.Tests.Combinators
             // The "invalid a" here is the token name, since we're using characters as tokens - in normal use
             // this would read more like "invalid URI: unexpected `:`".
             Assert.Equal("Syntax error (line 1, column 1): invalid a, unexpected `a`.", result.ToString());
+        }
+        
+        [Fact]
+        public void AFailingAppliedParserDoesNotCauseBacktracking()
+        {
+            var input = new TextSpan("aa");
+            var twodigits = Span.EqualTo("aa")
+                .Apply(Character.Digit.Value(TextSpan.Empty))
+                .Or(Span.EqualTo("bb"));
+            var result = twodigits(input);
+            Assert.False(result.HasValue);
+            Assert.Equal("Syntax error (line 1, column 1): unexpected `a`, expected digit.", result.ToString());
+        }
+        
+        [Fact]
+        public void AFailingAppliedParserDoesNotCauseTokenBacktracking1()
+        {
+            var input = StringAsCharTokenList.Tokenize("abcd");
+            var just42 = Token.EqualTo('a').Apply(Span.EqualTo("ab"))
+                .Or(Token.EqualTo('x').Value(TextSpan.Empty));
+            var result = just42(input);
+            Assert.False(result.HasValue);
+            // The "invalid a" here is the token name, since we're using characters as tokens - in normal use
+            // this would read more like "invalid URI: expected `:`".
+            Assert.Equal("Syntax error (line 1, column 2): incomplete a, expected `b`.", result.ToString());
+        }
+        
+        [Fact]
+        public void AFailingAppliedParserDoesNotCauseTokenBacktracking2()
+        {
+            var input = StringAsCharTokenList.Tokenize("abcd");
+            var just42 = Token.EqualTo('a').Apply(Span.EqualTo("b"))
+                .Or(Token.EqualTo('x').Value(TextSpan.Empty));
+            var result = just42(input);
+            Assert.False(result.HasValue);
+            // The "invalid a" here is the token name, since we're using characters as tokens - in normal use
+            // this would read more like "invalid URI: expected `:`".
+            Assert.Equal("Syntax error (line 1, column 1): invalid a, unexpected `a`, expected `b`.", result.ToString());
         }
     }
 }

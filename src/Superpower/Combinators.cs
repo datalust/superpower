@@ -77,8 +77,10 @@ namespace Superpower
                 if (uResult.HasValue)
                     return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
 
-                var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
-                return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null, uResult.Backtrack);
+                var problem = uResult.Remainder.IsAtEnd ? "incomplete" : "invalid";
+                var textError = uResult.Remainder.IsAtEnd ? (uResult.Expectations != null ? $", expected {Friendly.List(uResult.Expectations)}" : "") : $", {uResult.FormatErrorMessageFragment()}";
+                var message = $"{problem} {Presentation.FormatExpectation(rt.Value.Kind)}{textError}";
+                return new TokenListParserResult<TKind, U>(input, rt.Remainder, uResult.Remainder.Position, message, null, uResult.Backtrack);
             };
         }
 
@@ -94,17 +96,26 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (valueParser == null) throw new ArgumentNullException(nameof(valueParser));
-            var valueParserAtEnd = valueParser.AtEnd();
             return input =>
             {
                 var rt = parser(input);
                 if (!rt.HasValue)
                     return Result.CastEmpty<TextSpan, U>(rt);
+                                    
+                var uResult = valueParser(rt.Value);
 
-                var uResult = valueParserAtEnd(rt.Value);
                 if (!uResult.HasValue)
-                    return uResult;
-                
+                {
+                    var errloc = rt.Value.Source != input.Source ? rt.Location : uResult.Location;
+                    return new Result<U>(errloc, rt.Remainder, uResult.ErrorMessage, uResult.Expectations, false);
+                }
+
+                if (!uResult.Remainder.IsAtEnd)
+                {
+                    var errloc = rt.Value.Source != input.Source ? rt.Location : uResult.Remainder;
+                    return Result.Empty<U>(errloc);
+                }
+
                 return Result.Value(uResult.Value, rt.Location, rt.Remainder);
             };
         }
@@ -523,7 +534,7 @@ namespace Superpower
                 if (result.HasValue)
                     return result;
 
-                return TokenListParserResult.Empty<TKind, T>(result.Remainder, result.ErrorPosition, errorMessage);
+                return TokenListParserResult.Empty<TKind, T>(result.Remainder, result.SubTokenErrorPosition, errorMessage);
             };
         }
 
@@ -565,14 +576,8 @@ namespace Superpower
             return input =>
             {
                 var result = parser(input);
-                if (result.HasValue || result.Remainder != input)
+                if (result.HasValue || result.IsPartial(input))
                     return result;
-
-                // result.IsSubTokenError?
-                if (result.ErrorPosition.HasValue)
-                {
-                    return TokenListParserResult.Empty<TKind, T>(result.Remainder, result.ErrorPosition, result.FormatErrorMessageFragment());
-                }
 
                 return TokenListParserResult.Empty<TKind, T>(result.Remainder, new[] { name });
             };
@@ -593,7 +598,7 @@ namespace Superpower
             return input =>
             {
                 var result = parser(input);
-                if (result.HasValue || result.Remainder != input)
+                if (result.HasValue || result.IsPartial(input))
                     return result;
 
                 return Result.Empty<T>(result.Remainder, new[] { name });
