@@ -8,7 +8,7 @@ token-driven parsers.
 
 ### What is Superpower?
 
-The job of a parser is to take a sequence of characters as input, and produce as output a data structure that's easier
+The job of a parser is to take a sequence of characters as input, and produce a data structure that's easier
 for a program to analyze, manipulate, or transform. From this point of view, a parser is just a function from `string`
 to `T` - where `T` might be anything from a simple number, a list of fields in a data format, or the abstract syntax
 tree of some kind of programming language.
@@ -18,7 +18,7 @@ on the complexity of the parser you need to build (and how you plan to spend you
 
 Superpower is a library for writing parsers in a declarative style that mirrors
 the structure of the target grammar. Parsers built with Superpower are fast, robust, and report precise and
-informative errors when malformed input is encountered.
+informative errors when invalid input is encountered.
 
 ### Usage
 
