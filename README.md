@@ -227,6 +227,8 @@ Type=ArithmeticExpressionBenchmark  Mode=Throughput
 
 Benchmarks and results are included in the repository.
 
+**Tips:** if you find you need more throughput: 1) consider a hand-written tokenizer, and 2) avoid the use of LINQ comprehensions and instead use chained combinators like `Then()` and especially `IgnoreThen()` - these allocate fewer delegates (closures) during parsing.
+
 ### Examples
 
 Superpower is introduced, with a worked example, in [this blog post](https://nblumhardt.com/2016/09/superpower/).
