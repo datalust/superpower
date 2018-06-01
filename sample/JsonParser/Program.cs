@@ -100,6 +100,7 @@ namespace JsonParser
         static TextParser<Unit> JsonStringToken { get; } =
             from open in Character.EqualTo('"')
             from content in Span.EqualTo("\\\"").Value(Unit.Value).Try()
+                .Or(Span.EqualTo("\\\\").Value(Unit.Value).Try())
                 .Or(Character.Except('"').Value(Unit.Value))
                 .IgnoreMany()
             from close in Character.EqualTo('"')
@@ -253,20 +254,24 @@ namespace JsonParser
         // parser, which won't be constructed until after the runtime initializes
         // the `JsonObject` parser.
         static TokenListParser<JsonToken, object> JsonObject { get; } =
-            from open in Token.EqualTo(JsonToken.LBracket)
+            from begin in Token.EqualTo(JsonToken.LBracket)
             from properties in JsonString
+                .Named("property name")
                 .Then(name => Token.EqualTo(JsonToken.Colon)
                     .IgnoreThen(Parse.Ref(() => JsonValue)
-                        .Select(value => KeyValuePair.Create((string)name, value))))
-                .ManyDelimitedBy(Token.EqualTo(JsonToken.Comma))
-            from close in Token.EqualTo(JsonToken.RBracket)
+                    .Select(value => KeyValuePair.Create((string)name, value))))    
+                .ManyDelimitedBy(Token.EqualTo(JsonToken.Comma),
+                    end: Token.EqualTo(JsonToken.RBracket))
             select (object)new Dictionary<string, object>(properties);
 
+        // `ManyDelimitedBy()` is a convenience helper for parsing lists that contain
+        // separators. Specifying an `end` delimiter improves error reporting by enabling
+        // expectations like "expected (item) or (close delimiter)" when no content matches.
         static TokenListParser<JsonToken, object> JsonArray { get; } =
-            from open in Token.EqualTo(JsonToken.LSquareBracket)
+            from begin in Token.EqualTo(JsonToken.LSquareBracket)
             from values in Parse.Ref(() => JsonValue)
-                .ManyDelimitedBy(Token.EqualTo(JsonToken.Comma))
-            from close in Token.EqualTo(JsonToken.RSquareBracket)
+                .ManyDelimitedBy(Token.EqualTo(JsonToken.Comma),
+                    end: Token.EqualTo(JsonToken.RSquareBracket))
             select (object)values;
 
         static TokenListParser<JsonToken, object> JsonTrue { get; } =

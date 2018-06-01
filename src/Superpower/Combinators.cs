@@ -488,13 +488,25 @@ namespace Superpower
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="delimiter">The parser that matches the delimiters.</param>
+        /// <param name="end">A parser to match a final trailing delimiter, if required. Specifying
+        /// this can improve error reporting for some lists.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenListParser<TKind, T[]> ManyDelimitedBy<TKind, T, U>(this TokenListParser<TKind, T> parser, TokenListParser<TKind, U> delimiter)
+        public static TokenListParser<TKind, T[]> ManyDelimitedBy<TKind, T, U>(
+            this TokenListParser<TKind, T> parser,
+            TokenListParser<TKind, U> delimiter,
+            TokenListParser<TKind, U> end = null)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
-            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
+            if (end != null)
+                return parser
+                    .AtLeastOnceDelimitedBy(delimiter)
+                    .Then(p => end.Value(p))
+                    .Or(end.Value(new T[0]));
+
+            return parser
+                .Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
                 .OptionalOrDefault(new T[0]);
         }
 
