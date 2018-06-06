@@ -348,10 +348,11 @@ namespace JsonParser
                     else
                     {
                         Console.WriteLine($"     {new string(' ', errorPosition.Column)}^");   
-                        Console.WriteLine("Error: " + error);
+                        Console.WriteLine(error);
                     }
                 }
 
+                Console.WriteLine();
                 Console.Write("json> ");
                 line = Console.ReadLine();
             }
