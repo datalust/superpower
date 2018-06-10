@@ -27,7 +27,7 @@ namespace Superpower.Tests.Support
         {
             Succeeds(parser, input, t =>
             {
-                Assert.Equal(1, t.Count());
+                Assert.Single(t);
                 Assert.Equal(expectedResult, t.Single());
             });
         }
@@ -37,6 +37,11 @@ namespace Superpower.Tests.Support
             Succeeds(parser, input, t => Assert.True(t.SequenceEqual(expectedResult)));
         }
 
+        public static void SucceedsWithAll(TextParser<TextSpan> parser, string input)
+        {
+            SucceedsWithAll(parser.Select(s => s.ToStringValue().ToCharArray()), input);
+        }
+        
         public static void SucceedsWithAll(TextParser<char[]> parser, string input)
         {
             SucceedsWithMany(parser, input, input.ToCharArray());
@@ -83,7 +88,7 @@ namespace Superpower.Tests.Support
         {
             Succeeds(parser, input, t =>
             {
-                Assert.Equal(1, t.Count());
+                Assert.Single(t);
                 Assert.Equal(expectedResult, t.Single());
             });
         }
@@ -157,6 +162,14 @@ namespace Superpower.Tests.Support
         {
             var result = parser.TryParse(StringAsCharTokenList.Tokenize(input));
             Assert.Equal(message, result.ToString());
+        }
+
+        public static void FitsTheory(TextParser<TextSpan> parser, string input, bool isMatch)
+        {
+            if (isMatch)
+                SucceedsWithAll(parser, input);
+            else
+                Fails(parser.AtEnd(), input);
         }
     }
 }

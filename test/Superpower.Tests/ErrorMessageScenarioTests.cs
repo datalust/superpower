@@ -1,7 +1,10 @@
-﻿using Superpower.Parsers;
+﻿using System.Collections.Generic;
+using Superpower.Model;
+using Superpower.Parsers;
 using Superpower.Tests.ArithmeticExpressionScenario;
 using Superpower.Tests.SExpressionScenario;
 using Superpower.Tests.Support;
+using Superpower.Tokenizers;
 using Xunit;
 
 namespace Superpower.Tests
@@ -13,9 +16,9 @@ namespace Superpower.Tests
         {
             var number = Token.EqualTo(SExpressionToken.Number)
                   .Apply(t => Character.EqualTo('1').Then(_ => Character.EqualTo('x')));
-            
+
             var numbers = number.AtEnd();
-            
+
             AssertParser.FailsWithMessage(numbers, "123", new SExpressionTokenizer(),
                 "Syntax error (line 1, column 2): invalid number, unexpected `2`, expected `x`.");
         }
@@ -56,24 +59,43 @@ namespace Superpower.Tests
                 "Syntax error: unexpected end of input, expected atom.");
         }
 
-        [Fact]
-        public void DroppedClosingParenthesisProducesMeaningfulError()
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static IEnumerable<object[]> ArithmeticExpressionTokenizers()
         {
-            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + (2 * 3", new ArithmeticExpressionTokenizer(),
+            yield return new object[] { new ArithmeticExpressionTokenizer() };
+
+            yield return new object[] { 
+                new TokenizerBuilder<ArithmeticExpressionToken>()
+                    .Ignore(Span.WhiteSpace)
+                    .Match(Character.EqualTo('+'), ArithmeticExpressionToken.Plus)
+                    .Match(Character.EqualTo('-'), ArithmeticExpressionToken.Minus)
+                    .Match(Character.EqualTo('*'), ArithmeticExpressionToken.Times)
+                    .Match(Character.EqualTo('/'), ArithmeticExpressionToken.Divide)
+                    .Match(Character.EqualTo('('), ArithmeticExpressionToken.LParen)
+                    .Match(Character.EqualTo(')'), ArithmeticExpressionToken.RParen)
+                    .Match(Numerics.Natural, ArithmeticExpressionToken.Number, requireDelimiters: true)
+                    .Build()                
+            };
+        }
+
+        [Theory, MemberData(nameof(ArithmeticExpressionTokenizers))]
+        public void DroppedClosingParenthesisProducesMeaningfulError(Tokenizer<ArithmeticExpressionToken> tokenizer)
+        {
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + (2 * 3", tokenizer,
                 "Syntax error: unexpected end of input, expected `)`.");
         }
 
-        [Fact]
-        public void MissingOperandProducesMeaningfulError()
+        [Theory, MemberData(nameof(ArithmeticExpressionTokenizers))]
+        public void MissingOperandProducesMeaningfulError(Tokenizer<ArithmeticExpressionToken> tokenizer)
         {
-            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + * 3", new ArithmeticExpressionTokenizer(),
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 + * 3", tokenizer,
                  "Syntax error (line 1, column 5): unexpected operator `*`, expected expression.");
         }
 
-        [Fact]
-        public void MissingOperatorProducesMeaningfulError()
+        [Theory, MemberData(nameof(ArithmeticExpressionTokenizers))]
+        public void MissingOperatorProducesMeaningfulError(Tokenizer<ArithmeticExpressionToken> tokenizer)
         {
-            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 3", new ArithmeticExpressionTokenizer(),
+            AssertParser.FailsWithMessage(ArithmeticExpressionParser.Lambda, "1 3", tokenizer,
                  "Syntax error (line 1, column 3): unexpected number `3`.");
         }
 
@@ -115,6 +137,26 @@ namespace Superpower.Tests
             var equalToA = Span.EqualToIgnoreCase('a');
             AssertParser.FailsWithMessage(equalToA, "",
                 "Syntax error: unexpected end of input, expected `a`.");
+        }
+
+        [Fact]
+        public void MessageWithExpectedTokensUsesTokenPresentation()
+        {
+            // Composing a complex parser which does not fit a LALR(1) grammar, one might need
+            // to have multiple look-ahead tokens. While it is possible to compose parsers with back-tracking,
+            // manual generated parsers are some times easier to construct. These parsers would like
+            // to report expectations using tokens, but still benefit from the annotations put on
+            // the tokens, to generated nicely formatted error messages. The following construct
+            // shows how to generate an empty result, which indicates which tokens are expected.
+            var emptyParseResult = TokenListParserResult.Empty<ArithmeticExpressionToken, string>(
+                new TokenList<ArithmeticExpressionToken>(),
+                new []{ ArithmeticExpressionToken.Times, ArithmeticExpressionToken.Zero});
+
+            // Empty result represent expectations using nice string representation taken from
+            // annotations of enum values of tokens
+            Assert.Equal(2, emptyParseResult.Expectations.Length);
+            Assert.Equal( "`*`", emptyParseResult.Expectations[0]);
+            Assert.Equal("`zero`", emptyParseResult.Expectations[1]);
         }
     }
 }

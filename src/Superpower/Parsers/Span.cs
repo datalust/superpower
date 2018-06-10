@@ -15,6 +15,7 @@
 using Superpower.Model;
 using Superpower.Util;
 using System;
+using System.Text.RegularExpressions;
 using Superpower.Display;
 
 namespace Superpower.Parsers
@@ -22,7 +23,7 @@ namespace Superpower.Parsers
     /// <summary>
     /// Parsers for spans of characters.
     /// </summary>
-    public class Span
+    public static class Span
     {
         /// <summary>
         /// Parse a span of length <paramref name="length"/>/>.
@@ -114,7 +115,7 @@ namespace Superpower.Parsers
         }
 
         /// <summary>
-        /// Match a span equal to a singe character <paramref name="ch"/>.
+        /// Match a span equal to a single character <paramref name="ch"/>.
         /// </summary>
         /// <param name="ch">The character to match.</param>
         /// <returns>The matched text.</returns>
@@ -131,7 +132,7 @@ namespace Superpower.Parsers
         }
 
         /// <summary>
-        /// Match a span equal to a singe character <paramref name="ch"/>, ignoring invariant character case.
+        /// Match a span equal to a single character <paramref name="ch"/>, ignoring invariant character case.
         /// </summary>
         /// <param name="ch">The character to match.</param>
         /// <returns>The matched text.</returns>
@@ -153,11 +154,11 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="predicate">A predicate.</param>
         /// <returns>The matched text.</returns>
-        public static TextParser<TextSpan> Until(Func<char, bool> predicate)
+        public static TextParser<TextSpan> WithoutAny(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-            return While(ch => !predicate(ch));
+            return WithAll(ch => !predicate(ch));
         }
 
 
@@ -166,7 +167,7 @@ namespace Superpower.Parsers
         /// </summary>
         /// <param name="predicate">A predicate.</param>
         /// <returns>The matched text.</returns>
-        public static TextParser<TextSpan> While(Func<char, bool> predicate)
+        public static TextParser<TextSpan> WithAll(Func<char, bool> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
@@ -177,8 +178,10 @@ namespace Superpower.Parsers
                 {
                     next = next.Remainder.ConsumeChar();
                 }
-
-                return Result.Value(input.Until(next.Location), input, next.Location);
+                
+                return  next.Location == input ?
+                    Result.Empty<TextSpan>(input) :
+                    Result.Value(input.Until(next.Location), input, next.Location);
             };
         }
 
@@ -193,7 +196,64 @@ namespace Superpower.Parsers
                 next = next.Remainder.ConsumeChar();
             }
 
-            return Result.Value(input.Until(next.Location), input, next.Location);
+            return next.Location == input ?
+                Result.Empty<TextSpan>(input) :
+                Result.Value(input.Until(next.Location), input, next.Location);
         };
+       
+        /// <summary>
+        /// Parse until a whitespace character is encountered, returning the matched span of non-whitespace characters.
+        /// </summary>
+        public static TextParser<TextSpan> NonWhiteSpace { get; } = WithoutAny(char.IsWhiteSpace);
+
+        /// <summary>
+        /// Parse as much of the input as matches <paramref name="regex" />.
+        /// </summary>
+        /// <param name="regex">A regular expression. The expression should not be anchored with `^` (beginning of input), `$` (end of input) etc.</param>
+        /// <param name="options">Options to apply to the expression. Specifying `RegexOptions.Compiled` may speed up some cases.</param>
+        /// <returns>A parser that will match text matching the expression.</returns>
+        /// <exception cref="ArgumentNullException">The expression is null.</exception>
+        public static TextParser<TextSpan> Regex(string regex, RegexOptions options = RegexOptions.None)
+        {
+            if (regex == null) throw new ArgumentNullException(nameof(regex));
+            var re = new Regex($"^{regex}");
+            var expectations = new[] { "match for `regex`" };
+
+            return i =>
+            {
+                var m = re.Match(i.Source, i.Position.Absolute, i.Length);
+                if (!m.Success || m.Length == 0)
+                    return Result.Empty<TextSpan>(i, expectations);
+
+                var remainder = i;
+                for (var skip = 0; skip < m.Length; skip++)
+                    remainder = remainder.ConsumeChar().Remainder;
+
+                return Result.Value(i.First(m.Length), i, remainder);
+            };
+        }
+        
+        /// <summary>
+        /// A handy adapter that takes any text parser, regardless of its result
+        /// type, and returns the span consumed by that parser.
+        /// </summary>
+        /// <param name="parser">A parser to apply.</param>
+        /// <typeparam name="T">The parser's (ignored) result type.</typeparam>
+        /// <returns>A parser that will match the span covered by <paramref name="parser"/>.</returns>
+        public static TextParser<TextSpan> MatchedBy<T>(TextParser<T> parser)
+        {
+            return i =>
+            {
+                var result = parser(i);
+                
+                if (!result.HasValue)
+                    return Result.CastEmpty<T, TextSpan>(result);
+              
+                return Result.Value(
+                    i.Until(result.Remainder),
+                    i,
+                    result.Remainder);
+            };
+        }
     }
 }

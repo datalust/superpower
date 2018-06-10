@@ -158,9 +158,25 @@ namespace Superpower.Model
         public override string ToString()
         {
             if (_tokens == null)
-                return "Token stream (empty)";
+                return "Token list (empty)";
 
-            return "Token stream";
+            return "Token list";
+        }
+
+        // A mildly expensive way to find the "end of input" position for error reporting.
+        internal Position ComputeEndOfInputPosition()
+        {
+            EnsureHasValue();
+            
+            if (_tokens.Length == 0)
+                return Model.Position.Zero;
+
+            var lastSpan = _tokens[_tokens.Length - 1].Span;
+            var source = lastSpan.Source;
+            var position = lastSpan.Position;
+            for (var i = position.Absolute; i < source.Length; ++i)
+                position = position.Advance(source[i]);
+            return position;
         }
     }
 }

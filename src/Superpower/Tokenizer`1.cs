@@ -1,4 +1,4 @@
-// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2016-2018 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,10 +51,12 @@ namespace Superpower
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
+            var state = new TokenizationState<TKind>();
+
             var sourceSpan = new TextSpan(source);
             var remainder = sourceSpan;
             var results = new List<Token<TKind>>();
-            foreach (var result in Tokenize(sourceSpan))
+            foreach (var result in Tokenize(sourceSpan, state))
             {
                 if (!result.HasValue)
                     return Result.CastEmpty<TKind, TokenList<TKind>>(result);
@@ -64,7 +66,7 @@ namespace Superpower
 
                 remainder = result.Remainder;
                 var token = new Token<TKind>(result.Value, result.Location.Until(result.Remainder));
-                Previous = token;
+                state.Previous = token;
                 results.Add(token);
             }
 
@@ -73,17 +75,27 @@ namespace Superpower
         }
 
         /// <summary>
-        /// The previous token parsed.
-        /// </summary>
-        protected Token<TKind> Previous { get; private set; }
-
-        /// <summary>
         /// Subclasses should override to perform tokenization.
         /// </summary>
         /// <param name="span">The input span to tokenize.</param>
         /// <returns>A list of parsed tokens.</returns>
-        protected abstract IEnumerable<Result<TKind>> Tokenize(TextSpan span);
+        protected virtual IEnumerable<Result<TKind>> Tokenize(TextSpan span)
+        {
+            throw new NotImplementedException("Either `Tokenize(TextSpan)` or `Tokenize(TextSpan, TokenizationState)` must be implemented.");
+        }
 
+        /// <summary>
+        /// Subclasses should override to perform tokenization when the
+        /// last-produced-token needs to be tracked.
+        /// </summary>
+        /// <param name="span">The input span to tokenize.</param>
+        /// <param name="state">The tokenization state maintained during the operation.</param>
+        /// <returns>A list of parsed tokens.</returns>
+        protected virtual IEnumerable<Result<TKind>> Tokenize(TextSpan span, TokenizationState<TKind> state)
+        {
+            return Tokenize(span);
+        }
+        
         /// <summary>
         /// Advance until the first non-whitespace character is encountered.
         /// </summary>

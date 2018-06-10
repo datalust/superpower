@@ -26,12 +26,12 @@ namespace Superpower
     public static class Combinators
     {
         /// <summary>
-        /// Apply the character parser <paramref name="valueParser"/> to the span represented by the parsed token.
+        /// Apply the text parser <paramref name="valueParser"/> to the span represented by the parsed token.
         /// </summary>
         /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
-        /// <param name="valueParser">A function that determines which character parser to apply.</param>
+        /// <param name="valueParser">A function that determines which text parser to apply.</param>
         /// <returns>A parser that returns the result of parsing the token value.</returns>
         public static TokenListParser<TKind, U> Apply<TKind, U>(this TokenListParser<TKind, Token<TKind>> parser, Func<Token<TKind>, TextParser<U>> valueParser)
         {
@@ -45,30 +45,79 @@ namespace Superpower
 
                 var uParser = valueParser(rt.Value);
                 var uResult = uParser.AtEnd()(rt.Value.Span);
-                if (!uResult.HasValue)
-                {
-                    var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
-                    return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null, uResult.Backtrack);
-                }
+                if (uResult.HasValue)
+                    return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
 
-                return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
+                var message = $"invalid {Presentation.FormatExpectation(rt.Value.Kind)}, {uResult.FormatErrorMessageFragment()}";
+                return new TokenListParserResult<TKind, U>(input, uResult.Remainder.Position, message, null, uResult.Backtrack);
             };
         }
 
         /// <summary>
-        /// Apply the character parser <paramref name="valueParser"/> to the span represented by the parsed token.
+        /// Apply the text parser <paramref name="valueParser"/> to the span represented by the parsed token.
         /// </summary>
         /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
-        /// <param name="valueParser">A character parser to apply.</param>
+        /// <param name="valueParser">A text parser to apply.</param>
         /// <returns>A parser that returns the result of parsing the token value.</returns>
         public static TokenListParser<TKind, U> Apply<TKind, U>(this TokenListParser<TKind, Token<TKind>> parser, TextParser<U> valueParser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (valueParser == null) throw new ArgumentNullException(nameof(valueParser));
 
-            return parser.Apply(rt => valueParser);
+            var valueParserAtEnd = valueParser.AtEnd();
+            return input =>
+            {
+                var rt = parser(input);
+                if (!rt.HasValue)
+                    return TokenListParserResult.CastEmpty<TKind, Token<TKind>, U>(rt);
+
+                var uResult = valueParserAtEnd(rt.Value.Span);
+                if (uResult.HasValue)
+                    return TokenListParserResult.Value(uResult.Value, rt.Location, rt.Remainder);
+
+                var problem = uResult.Remainder.IsAtEnd ? "incomplete" : "invalid";
+                var textError = uResult.Remainder.IsAtEnd ? (uResult.Expectations != null ? $", expected {Friendly.List(uResult.Expectations)}" : "") : $", {uResult.FormatErrorMessageFragment()}";
+                var message = $"{problem} {Presentation.FormatExpectation(rt.Value.Kind)}{textError}";
+                return new TokenListParserResult<TKind, U>(input, rt.Remainder, uResult.Remainder.Position, message, null, uResult.Backtrack);
+            };
+        }
+
+        /// <summary>
+        /// Apply the text parser <paramref name="valueParser"/> to the span
+        /// captured by the parser.
+        /// </summary>
+        /// <typeparam name="U">The type of the resulting value.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="valueParser">A text parser to apply to the span.</param>
+        /// <returns>A parser that returns the result of parsing the span value.</returns>
+        public static TextParser<U> Apply<U>(this TextParser<TextSpan> parser, TextParser<U> valueParser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (valueParser == null) throw new ArgumentNullException(nameof(valueParser));
+            return input =>
+            {
+                var rt = parser(input);
+                if (!rt.HasValue)
+                    return Result.CastEmpty<TextSpan, U>(rt);
+                                    
+                var uResult = valueParser(rt.Value);
+
+                if (!uResult.HasValue)
+                {
+                    var errloc = rt.Value.Source != input.Source ? rt.Location : uResult.Location;
+                    return new Result<U>(errloc, rt.Remainder, uResult.ErrorMessage, uResult.Expectations, false);
+                }
+
+                if (!uResult.Remainder.IsAtEnd)
+                {
+                    var errloc = rt.Value.Source != input.Source ? rt.Location : uResult.Remainder;
+                    return Result.Empty<U>(errloc);
+                }
+
+                return Result.Value(uResult.Value, rt.Location, rt.Remainder);
+            };
         }
 
         /// <summary>
@@ -144,6 +193,73 @@ namespace Superpower
         }
 
         /// <summary>
+        /// Construct a parser that matches a specified number of instances of applying <paramref name="parser"/>.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="count">The number of times to apply <paramref name="parser"/>.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TokenListParser<TKind, T[]> Repeat<TKind, T>(this TokenListParser<TKind, T> parser, int count)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+
+            return input =>
+            {
+                // Assuming we'll try the parser and fail quite often, allocating the result
+                // array lazily should save some allocs for not much effort here.
+                T[] result = null;
+                var remainder = input;
+                for (var i = 0; i < count; ++i)
+                {
+                    var r = parser(remainder);
+                    if (!r.HasValue)
+                        return TokenListParserResult.CastEmpty<TKind, T, T[]>(r);
+
+                    result = result ?? new T[count];
+                    result[i] = r.Value;
+                    remainder = r.Remainder;
+                }
+
+                return TokenListParserResult.Value(result ?? new T[0], input, remainder);
+            };
+        }
+
+        /// <summary>
+        /// Construct a parser that matches a specified number of instances of applying <paramref name="parser"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="count">The number of times to apply <paramref name="parser"/>.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TextParser<T[]> Repeat<T>(this TextParser<T> parser, int count)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+
+            return input =>
+            {
+                // Assuming we'll try the parser and fail quite often, allocating the result
+                // array lazily should save some allocs for not much effort here.
+                T[] result = null;
+                var remainder = input;
+                for (var i = 0; i < count; ++i)
+                {
+                    var r = parser(remainder);
+                    if (!r.HasValue)
+                        return Result.CastEmpty<T, T[]>(r);
+
+                    result = result ?? new T[count];
+                    result[i] = r.Value;
+                    remainder = r.Remainder;
+                }
+
+                return Result.Value(result ?? new T[0], input, remainder);
+            };
+        }
+
+        /// <summary>
         /// Construct a parser that matches one or more instances of applying <paramref name="parser"/>, delimited by <paramref name="delimiter"/>.
         /// </summary>
         /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
@@ -174,6 +290,39 @@ namespace Superpower
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
             return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
+        }
+
+        /// <summary>
+        /// Construct a parser that matches <paramref name="left"/>, discards the resulting value,
+        /// then matches <paramref name="parser"/>, keeps the value, then matches <paramref name="right"/>
+        /// and returns the value matched by <paramref name="parser"/>.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <typeparam name="U">The type of the resulting value.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="left">First parser to match, value is ignored.</param>
+        /// <param name="right">Last parser to match, value is ignored.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TokenListParser<TKind, T> Between<TKind, T, U>(this TokenListParser<TKind, T> parser, TokenListParser<TKind, U> left, TokenListParser<TKind, U> right)
+        {
+            return left.IgnoreThen(parser.Then(right.Value));
+        }
+
+        /// <summary>
+        /// Construct a parser that matches <paramref name="left"/>, discards the resulting value,
+        /// then matches <paramref name="parser"/>, keeps the value, then matches <paramref name="right"/>
+        /// and returns the value matched by <paramref name="parser"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <typeparam name="U">The type of the resulting value.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="left">First parser to match, value is ignored.</param>
+        /// <param name="right">Last parser to match, value is ignored.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TextParser<T> Between<T, U>(this TextParser<T> parser, TextParser<U> left, TextParser<U> right)
+        {
+            return left.IgnoreThen(parser.Then(right.Value));
         }
 
         /// <summary>
@@ -279,23 +428,55 @@ namespace Superpower
             return input =>
             {
                 var result = new List<T>();
-                var @from = input;
+                var from = input;
                 var r = parser(input);
                 while (r.HasValue)
                 {
-                    if (@from == r.Remainder) // Broken parser, not a failed parsing.
+                    if (from == r.Remainder) // Broken parser, not a failed parsing.
                         throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
 
                     result.Add(r.Value);
 
-                    @from = r.Remainder;
+                    from = r.Remainder;
                     r = parser(r.Remainder);
                 }
 
-                if (!r.Backtrack && r.IsPartial(@from))
+                if (!r.Backtrack && r.IsPartial(from))
                     return Result.CastEmpty<T, T[]>(r);
 
                 return Result.Value(result.ToArray(), input, r.Remainder);
+            };
+        }
+
+        /// <summary>
+        /// Construct a parser that matches <paramref name="parser"/> zero or more times, discarding the
+        /// result. This is useful for avoiding the array allocation performed by <see cref="Many{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        /// <remarks>IgnoreMany will fail if any item partially matches this. To modify this behavior use <see cref="Try{T}(TextParser{T})"/>.</remarks>
+        public static TextParser<Unit> IgnoreMany<T>(this TextParser<T> parser)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return input =>
+            {
+                var from = input;
+                var r = parser(input);
+                while (r.HasValue)
+                {
+                    if (from == r.Remainder) // Broken parser, not a failed parsing.
+                        throw new ParseException($"IgnoreMany() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
+
+                    from = r.Remainder;
+                    r = parser(r.Remainder);
+                }
+
+                if (!r.Backtrack && r.IsPartial(from))
+                    return Result.CastEmpty<T, Unit>(r);
+
+                return Result.Value(Unit.Value, input, r.Remainder);
             };
         }
 
@@ -307,13 +488,25 @@ namespace Superpower
         /// <typeparam name="U">The type of the resulting value.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="delimiter">The parser that matches the delimiters.</param>
+        /// <param name="end">A parser to match a final trailing delimiter, if required. Specifying
+        /// this can improve error reporting for some lists.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenListParser<TKind, T[]> ManyDelimitedBy<TKind, T, U>(this TokenListParser<TKind, T> parser, TokenListParser<TKind, U> delimiter)
+        public static TokenListParser<TKind, T[]> ManyDelimitedBy<TKind, T, U>(
+            this TokenListParser<TKind, T> parser,
+            TokenListParser<TKind, U> delimiter,
+            TokenListParser<TKind, U> end = null)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
-            return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
+            if (end != null)
+                return parser
+                    .AtLeastOnceDelimitedBy(delimiter)
+                    .Then(p => end.Value(p))
+                    .Or(end.Value(new T[0]));
+
+            return parser
+                .Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
                 .OptionalOrDefault(new T[0]);
         }
 
@@ -353,7 +546,7 @@ namespace Superpower
                 if (result.HasValue)
                     return result;
 
-                return TokenListParserResult.Empty<TKind, T>(result.Remainder, result.ErrorPosition, errorMessage);
+                return TokenListParserResult.Empty<TKind, T>(result.Remainder, result.SubTokenErrorPosition, errorMessage);
             };
         }
 
@@ -395,14 +588,8 @@ namespace Superpower
             return input =>
             {
                 var result = parser(input);
-                if (result.HasValue || result.Remainder != input)
+                if (result.HasValue || result.IsPartial(input))
                     return result;
-
-                // result.IsSubTokenError?
-                if (result.ErrorPosition.HasValue)
-                {
-                    return TokenListParserResult.Empty<TKind, T>(result.Remainder, result.ErrorPosition, result.FormatErrorMessageFragment());
-                }
 
                 return TokenListParserResult.Empty<TKind, T>(result.Remainder, new[] { name });
             };
@@ -423,7 +610,7 @@ namespace Superpower
             return input =>
             {
                 var result = parser(input);
-                if (result.HasValue || result.Remainder != input)
+                if (result.HasValue || result.IsPartial(input))
                     return result;
 
                 return Result.Empty<T>(result.Remainder, new[] { name });
@@ -576,6 +763,37 @@ namespace Superpower
             if (selector == null) throw new ArgumentNullException(nameof(selector));
 
             return parser.Then(rt => Parse.Return(selector(rt)));
+        }
+
+        /// <summary>
+        /// Construct a parser that takes the result of <paramref name="parser"/> and casts it to <typeparamref name="U"/>.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <typeparam name="U">The type of the resulting value.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TokenListParser<TKind, U> Cast<TKind, T, U>(this TokenListParser<TKind, T> parser)
+            where T: U
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return parser.Then(rt => Parse.Return<TKind, U>((U)rt));
+        }
+        
+        /// <summary>
+        /// Construct a parser that takes the result of <paramref name="parser"/> and casts it to <typeparamref name="U"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <typeparam name="U">The type of the resulting value.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TextParser<U> Cast<T, U>(this TextParser<T> parser)
+            where T: U
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            return parser.Then(rt => Parse.Return((U)rt));
         }
 
         /// <summary>

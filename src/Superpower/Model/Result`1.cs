@@ -26,12 +26,13 @@ namespace Superpower.Model
         readonly T _value;
 
         /// <summary>
-        /// The location in the stream where the parsing began (== the input).
+        /// If the result is a value, the location in the input corresponding to the
+        /// value. If the result is an error, it's the location of the error.
         /// </summary>
         public TextSpan Location { get; }
 
         /// <summary>
-        /// The first un-parsed location in the stream.
+        /// The first un-parsed location in the input.
         /// </summary>
         public TextSpan Remainder { get; }
 
@@ -41,9 +42,9 @@ namespace Superpower.Model
         public bool HasValue { get; }
 
         /// <summary>
-        /// The position of the first un-parsed location.
+        /// If the result is an error, the source-level position of the error; otherwise, <see cref="Position.Empty"/>.
         /// </summary>
-        public Position ErrorPosition => Remainder.Position;
+        public Position ErrorPosition => HasValue ? Position.Empty : Location.Position;
 
         /// <summary>
         /// A provided error message, or null.
@@ -55,7 +56,7 @@ namespace Superpower.Model
         /// </summary>
         public string[] Expectations { get; }
 
-        internal bool IsPartial(TextSpan @from) => @from != Remainder;
+        internal bool IsPartial(TextSpan from) => from != Remainder;
 
         internal bool Backtrack { get; set; }
 
@@ -83,6 +84,17 @@ namespace Superpower.Model
             Backtrack = backtrack;
         }
 
+        internal Result(TextSpan location, TextSpan remainder, string errorMessage, string[] expectations, bool backtrack)
+        {
+            Location = location;
+            Remainder = remainder;
+            _value = default(T);
+            HasValue = false;
+            Expectations = expectations;
+            ErrorMessage = errorMessage;
+            Backtrack = backtrack;
+        }
+
         internal Result(TextSpan remainder, string errorMessage, string[] expectations, bool backtrack)
         {
             Location = Remainder = remainder;
@@ -104,9 +116,9 @@ namespace Superpower.Model
 
             var message = FormatErrorMessageFragment();
             var location = "";
-            if (!Remainder.IsAtEnd)
+            if (!Location.IsAtEnd)
             {
-                location = $" (line {Remainder.Position.Line}, column {Remainder.Position.Column})";
+                location = $" (line {Location.Position.Line}, column {Location.Position.Column})";
             }
 
             return $"Syntax error{location}: {message}.";
@@ -122,13 +134,13 @@ namespace Superpower.Model
                 return ErrorMessage;
             
             string message;
-            if (Remainder.IsAtEnd)
+            if (Location.IsAtEnd)
             {
                 message = "unexpected end of input";
             }
             else
             {
-                var next = Remainder.ConsumeChar().Value;
+                var next = Location.ConsumeChar().Value;
                 message = $"unexpected `{next}`";
             }
 

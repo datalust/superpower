@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
+using Superpower.Display;
+
 namespace Superpower.Model
 {
     /// <summary>
@@ -42,6 +45,20 @@ namespace Superpower.Model
         public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder, string[] expectations)
         {
             return new TokenListParserResult<TKind, T>(remainder, Position.Empty, null, expectations, false);
+        }
+
+        /// <summary>
+        /// Create a token result with no value, indicating a failure to parse any value.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of token.</typeparam>
+        /// <typeparam name="T">The result type.</typeparam>
+        /// <param name="remainder">The start of un-parsed input.</param>
+        /// <param name="expectations">Expectations that could not be fulfilled.</param>
+        /// <returns>An empty result.</returns>
+        public static TokenListParserResult<TKind, T> Empty<TKind, T>(TokenList<TKind> remainder, TKind[] expectations)
+        {
+            var stringExpectations = expectations.Select(Presentation.FormatExpectation).ToArray();
+            return new TokenListParserResult<TKind, T>(remainder, Position.Empty, null, stringExpectations, false);
         }
 
         /// <summary>
@@ -96,7 +113,7 @@ namespace Superpower.Model
         /// <returns>The converted result.</returns>
         public static TokenListParserResult<TKind,U> CastEmpty<TKind, T, U>(TokenListParserResult<TKind, T> result)
         {
-            return new TokenListParserResult<TKind, U>(result.Remainder, result.ErrorPosition, result.ErrorMessage, result.Expectations, result.Backtrack);
+            return new TokenListParserResult<TKind, U>(result.Remainder, result.SubTokenErrorPosition, result.ErrorMessage, result.Expectations, result.Backtrack);
         }
 
         /// <summary>
@@ -125,7 +142,7 @@ namespace Superpower.Model
                     expectations[i] = second.Expectations[j];
             }
 
-            return new TokenListParserResult<TKind, T>(second.Remainder, second.ErrorPosition, first.ErrorMessage, expectations, second.Backtrack);
+            return new TokenListParserResult<TKind, T>(second.Remainder, second.SubTokenErrorPosition, first.ErrorMessage, expectations, second.Backtrack);
         }
     }
 }
