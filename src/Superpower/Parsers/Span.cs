@@ -216,7 +216,7 @@ namespace Superpower.Parsers
         public static TextParser<TextSpan> Regex(string regex, RegexOptions options = RegexOptions.None)
         {
             if (regex == null) throw new ArgumentNullException(nameof(regex));
-            var re = new Regex($"^{regex}");
+            var re = new Regex($"^{regex}", options);
             var expectations = new[] { "match for `regex`" };
 
             return i =>
