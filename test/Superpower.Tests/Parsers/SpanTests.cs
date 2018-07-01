@@ -4,6 +4,8 @@ using Xunit;
 
 namespace Superpower.Tests.Parsers
 {
+    using System.Text.RegularExpressions;
+
     public class SpanTests
     {
         [Theory]
@@ -71,6 +73,15 @@ namespace Superpower.Tests.Parsers
             var input = new TextSpan("123abc");
             var r = parser(input);
             Assert.Equal("123", r.Value.ToStringValue());
+        }
+
+        [Fact]
+        public void RegexMatches()
+        {
+            var parser = Span.Regex("foo", RegexOptions.IgnoreCase);
+            var input = new TextSpan("Foo");
+            var r = parser(input);
+            Assert.Equal("Foo", r.Value.ToStringValue());
         }
     }
 }
