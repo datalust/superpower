@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using Superpower.Model;
 using Superpower.Util;
 
@@ -204,6 +205,18 @@ namespace Superpower.Parsers
             Integer
                 .Then(n => Character.EqualTo('.').IgnoreThen(Natural).OptionalOrDefault()
                     .Select(f => f == TextSpan.None ? n : new TextSpan(n.Source, n.Position, n.Length + f.Length + 1)));
+
+        /// <summary>
+        /// Matches decimal numbers, for example <code>-1.23</code>, converted into a <see cref="decimal"/>.
+        /// </summary>
+        public static TextParser<decimal> DecimalDecimal { get; } =
+            Decimal.Select(span => decimal.Parse(span.ToStringValue(), CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// Matches decimal numbers, for example <code>-1.23</code>, converted into a <see cref="double"/>.
+        /// </summary>
+        public static TextParser<double> DecimalDouble { get; } =
+            Decimal.Select(span => double.Parse(span.ToStringValue(), CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Matches hexadecimal numbers.

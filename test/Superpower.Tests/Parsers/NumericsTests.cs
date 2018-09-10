@@ -81,5 +81,19 @@ namespace Superpower.Tests.Parsers
         {
             AssertParser.FitsTheory(Numerics.Decimal, input, isMatch);
         }
+
+        [Fact]
+        public void DecimalNumbersAreParsed()
+        {
+            var parsed = Numerics.DecimalDecimal.Parse("-123.456");
+            Assert.Equal(-123.456m, parsed);
+        }
+
+        [Fact]
+        public void DecimalDoublesAreParsed()
+        {
+            var parsed = Numerics.DecimalDouble.Parse("-123.456");
+            Assert.Equal(-123.456, parsed);
+        }
     }
 }
