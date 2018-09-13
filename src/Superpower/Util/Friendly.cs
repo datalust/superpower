@@ -34,11 +34,23 @@ namespace Superpower.Util
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 
-            var list = items.Last();
-            var count = items.Count();
-            if (count > 1)
-                list = $"{string.Join(", ", items.Take(count - 1))} or {list}";
-            return list;
+            // Keep the order stable
+            var seen = new HashSet<string>();
+            var unique = new List<string>();
+            foreach (var item in items)
+            {
+                if (seen.Contains(item)) continue;
+                seen.Add(item);
+                unique.Add(item);
+            }
+
+            if (unique.Count == 0)
+                throw new ArgumentException("Friendly list formatting requires at least one element.", nameof(items));
+
+            if (unique.Count == 1)
+                return unique.Single();
+
+            return $"{string.Join(", ", unique.Take(unique.Count - 1))} or {unique.Last()}";
         }
 
         public static string Clip(string value, int maxLength)

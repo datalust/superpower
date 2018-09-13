@@ -69,5 +69,17 @@ namespace Superpower.Tests.Tokenizers
             var msg = tokens.ToString();
             Assert.Equal("Syntax error (line 1, column 2): incomplete abc, unexpected end of input, expected `c`.", msg);
         }
+
+        [Fact]
+        public void InvalidDelimitedTokenAtEndIsReported()
+        {
+            var tokenizer = new TokenizerBuilder<string>()
+                .Match(Span.EqualTo("abc"), "abc", requireDelimiters: true)
+                .Match(Character.LetterOrDigit.AtLeastOnce(), "lod", requireDelimiters: true)
+                .Build();
+
+            var tokens = tokenizer.TryTokenize("abc_");
+            Assert.False(tokens.HasValue);
+        }
     }
 }
