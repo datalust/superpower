@@ -158,7 +158,7 @@ namespace Superpower.Tokenizers
                     }
                     else
                     {
-                        yield break;
+                        break;
                     }
                 }
 
