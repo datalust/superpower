@@ -1,0 +1,47 @@
+{
+   "version": "0.2.0",
+   "configurations": [
+        {
+            "name": "IntCalc",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/sample/IntCalc/bin/Debug/netcoreapp2.0/IntCalc.dll",
+            "args": [ "IntCalc" ],
+            "cwd": "${workspaceFolder}/sample/IntCalc",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "JsonParser",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/sample/JsonParser/bin/Debug/netcoreapp2.0/JsonParser.dll",
+            "args": [ "IntCalc" ],
+            "cwd": "${workspaceFolder}/sample/JsonParser",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "DateTimeTextParser",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/sample/DateTimeTextParser/bin/Debug/netcoreapp2.0/DateTimeParser.dll",
+            "args": [ "IntCalc" ],
+            "cwd": "${workspaceFolder}/sample/DateTimeTextParser",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ]
+}
