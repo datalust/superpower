@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "group": {
+              "kind": "build",
+              "isDefault": true
+            },
+            "args": [
+              "build",
+              "/p:GenerateFullPaths=true"
+            ],
+            "problemMatcher": "$msCompile"
+          },
+          {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "group": {
+              "kind": "test",
+              "isDefault": true
+            },
+            "args": [
+              "test",
+              "${workspaceFolder}/test/Superpower.Tests/Superpower.Tests.csproj",
+              "/p:GenerateFullPaths=true"
+            ],
+            "problemMatcher": "$msCompile"
+          }
+    ]
+}
