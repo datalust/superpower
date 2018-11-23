@@ -173,7 +173,7 @@ namespace Superpower.Model
             next.EnsureHasValue();
             if (next.Source != Source) throw new ArgumentException("The spans are on different source strings.", nameof(next));
 #endif
-            var charCount = Length - next.Length;
+            var charCount = next.Position.Absolute - Position.Absolute;
             return First(charCount);
         }
 

@@ -41,6 +41,16 @@ namespace Superpower.Tests
         }
 
         [Fact]
+        public void EqualSpansAreEqualCase65()
+        {
+            var source = "123";
+            var one = Position.Zero.Advance(source[0]);
+            var t1 = new TextSpan(source);
+            var t2 = new TextSpan(source, one, 1);
+            Assert.Equal("1", t1.Until(t2).ToStringValue());
+        }
+
+        [Fact]
         public void SpansAtDifferentPositionsAreNotEqual()
         {
             var source = "111";
