@@ -99,11 +99,6 @@ namespace Superpower.Display
                 //Paragraph Separator
                 case '\x2029': return "paragraph separator";
                 
-                //Ascii Whitespace
-
-                
-                
-
                 //Unicode C0 Control Codes (ascii equivalent) 
                 case '\x0000': return "NUL";
                 case '\x0001': return "start of heading";
@@ -139,9 +134,7 @@ namespace Superpower.Display
                 case '\x001F': return "unit separator";
                 case '\x007F': return "delete";
 
-
-                default:
-                    return "`" + literal + "`";
+                default: return "`" + literal + "`";
             }
         }
 
