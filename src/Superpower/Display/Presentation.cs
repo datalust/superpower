@@ -70,7 +70,8 @@ namespace Superpower.Display
 
             return $"{FormatKind(kind)} {clipped}";
         }
-        public static string FormatLiteral(char literal)
+        public static string FormatLiteral(char literal) => FormatLiteral(literal, true);
+        public static string FormatLiteral(char literal,bool wrapDefault)
         {
             switch (literal)
             {
@@ -134,7 +135,7 @@ namespace Superpower.Display
                 case '\x001F': return "unit separator";
                 case '\x007F': return "delete";
 
-                default: return "`" + literal + "`";
+                default: return wrapDefault?("`" + literal + "`"):literal.ToString();
             }
         }
 
