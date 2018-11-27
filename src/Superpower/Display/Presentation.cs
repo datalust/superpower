@@ -74,9 +74,6 @@ namespace Superpower.Display
         {
             switch (literal)
             {
-     
-               
-
                 //Unicode Category: Space Separators
                 case '\x0020': return "space";
                 case '\x00A0': return "no-break space";
@@ -102,11 +99,45 @@ namespace Superpower.Display
                 //Paragraph Separator
                 case '\x2029': return "paragraph separator";
                 
-                //Ascii Non-Graphical
-                case '\r': return "carriage return";
-                case '\n': return "line feed";
-                case '\t': return "tab";
-                case '\0': return "NUL";
+                //Ascii Whitespace
+
+                
+                
+
+                //Unicode C0 Control Codes (ascii equivalent) 
+                case '\x0000': return "NUL";
+                case '\x0001': return "start of heading";
+                case '\x0002': return "start of text";
+                case '\x0003': return "end of text";
+                case '\x0004': return "end of transmission";
+                case '\x0005': return "enquiry";
+                case '\x0006': return "acknoledge";
+                case '\x0007': return "bell";
+                case '\x0008': return "backspace";
+                case '\x0009': return "tab"; //\t
+                case '\x000A': return "line feed"; //\n
+                case '\x000B': return "vertical tab";
+                case '\x000C': return "form feed";
+                case '\x000D': return "carriage return";
+                case '\x000E': return "shift in";
+                case '\x000F': return "shift out";
+                case '\x0010': return "data link escape";
+                case '\x0011': return "device ctrl 1";
+                case '\x0012': return "device ctrl 2";
+                case '\x0013': return "device ctrl 3";
+                case '\x0014': return "device ctrl 4";
+                case '\x0015': return "not acknoledge";
+                case '\x0016': return "synchronous idle";
+                case '\x0017': return "end transmission block";
+                case '\x0018': return "cancel";
+                case '\x0019': return "end of medium";
+                case '\x001A': return "substitute";
+                case '\x001B': return "escape";
+                case '\x001C': return "file separator";
+                case '\x001D': return "group separator";
+                case '\x001E': return "record separator";
+                case '\x001F': return "unit separator";
+                case '\x007F': return "delete";
 
 
                 default:
