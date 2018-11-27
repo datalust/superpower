@@ -31,7 +31,7 @@ namespace Superpower.Tests.Display
         public void ProperNameIsDisplayedWhenNonGraphicalIsFailed()
         {
             var result=Character.EqualTo('\x2007').TryParse("a");
-            Assert.Equal("Syntax error (line 1, column 1): unexpected `a`, expected figure space.",result.ToString());
+            Assert.Equal("Syntax error (line 1, column 1): unexpected `a`, expected `figure space`.",result.ToString());
         }
     }
 }

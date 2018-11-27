@@ -73,70 +73,73 @@ namespace Superpower.Display
         public static string FormatLiteral(char literal) => FormatLiteral(literal, true);
         public static string FormatLiteral(char literal,bool wrapDefault)
         {
+            string result;
             switch (literal)
             {
                 //Unicode Category: Space Separators
-                case '\x0020': return "space";
-                case '\x00A0': return "no-break space";
-                case '\x1680': return "ogham space mark";
-                case '\x2000': return "en quad";
-                case '\x2001': return "em quad";
-                case '\x2002': return "en space";
-                case '\x2003': return "em space";
-                case '\x2004': return "three-per-em space";
-                case '\x2005': return "four-per-em space";
-                case '\x2006': return "siz-per-em space";
-                case '\x2007': return "figure space";
-                case '\x2008': return "punctuation space";
-                case '\x2009': return "thin space";
-                case '\x200A': return "hair space";
-                case '\x202F': return "narrow no-break space";
-                case '\x205F': return "medium mathematical space";
-                case '\x3000': return "ideographic space";
+                case '\x0020': result= "space"; break;
+                case '\x00A0': result= "no-break space"; break;
+                case '\x1680': result= "ogham space mark"; break;
+                case '\x2000': result= "en quad"; break;
+                case '\x2001': result= "em quad"; break;
+                case '\x2002': result= "en space"; break;
+                case '\x2003': result= "em space"; break;
+                case '\x2004': result= "three-per-em space"; break;
+                case '\x2005': result= "four-per-em space"; break;
+                case '\x2006': result= "siz-per-em space"; break;
+                case '\x2007': result= "figure space"; break;
+                case '\x2008': result= "punctuation space"; break;
+                case '\x2009': result= "thin space"; break;
+                case '\x200A': result= "hair space"; break;
+                case '\x202F': result= "narrow no-break space"; break;
+                case '\x205F': result= "medium mathematical space"; break;
+                case '\x3000': result= "ideographic space"; break;
 
                 //Line Separator
-                case '\x2028': return "line separator";
+                case '\x2028': result= "line separator"; break;
 
                 //Paragraph Separator
-                case '\x2029': return "paragraph separator";
+                case '\x2029': result= "paragraph separator"; break;
                 
                 //Unicode C0 Control Codes (ascii equivalent) 
-                case '\x0000': return "NUL";
-                case '\x0001': return "start of heading";
-                case '\x0002': return "start of text";
-                case '\x0003': return "end of text";
-                case '\x0004': return "end of transmission";
-                case '\x0005': return "enquiry";
-                case '\x0006': return "acknoledge";
-                case '\x0007': return "bell";
-                case '\x0008': return "backspace";
-                case '\x0009': return "tab"; //\t
-                case '\x000A': return "line feed"; //\n
-                case '\x000B': return "vertical tab";
-                case '\x000C': return "form feed";
-                case '\x000D': return "carriage return";
-                case '\x000E': return "shift in";
-                case '\x000F': return "shift out";
-                case '\x0010': return "data link escape";
-                case '\x0011': return "device ctrl 1";
-                case '\x0012': return "device ctrl 2";
-                case '\x0013': return "device ctrl 3";
-                case '\x0014': return "device ctrl 4";
-                case '\x0015': return "not acknoledge";
-                case '\x0016': return "synchronous idle";
-                case '\x0017': return "end transmission block";
-                case '\x0018': return "cancel";
-                case '\x0019': return "end of medium";
-                case '\x001A': return "substitute";
-                case '\x001B': return "escape";
-                case '\x001C': return "file separator";
-                case '\x001D': return "group separator";
-                case '\x001E': return "record separator";
-                case '\x001F': return "unit separator";
-                case '\x007F': return "delete";
+                case '\x0000': result= "NUL"; break;
+                case '\x0001': result= "start of heading"; break;
+                case '\x0002': result= "start of text"; break;
+                case '\x0003': result= "end of text"; break;
+                case '\x0004': result= "end of transmission"; break;
+                case '\x0005': result= "enquiry"; break;
+                case '\x0006': result= "acknoledge"; break;
+                case '\x0007': result= "bell"; break;
+                case '\x0008': result= "backspace"; break;
+                case '\x0009': result= "tab"; break; //\t
+                case '\x000A': result= "line feed"; break; //\n
+                case '\x000B': result= "vertical tab"; break;
+                case '\x000C': result= "form feed"; break;
+                case '\x000D': result= "carriage result="; break;
+                case '\x000E': result= "shift in"; break;
+                case '\x000F': result= "shift out"; break;
+                case '\x0010': result= "data link escape"; break;
+                case '\x0011': result= "device ctrl 1"; break;
+                case '\x0012': result= "device ctrl 2"; break;
+                case '\x0013': result= "device ctrl 3"; break;
+                case '\x0014': result= "device ctrl 4"; break;
+                case '\x0015': result= "not acknoledge"; break;
+                case '\x0016': result= "synchronous idle"; break;
+                case '\x0017': result= "end transmission block"; break;
+                case '\x0018': result= "cancel"; break;
+                case '\x0019': result= "end of medium"; break;
+                case '\x001A': result= "substitute"; break;
+                case '\x001B': result= "escape"; break;
+                case '\x001C': result= "file separator"; break;
+                case '\x001D': result= "group separator"; break;
+                case '\x001E': result= "record separator"; break;
+                case '\x001F': result= "unit separator"; break;
+                case '\x007F': result= "delete"; break;
 
-                default: return wrapDefault?("`" + literal + "`"):literal.ToString();
+                default: result = literal.ToString(); break;
             }
+            return wrapDefault?"`" + result + "`":result;
+
         }
 
         public static string FormatLiteral(string literal)

@@ -141,7 +141,7 @@ namespace Superpower.Model
             else
             {
                 var next = Location.ConsumeChar().Value;
-                message = $"unexpected `{Display.Presentation.FormatLiteral(next,false)}`";
+                message = $"unexpected {Display.Presentation.FormatLiteral(next)}";
             }
 
             if (Expectations != null)
