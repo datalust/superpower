@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Reflection;
 using Superpower.Util;
 
@@ -69,19 +70,37 @@ namespace Superpower.Display
 
             return $"{FormatKind(kind)} {clipped}";
         }
-
         public static string FormatLiteral(char literal)
         {
             switch (literal)
             {
-                case '\r':
-                    return "carriage return";
-                case '\n':
-                    return "line feed";
-                case '\t':
-                    return "tab";
-                case '\0':
-                    return "NUL";
+     
+                case '\0': return "NUL";
+
+                //Unicode Category: Space Separators
+                case '\x0020': return "space";
+                case '\x00A0': return "no-break space";
+                case '\x1680': return "ogham space mark";
+                case '\x2000': return "en quad";
+                case '\x2001': return "em quad";
+                case '\x2002': return "en space";
+                case '\x2003': return "em space";
+                case '\x2004': return "three-per-em space";
+                case '\x2005': return "four-per-em space";
+                case '\x2006': return "siz-per-em space";
+                case '\x2007': return "figure space";
+                case '\x2008': return "punctuation space";
+                case '\x2009': return "thin space";
+                case '\x200A': return "hair space";
+                case '\x202F': return "narrow no-break space";
+                case '\x205F': return "medium mathematical space";
+                case '\x3000': return "ideographic space";
+
+                case '\r': return "carriage return";
+                case '\n': return "line feed";
+                case '\t': return "tab";
+
+
                 default:
                     return "`" + literal + "`";
             }
@@ -89,6 +108,7 @@ namespace Superpower.Display
 
         public static string FormatLiteral(string literal)
         {
+           
             return "`" + literal + "`";
         }
     }
