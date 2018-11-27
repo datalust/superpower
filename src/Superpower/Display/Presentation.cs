@@ -75,7 +75,7 @@ namespace Superpower.Display
             switch (literal)
             {
      
-                case '\0': return "NUL";
+               
 
                 //Unicode Category: Space Separators
                 case '\x0020': return "space";
@@ -96,9 +96,17 @@ namespace Superpower.Display
                 case '\x205F': return "medium mathematical space";
                 case '\x3000': return "ideographic space";
 
+                //Line Separator
+                case '\x2028': return "line separator";
+
+                //Paragraph Separator
+                case '\x2029': return "paragraph separator";
+                
+                //Ascii Non-Graphical
                 case '\r': return "carriage return";
                 case '\n': return "line feed";
                 case '\t': return "tab";
+                case '\0': return "NUL";
 
 
                 default:
