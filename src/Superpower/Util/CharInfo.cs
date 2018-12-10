@@ -16,14 +16,19 @@ namespace Superpower.Util
 {
     static class CharInfo
     {
+        public static bool IsLatinDigit(char ch)
+        {
+            return ch >= '0' && ch <= '9';
+        }
+
         public static bool IsHexDigit(char ch)
         {
-            return char.IsDigit(ch) || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F';
+            return IsLatinDigit(ch) || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F';
         }
 
         public static int HexValue(char ch)
         {
-            if (char.IsDigit(ch))
+            if (IsLatinDigit(ch))
                 return ch - '0';
 
             if (ch >= 'a' && ch <= 'f')

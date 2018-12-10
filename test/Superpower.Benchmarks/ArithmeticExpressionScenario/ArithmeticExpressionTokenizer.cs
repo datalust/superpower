@@ -26,13 +26,14 @@ namespace Superpower.Benchmarks.ArithmeticExpressionScenario
             {
                 ArithmeticExpressionToken charToken;
 
-                if (char.IsDigit(next.Value))
+                var ch = next.Value;
+                if (ch >= '0' && ch <= '9')
                 {
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.ConsumeChar();
                     yield return Result.Value(ArithmeticExpressionToken.Number, integer.Location, integer.Remainder);
                 }
-                else if (_operators.TryGetValue(next.Value, out charToken))
+                else if (_operators.TryGetValue(ch, out charToken))
                 {
                     yield return Result.Value(charToken, next.Location, next.Remainder);
                     next = next.Remainder.ConsumeChar();

@@ -15,7 +15,8 @@ namespace Superpower.Benchmarks.NumberListScenario
 
             do
             {
-                if (char.IsDigit(next.Value))
+                var ch = next.Value;
+                if (ch >= '0' && ch <= '9')
                 {
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.ConsumeChar();
