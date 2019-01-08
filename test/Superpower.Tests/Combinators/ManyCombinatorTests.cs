@@ -66,5 +66,21 @@ namespace Superpower.Tests.Combinators
             var list = Span.MatchedBy(ab.Try().Many().Then(_ => ac));
             AssertParser.SucceedsWithAll(list, "ababac");
         }
+        
+        [Fact]
+        public void ManyReportsCorrectErrorPositionForNonBacktrackingPartialItemMatch()
+        {
+            var ab = Character.EqualTo('a').Then(_ => Character.EqualTo('b'));
+            var list = ab.Many();
+            AssertParser.FailsWithMessage(list, "ababac", "Syntax error (line 1, column 6): unexpected `c`, expected `b`.");
+        }
+        
+        [Fact]
+        public void ManyReportsCorrectRemainderForBacktrackingPartialItemMatch()
+        {
+            var ab = Character.EqualTo('a').Then(_ => Character.EqualTo('b'));
+            var list = Span.MatchedBy(ab.Try().Many()).Select(s => s.ToStringValue());
+            AssertParser.SucceedsWith(list, "ababac", "abab");
+        }
     }
 }
