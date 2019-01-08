@@ -15,6 +15,8 @@ namespace Superpower.Tests.Parsers
         [InlineData("1.1", false)]
         [InlineData("a", false)]
         [InlineData("", false)]
+        [InlineData("\u0669\u0661\u0660", false)] // 910 in Arabic
+        [InlineData("9\u0661\u0660", false)] // 9 in Latin then 10 in Arabic
         public void IntegersAreRecognized(string input, bool isMatch)
         {
             AssertParser.FitsTheory(Numerics.Integer, input, isMatch);
@@ -29,6 +31,8 @@ namespace Superpower.Tests.Parsers
         [InlineData("1.1", false)]
         [InlineData("a", false)]
         [InlineData("", false)]
+        [InlineData("\u0669\u0661\u0660", false)] // 910 in Arabic
+        [InlineData("9\u0661\u0660", false)] // 9 in Latin then 10 in Arabic
         public void NaturalNumbersAreRecognized(string input, bool isMatch)
         {
             AssertParser.FitsTheory(Numerics.Natural, input, isMatch);
@@ -44,6 +48,8 @@ namespace Superpower.Tests.Parsers
         [InlineData("0123456789abcdef", true)]
         [InlineData("g", false)]
         [InlineData("", false)]
+        [InlineData("\u0669\u0661\u0660", false)] // 910 in Arabic
+        [InlineData("9\u0661\u0660", false)] // 9 in Latin then 10 in Arabic
         public void HexDigitsAreRecognized(string input, bool isMatch)
         {
             AssertParser.FitsTheory(Numerics.HexDigits, input, isMatch);

@@ -25,7 +25,7 @@ namespace Superpower.Tests.SExpressionScenario
                     yield return Result.Value(SExpressionToken.RParen, next.Location, next.Remainder);
                     next = next.Remainder.ConsumeChar();
                 }
-                else if (char.IsDigit(next.Value))
+                else if (next.Value >= '0' && next.Value <= '9')
                 {
                     var integer = Numerics.Integer(next.Location);
                     next = integer.Remainder.ConsumeChar();
