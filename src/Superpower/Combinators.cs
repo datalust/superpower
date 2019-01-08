@@ -410,7 +410,7 @@ namespace Superpower
                 if (!r.Backtrack && r.IsPartial(@from))
                     return TokenListParserResult.CastEmpty<TKind, T, T[]>(r);
 
-                return TokenListParserResult.Value(result.ToArray(), input, r.Remainder);
+                return TokenListParserResult.Value(result.ToArray(), input, from);
             };
         }
 
@@ -444,7 +444,7 @@ namespace Superpower
                 if (!r.Backtrack && r.IsPartial(from))
                     return Result.CastEmpty<T, T[]>(r);
 
-                return Result.Value(result.ToArray(), input, r.Remainder);
+                return Result.Value(result.ToArray(), input, from);
             };
         }
 
@@ -476,7 +476,7 @@ namespace Superpower
                 if (!r.Backtrack && r.IsPartial(from))
                     return Result.CastEmpty<T, Unit>(r);
 
-                return Result.Value(Unit.Value, input, r.Remainder);
+                return Result.Value(Unit.Value, input, from);
             };
         }
 

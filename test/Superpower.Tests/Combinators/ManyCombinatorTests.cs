@@ -57,5 +57,14 @@ namespace Superpower.Tests.Combinators
             var list = ab.Many();
             AssertParser.Fails(list, "ababa");
         }
+
+        [Fact]
+        public void ManySucceedsWithBacktrackedPartialItemMatch()
+        {
+            var ab = Character.EqualTo('a').Then(_ => Character.EqualTo('b'));
+            var ac = Character.EqualTo('a').Then(_ => Character.EqualTo('c'));
+            var list = Span.MatchedBy(ab.Try().Many().Then(_ => ac));
+            AssertParser.SucceedsWithAll(list, "ababac");
+        }
     }
 }
