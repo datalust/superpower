@@ -7,7 +7,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <Description>A parser combinator library for C#</Description>
-    <VersionPrefix>2.1.1</VersionPrefix>
+    <VersionPrefix>2.2.0</VersionPrefix>
     <Authors>Datalust;Superpower Contributors;Sprache Contributors</Authors>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
