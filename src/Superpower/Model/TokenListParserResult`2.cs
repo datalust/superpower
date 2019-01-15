@@ -86,7 +86,7 @@ namespace Superpower.Model
             get
             {
                 if (!HasValue)
-                    throw new InvalidOperationException("TokenResult has no value.");
+                    throw new InvalidOperationException($"{nameof(TokenListParserResult)} has no value.");
                 return _value;
             }
         }

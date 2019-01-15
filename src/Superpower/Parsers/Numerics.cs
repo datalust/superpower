@@ -35,7 +35,7 @@ namespace Superpower.Parsers
         public static TextParser<TextSpan> Natural { get; } = input =>
         {
             var next = input.ConsumeChar();
-            if (!next.HasValue || !char.IsDigit(next.Value))
+            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
                 return Result.Empty<TextSpan>(input, ExpectedDigit);
 
             TextSpan remainder;
@@ -43,7 +43,7 @@ namespace Superpower.Parsers
             {
                 remainder = next.Remainder;
                 next = remainder.ConsumeChar();
-            } while (next.HasValue && char.IsDigit(next.Value));
+            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
             return Result.Value(input.Until(remainder), input, remainder);
         };
@@ -55,7 +55,7 @@ namespace Superpower.Parsers
         {
             var next = input.ConsumeChar();
             
-            if (!next.HasValue || !char.IsDigit(next.Value))
+            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
                 return Result.Empty<uint>(input, ExpectedDigit);
 
             TextSpan remainder;
@@ -65,7 +65,7 @@ namespace Superpower.Parsers
                 val = 10 * val + (uint)(next.Value - '0');
                 remainder = next.Remainder;
                 next = remainder.ConsumeChar();
-            } while (next.HasValue && char.IsDigit(next.Value));
+            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
             
             return Result.Value(val, input, remainder);
         };
@@ -77,7 +77,7 @@ namespace Superpower.Parsers
         {
             var next = input.ConsumeChar();
             
-            if (!next.HasValue || !char.IsDigit(next.Value))
+            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
                 return Result.Empty<ulong>(input, ExpectedDigit);
 
             TextSpan remainder;
@@ -87,7 +87,7 @@ namespace Superpower.Parsers
                 val = 10 * val + (ulong)(next.Value - '0');
                 remainder = next.Remainder;
                 next = remainder.ConsumeChar();
-            } while (next.HasValue && char.IsDigit(next.Value));
+            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
             
             return Result.Value(val, input, remainder);
         };
@@ -105,7 +105,7 @@ namespace Superpower.Parsers
             if (next.Value == '-' || next.Value == '+')
                 next = next.Remainder.ConsumeChar();
 
-            if (!next.HasValue || !char.IsDigit(next.Value))
+            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
                 return Result.Empty<TextSpan>(input, ExpectedDigit);
 
             TextSpan remainder;
@@ -113,7 +113,7 @@ namespace Superpower.Parsers
             {
                 remainder = next.Remainder;
                 next = remainder.ConsumeChar();
-            } while (next.HasValue && char.IsDigit(next.Value));
+            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
             return Result.Value(input.Until(remainder), input, remainder);
         };
@@ -140,7 +140,7 @@ namespace Superpower.Parsers
                 next = next.Remainder.ConsumeChar();
             }
             
-            if (!next.HasValue || !char.IsDigit(next.Value))
+            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
                 return Result.Empty<int>(input, ExpectedDigit);
 
             TextSpan remainder;
@@ -150,7 +150,7 @@ namespace Superpower.Parsers
                 val = 10 * val + (next.Value - '0');
                 remainder = next.Remainder;
                 next = remainder.ConsumeChar();
-            } while (next.HasValue && char.IsDigit(next.Value));
+            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
             if (negative)
                 val = -val;
@@ -180,7 +180,7 @@ namespace Superpower.Parsers
                 next = next.Remainder.ConsumeChar();
             }
             
-            if (!next.HasValue || !char.IsDigit(next.Value))
+            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
                 return Result.Empty<long>(input, ExpectedDigit);
 
             TextSpan remainder;
@@ -190,7 +190,7 @@ namespace Superpower.Parsers
                 val = 10 * val + (next.Value - '0');
                 remainder = next.Remainder;
                 next = remainder.ConsumeChar();
-            } while (next.HasValue && char.IsDigit(next.Value));
+            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
             if (negative)
                 val = -val;

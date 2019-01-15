@@ -1,7 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' "> 
+    <TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
+  </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
     <AssemblyName>IntCalc</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>IntCalc</PackageId>

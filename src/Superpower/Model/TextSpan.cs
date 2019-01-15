@@ -128,13 +128,16 @@ namespace Superpower.Model
         }
 
         /// <summary>
-        /// Compare a string span with another using source identity semantics - same source, same position, same length.
+        /// Compare a string span with another using source identity
+        /// semantics - same source, same position, same length.
         /// </summary>
         /// <param name="other">The other span.</param>
         /// <returns>True if the spans are the same.</returns>
         public bool Equals(TextSpan other)
         {
-            return string.Equals(Source, other.Source) && Position.Absolute == other.Position.Absolute;
+            return ReferenceEquals(Source, other.Source) &&
+                   Position.Absolute == other.Position.Absolute &&
+                   Length == other.Length;
         }
 
         /// <summary>
@@ -170,7 +173,7 @@ namespace Superpower.Model
             next.EnsureHasValue();
             if (next.Source != Source) throw new ArgumentException("The spans are on different source strings.", nameof(next));
 #endif
-            var charCount = Length - next.Length;
+            var charCount = next.Position.Absolute - Position.Absolute;
             return First(charCount);
         }
 

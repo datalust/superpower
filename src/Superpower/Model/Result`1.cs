@@ -68,7 +68,7 @@ namespace Superpower.Model
             get
             {
                 if (!HasValue)
-                    throw new InvalidOperationException("Result has no value.");
+                    throw new InvalidOperationException($"{nameof(Result)} has no value.");
                 return _value;
             }
         }
@@ -141,7 +141,7 @@ namespace Superpower.Model
             else
             {
                 var next = Location.ConsumeChar().Value;
-                message = $"unexpected `{next}`";
+                message = $"unexpected {Display.Presentation.FormatLiteral(next)}";
             }
 
             if (Expectations != null)

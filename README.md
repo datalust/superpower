@@ -240,6 +240,7 @@ Superpower is introduced, with a worked example, in [this blog post](https://nbl
 * [_DateTimeTextParser_](https://github.com/datalust/superpower/tree/dev/sample/DateTimeTextParser) shows how Superpower's text parsers work, parsing ISO-8601 date-times
 * [_IntCalc_](https://github.com/datalust/superpower/tree/dev/sample/IntCalc) is a simple arithmetic expresion parser (`1 + 2 * 3`) included in the repository, demonstrating how Superpower token parsing works
 * [_Plotty_](https://github.com/SuperJMN/Plotty) implements an instruction set for a RISC virtual machine
+* [_tcalc_](https://github.com/nblumhardt/tcalc) is an example expression language that computes durations (`1d / 12m`)
 
 **Real-world** projects built with Superpower:
 
