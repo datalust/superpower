@@ -70,20 +70,6 @@ namespace Superpower.Model
         }
 
         /// <summary>
-        /// Create a new Result based on another Result, supplying just the values to override
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="original"></param>
-        /// <param name="remainder"></param>
-        /// <param name="errorMessage"></param>
-        /// <param name="expectations"></param>
-        /// <returns></returns>
-        public static Result<T> Augment<T>(this Result<T> original, TextSpan? remainder, string errorMessage, string[] expectations)
-        {
-            return new Result<T>(remainder ?? original.Remainder, errorMessage ?? original.ErrorMessage, expectations ?? original.Expectations, original.Backtrack);
-        }
-
-        /// <summary>
         /// Convert an empty result of one type into another.
         /// </summary>
         /// <typeparam name="T">The source type.</typeparam>
