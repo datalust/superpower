@@ -17,7 +17,10 @@ using Superpower.Util;
 
 namespace Superpower.Display
 {
-    static class Presentation
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class Presentation
     {
         static string FormatKind(object kind)
         {
@@ -39,6 +42,12 @@ namespace Superpower.Display
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TKind"></typeparam>
+        /// <param name="kind"></param>
+        /// <returns></returns>
         public static string FormatExpectation<TKind>(TKind kind)
         {
             var description = TryGetTokenAttribute(kind);
@@ -53,6 +62,13 @@ namespace Superpower.Display
             return FormatKind(kind);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TKind"></typeparam>
+        /// <param name="kind"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string FormatAppearance<TKind>(TKind kind, string value)
         {
             var clipped = FormatLiteral(Friendly.Clip(value, 12));
@@ -69,6 +85,11 @@ namespace Superpower.Display
 
             return $"{FormatKind(kind)} {clipped}";
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="literal"></param>
+        /// <returns></returns>
         public static string FormatLiteral(char literal)
         {
             switch (literal)
@@ -137,6 +158,11 @@ namespace Superpower.Display
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="literal"></param>
+        /// <returns></returns>
         public static string FormatLiteral(string literal)
         {        
             return "`" + literal + "`";
