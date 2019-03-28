@@ -22,12 +22,23 @@ namespace Superpower.Display
     /// </summary>
     public static class Presentation
     {
-        static string FormatKind(object kind)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <returns></returns>
+        public static string FormatKind(object kind)
         {
             return kind.ToString().ToLower();
         }
 
-        static TokenAttribute TryGetTokenAttribute<TKind>(TKind kind)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TKind"></typeparam>
+        /// <param name="kind"></param>
+        /// <returns></returns>
+        public static TokenAttribute TryGetTokenAttribute<TKind>(TKind kind)
         {
             var kindTypeInfo = typeof(TKind).GetTypeInfo();
             if (kindTypeInfo.IsEnum)
