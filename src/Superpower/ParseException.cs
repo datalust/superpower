@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Superpower.Model;
 
 namespace Superpower
 {
@@ -22,23 +23,27 @@ namespace Superpower
     public class ParseException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParseException" /> class.
+        /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
         /// </summary>
-        public ParseException() { }
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="errorPosition"> position that the recorded error occurred at.</param>
+        public ParseException(string message, Position errorPosition) : this(message, errorPosition, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
-        public ParseException(string message) : base(message) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message 
-        /// and a reference to the inner exception that is the cause of this exception.
-        /// </summary>
-        /// <param name="message">The error message that explains the reason for the exception.</param>
+        /// <param name="errorPosition"> position that the recorded error occurred at.</param>
         /// <param name="innerException">The exception that is the cause of the current exception, 
         /// or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
-        public ParseException(string message, Exception innerException) : base(message, innerException) { }
+        public ParseException(string message, Position errorPosition, Exception innerException = null) : base(message, innerException)
+        {
+            ErrorPosition = errorPosition;
+        }
+
+        /// <summary>
+        /// The position that the recorded error occurred at
+        /// </summary>
+        public Position ErrorPosition { get; }
     }
 }

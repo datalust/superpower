@@ -74,7 +74,7 @@ namespace Superpower
             if (result.HasValue)
                 return result.Value;
 
-            throw new ParseException(result.ToString());
+            throw new ParseException(result.ToString(), result.ErrorPosition);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Superpower
             if (result.HasValue)
                 return result.Value;
 
-            throw new ParseException(result.ToString());
+            throw new ParseException(result.ToString(), result.ErrorPosition);
         }
 
         /// <summary>

@@ -202,7 +202,7 @@ namespace Superpower.Tokenizers
                         if (attempt.HasValue)
                         {
                             if (attempt.Remainder == span) // Broken parser, not a failed parsing.
-                                throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatExpectation(recognizer.Kind)} at position {attempt.Location.Position}.");
+                                throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatExpectation(recognizer.Kind)} at position {attempt.Location.Position}.", attempt.Location.Position);
                             
                             match = Result.Value(recognizer.Kind, span, attempt.Remainder);
                             recognizerIndex = searchStart;
