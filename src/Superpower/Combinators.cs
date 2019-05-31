@@ -746,7 +746,16 @@ namespace Superpower
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (selector == null) throw new ArgumentNullException(nameof(selector));
 
-            return parser.Then(rt => Parse.Return<TKind, U>(selector(rt)));
+            return input =>
+            {
+                var rt = parser(input);
+                if (!rt.HasValue)
+                    return TokenListParserResult.CastEmpty<TKind, T, U>(rt);
+
+                var u = selector(rt.Value);
+
+                return TokenListParserResult.Value(u, input, rt.Remainder);
+            };
         }
 
         /// <summary>
@@ -762,7 +771,16 @@ namespace Superpower
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (selector == null) throw new ArgumentNullException(nameof(selector));
 
-            return parser.Then(rt => Parse.Return(selector(rt)));
+            return input =>
+            {
+                var rt = parser(input);
+                if (!rt.HasValue)
+                    return Result.CastEmpty<T, U>(rt);
+
+                var u = selector(rt.Value);
+
+                return Result.Value(u, input, rt.Remainder);
+            };
         }
 
         /// <summary>
@@ -778,7 +796,7 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Then(rt => Parse.Return<TKind, U>((U)rt));
+            return parser.Select(rt => (U)rt);
         }
         
         /// <summary>
@@ -793,7 +811,7 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Then(rt => Parse.Return((U)rt));
+            return parser.Select(rt => (U)rt);
         }
 
         /// <summary>
