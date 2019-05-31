@@ -23,26 +23,47 @@ namespace Superpower
     public class ParseException : Exception
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ParseException" /> class with a default error message.
+        /// </summary>
+        public ParseException() : this("Parsing failed.", Position.Empty, null) { }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
-        /// <param name="errorPosition"> position that the recorded error occurred at.</param>
+        public ParseException(string message) : this(message, Position.Empty, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
+        public ParseException(string message, Exception innerException) : this(message, Position.Empty, innerException)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="errorPosition">The position of the error in the input text.</param>
         public ParseException(string message, Position errorPosition) : this(message, errorPosition, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
-        /// <param name="errorPosition"> position that the recorded error occurred at.</param>
-        /// <param name="innerException">The exception that is the cause of the current exception, 
-        /// or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
-        public ParseException(string message, Position errorPosition, Exception innerException = null) : base(message, innerException)
+        /// <param name="errorPosition">The position of the error in the input text.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
+        public ParseException(string message, Position errorPosition, Exception innerException) : base(message, innerException)
         {
             ErrorPosition = errorPosition;
         }
 
         /// <summary>
-        /// The position that the recorded error occurred at
+        /// The position of the error in the input text, or <see cref="Position.Empty"/> if no position is specified.
         /// </summary>
         public Position ErrorPosition { get; }
     }
