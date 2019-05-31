@@ -62,7 +62,7 @@ namespace JsonParser
         // concept that groups `true`, `false`, and `null`, it's useful
         // for the tokenizer to be very permissive - it's more informative
         // to generate an error later at the parsing stage, e.g.
-        // "unexpected identifier `flase`", instead of failing at the
+        // "unexpected identifier `false`", instead of failing at the
         // tokenization stage where all we'd have is "unexpected `l`".
         Identifier,
     }
@@ -100,7 +100,6 @@ namespace JsonParser
         static TextParser<Unit> JsonStringToken { get; } =
             from open in Character.EqualTo('"')
             from content in Span.EqualTo("\\\"").Value(Unit.Value).Try()
-                .Or(Span.EqualTo("\\\\").Value(Unit.Value).Try())
                 .Or(Character.Except('"').Value(Unit.Value))
                 .IgnoreMany()
             from close in Character.EqualTo('"')

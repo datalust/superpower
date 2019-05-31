@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Superpower.Model;
-using Superpower.Parsers;
 
 namespace Superpower.Benchmarks.NumberListScenario
 {
-    class NumberListTokenizer : Tokenizer<NumberListToken>
+    public class NumberListTokenizer : Tokenizer<NumberListToken>
     {
+        public static NumberListTokenizer Instance { get; } = new NumberListTokenizer();
+
         protected override IEnumerable<Result<NumberListToken>> Tokenize(TextSpan span)
         {
             var next = SkipWhiteSpace(span);
@@ -18,9 +18,13 @@ namespace Superpower.Benchmarks.NumberListScenario
                 var ch = next.Value;
                 if (ch >= '0' && ch <= '9')
                 {
-                    var integer = Numerics.Integer(next.Location);
-                    next = integer.Remainder.ConsumeChar();
-                    yield return Result.Value(NumberListToken.Number, integer.Location, integer.Remainder);
+                    var start = next;
+                    next = next.Remainder.ConsumeChar();
+                    while (next.HasValue && next.Value >= '0' && next.Value <= '9')
+                    {
+                        next = next.Remainder.ConsumeChar();
+                    }
+                    yield return Result.Value(NumberListToken.Number, start.Location, next.Location);
                 }
                 else
                 {

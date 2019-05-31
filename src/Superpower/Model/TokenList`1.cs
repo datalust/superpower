@@ -55,7 +55,7 @@ namespace Superpower.Model
         /// <summary>
         /// A token list with no value.
         /// </summary>
-        public static TokenList<TKind> Empty { get; } = default(TokenList<TKind>);
+        public static TokenList<TKind> Empty { get; } = default;
 
         /// <summary>
         /// True if the token list contains no tokens.

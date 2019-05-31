@@ -88,7 +88,7 @@ namespace Superpower.Model
         {
             Location = location;
             Remainder = remainder;
-            _value = default(T);
+            _value = default;
             HasValue = false;
             Expectations = expectations;
             ErrorMessage = errorMessage;
@@ -98,7 +98,7 @@ namespace Superpower.Model
         internal Result(TextSpan remainder, string errorMessage, string[] expectations, bool backtrack)
         {
             Location = Remainder = remainder;
-            _value = default(T);
+            _value = default;
             HasValue = false;
             Expectations = expectations;
             ErrorMessage = errorMessage;
