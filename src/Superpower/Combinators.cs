@@ -400,7 +400,7 @@ namespace Superpower
                 while (r.HasValue)
                 {
                     if (@from == r.Remainder) // Broken parser, not a failed parsing.
-                        throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
+                        throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.", r.ErrorPosition);
 
                     result.Add(r.Value);
                     @from = r.Remainder;
@@ -433,7 +433,7 @@ namespace Superpower
                 while (r.HasValue)
                 {
                     if (from == r.Remainder) // Broken parser, not a failed parsing.
-                        throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
+                        throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.", r.Location.Position);
 
                     result.Add(r.Value);
 
@@ -467,7 +467,7 @@ namespace Superpower
                 while (r.HasValue)
                 {
                     if (from == r.Remainder) // Broken parser, not a failed parsing.
-                        throw new ParseException($"IgnoreMany() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.");
+                        throw new ParseException($"IgnoreMany() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.", r.Location.Position);
 
                     from = r.Remainder;
                     r = parser(r.Remainder);
