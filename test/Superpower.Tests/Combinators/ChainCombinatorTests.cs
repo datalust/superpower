@@ -68,7 +68,7 @@ namespace Superpower.Tests.Combinators
             var chainParser = seed.Chain(
                     Character.EqualTo('.'),
                     Numerics.IntegerInt32,
-                    (r, o, i) => r.Add(i));
+                    (o, r, i) => r.Add(i));
 
             AssertParser.SucceedsWith(chainParser, input, System.Collections.Immutable.ImmutableList.Create(1, 2, 3));
         }
