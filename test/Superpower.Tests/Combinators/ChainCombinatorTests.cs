@@ -59,5 +59,18 @@ namespace Superpower.Tests.Combinators
 
             AssertParser.FailsAt(nPlusPlusN, "1+1", 2);
         }
+
+        [Fact]
+        public void SuccessLeftAssociativeChain()
+        {
+            string input = "A.1.2.3";
+            var seed = Character.EqualTo('A').Select(i => System.Collections.Immutable.ImmutableList.Create<int>());
+            var chainParser = seed.ChainLeft(
+                    Character.EqualTo('.'),
+                    Numerics.IntegerInt32,
+                    (r, o, i) => r.Add(i));
+
+            AssertParser.SucceedsWith(chainParser, input, System.Collections.Immutable.ImmutableList.Create<int>(1, 2, 3));
+        }
     }
 }
