@@ -69,7 +69,7 @@ namespace Superpower.Model
         /// <summary>
         /// A span with no value.
         /// </summary>
-        public static TextSpan None { get; } = default(TextSpan);
+        public static TextSpan None { get; } = default;
 
         /// <summary>
         /// A span corresponding to the empty string.

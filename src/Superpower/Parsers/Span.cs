@@ -188,6 +188,9 @@ namespace Superpower.Parsers
         /// <summary>
         /// Parse until a non-whitespace character is encountered, returning the matched span of whitespace.
         /// </summary>
+        /// <remarks>
+        /// Requires at least one whitespace character.
+        /// </remarks>
         public static TextParser<TextSpan> WhiteSpace { get; } = input =>
         {
             var next = input.ConsumeChar();

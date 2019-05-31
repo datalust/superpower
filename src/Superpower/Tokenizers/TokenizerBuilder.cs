@@ -65,7 +65,7 @@ namespace Superpower.Tokenizers
         {
             if (recognizer == null) throw new ArgumentNullException(nameof(recognizer));
             _recognizers.Add(new Recognizer(
-                recognizer.Select(_ => Unit.Value), false, kind, !requireDelimiters));
+                recognizer.Value(Unit.Value), false, kind, !requireDelimiters));
             return this;
         }
 
@@ -80,7 +80,7 @@ namespace Superpower.Tokenizers
         {
             if (ignored == null) throw new ArgumentNullException(nameof(ignored));
             _recognizers.Add(new Recognizer(
-                ignored.Select(_ => Unit.Value), true, default(TKind), true));
+                ignored.Value(Unit.Value), true, default, true));
             return this;
         }
 
@@ -106,7 +106,7 @@ namespace Superpower.Tokenizers
             /// <inheritdoc/>
             /// <remarks>
             /// The complexity in this method is due to the desire to distinguish between (e.g. in C#)
-            /// the keyworkd `null` vs the identifier `nullability`. The tokenizer, when it encounters
+            /// the keyword `null` vs the identifier `nullability`. The tokenizer, when it encounters
             /// a non-delimiter match (like `null`), looks ahead to see whether it's immediately followed
             /// by a delimiter or end-of-input. If not, the match is discarded and subsequent recognizers
             /// are tested.
@@ -126,7 +126,7 @@ namespace Superpower.Tokenizers
                     {
                         remainder = current.Remainder;
                         hasCurrent = false;
-                        current = default(Result<TKind>);
+                        current = default;
                         recognizerSearchStart = 0;
                         recognizerIndex = -1;
                     }
@@ -135,7 +135,7 @@ namespace Superpower.Tokenizers
                         yield return current;
                         remainder = current.Remainder;
                         hasCurrent = false;
-                        current = default(Result<TKind>);
+                        current = default;
                         recognizerSearchStart = 0;
                         recognizerIndex = -1;
                     }
@@ -152,7 +152,7 @@ namespace Superpower.Tokenizers
                     else if (recognizerIndex < _recognizers.Length - 1)
                     {
                         hasCurrent = false;
-                        current = default(Result<TKind>);
+                        current = default;
                         recognizerSearchStart = recognizerIndex + 1;
                         recognizerIndex = -1;
                     }
@@ -213,7 +213,7 @@ namespace Superpower.Tokenizers
                     }
                 }
 
-                match = default(Result<TKind>);
+                match = default;
                 recognizerIndex = -1;
                 return false;
             }

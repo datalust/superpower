@@ -22,6 +22,6 @@ namespace Superpower.Model
         /// <summary>
         /// The singleton value of the struct, with no value.
         /// </summary>
-        public static Unit Value { get; } = default(Unit);
+        public static Unit Value { get; } = default;
     }
 }
