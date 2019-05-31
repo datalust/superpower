@@ -499,6 +499,8 @@ namespace Superpower
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
+            // ReSharper disable once ConvertClosureToMethodGroup
+
             if (end != null)
                 return parser
                     .AtLeastOnceDelimitedBy(delimiter)
