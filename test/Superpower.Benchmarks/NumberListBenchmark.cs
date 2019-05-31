@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 using Sprache;
-using Superpower;
 using Superpower.Parsers;
 using Superpower.Model;
 using Superpower.Benchmarks.NumberListScenario;
@@ -10,13 +9,38 @@ using Xunit;
 
 namespace Superpower.Benchmarks
 {
+    [MemoryDiagnoser]
     public class NumberListBenchmark
     {
-        const int NumbersLength = 1000;
+        public const int NumbersLength = 1000;
         static readonly string Numbers = string.Join(" ", Enumerable.Range(0, NumbersLength));
+        static readonly Input SpracheInput = new Input(Numbers);
+        static readonly TextSpan SuperpowerTextSpan = new TextSpan(Numbers);
+
+        static void AssertComplete(int[] numbers)
+        {
+            Assert.Equal(NumbersLength, numbers.Length);
+            for (var i = 0; i < NumbersLength; ++i)
+                Assert.Equal(i, numbers[i]);
+        }
+
+        [Fact]
+        public void Verify()
+        {
+            AssertComplete(StringSplitAndInt32Parse());
+            AssertComplete(SpracheText().Value);
+            AssertComplete(SuperpowerText().Value);
+            AssertComplete(SuperpowerToken().Value);
+        }
+
+        [Fact]
+        public void Benchmark()
+        {
+            BenchmarkRunner.Run<NumberListBenchmark>();
+        }
 
         [Benchmark(Baseline = true)]
-        public void StringSplitAndInt32Parse()
+        public int[] StringSplitAndInt32Parse()
         {
             var tokens = Numbers.Split(' ');
             var numbers = new int[tokens.Length];
@@ -24,58 +48,44 @@ namespace Superpower.Benchmarks
             {
                 numbers[i] = int.Parse(tokens[i]);
             }
-            Assert.Equal(NumbersLength, numbers.Length);
+
+            return numbers;
         }
 
-        static readonly Parser<int[]> SpracheSimpleParser =
+        static readonly Parser<int[]> SpracheParser =
             Sprache.Parse.Number.Token()
                 .Select(int.Parse)
                 .Many()
                 .Select(n => n.ToArray());
 
         [Benchmark]
-        public void SpracheSimple()
+        public IResult<int[]> SpracheText()
         {
-            var numbers = SpracheSimpleParser.Parse(Numbers);
-            Assert.Equal(NumbersLength, numbers.Length);
-        }
-
-        static readonly TextParser<int[]> SuperpowerSimpleParser =
-            Numerics.Integer
-                .Then(n => Span.WhiteSpace.Select(_ => int.Parse(n.ToStringValue())))
-                .Many();
-
-        [Benchmark]
-        public void SuperpowerSimple()
-        {
-            var numbers = SuperpowerSimpleParser(new TextSpan(Numbers));
-            Assert.Equal(NumbersLength, numbers.Value.Length);
+            return SpracheParser(SpracheInput);
         }
 
         static readonly TextParser<int[]> SuperpowerTextParser =
-            Numerics.IntegerInt32
-                .Then(n => Span.WhiteSpace.Select(_ => n))
-                .Many();
+            Span.WhiteSpace.Optional()
+                .IgnoreThen(Numerics.IntegerInt32)
+                .Many()
+                .AtEnd();
 
         [Benchmark]
-        public void SuperpowerChar()
+        public Result<int[]> SuperpowerText()
         {
-            var numbers = SuperpowerTextParser(new TextSpan(Numbers));
-            Assert.Equal(NumbersLength, numbers.Value.Length);
+            return SuperpowerTextParser(SuperpowerTextSpan);
         }
 
         static readonly TokenListParser<NumberListToken, int[]> SuperpowerTokenListParser =
             Token.EqualTo(NumberListToken.Number)
                 .Apply(Numerics.IntegerInt32) // Slower that int.Parse(), but worth benchmarking
-                .Many();
-
-        static readonly NumberListTokenizer Tokenizer = new NumberListTokenizer();
+                .Many()
+                .AtEnd();
 
         [Benchmark]
-        public void SuperpowerToken()
+        public TokenListParserResult<NumberListToken, int[]> SuperpowerToken()
         {
-            var numbers = SuperpowerTokenListParser(Tokenizer.Tokenize(Numbers));
-            Assert.Equal(NumbersLength, numbers.Value.Length);
+            return SuperpowerTokenListParser(NumberListTokenizer.Instance.Tokenize(Numbers));
         }
     }
 }

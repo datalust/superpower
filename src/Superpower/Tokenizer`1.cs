@@ -37,7 +37,7 @@ namespace Superpower
             if (result.HasValue)
                 return result.Value;
 
-            throw new ParseException(result.ToString());
+            throw new ParseException(result.ToString(), result.ErrorPosition);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Superpower
                     return Result.CastEmpty<TKind, TokenList<TKind>>(result);
 
                 if (result.Remainder == remainder) // Broken parser, not a failed parsing.
-                    throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatExpectation(result.Value)} at position {result.Location.Position}.");
+                    throw new ParseException($"Zero-width tokens are not supported; token {Presentation.FormatExpectation(result.Value)} at position {result.Location.Position}.", result.Location.Position);
 
                 remainder = result.Remainder;
                 var token = new Token<TKind>(result.Value, result.Location.Until(result.Remainder));

@@ -2,7 +2,7 @@
 
 namespace Superpower.Benchmarks.ArithmeticExpressionScenario
 {
-    enum ArithmeticExpressionToken
+    public enum ArithmeticExpressionToken
     {
         None,
 

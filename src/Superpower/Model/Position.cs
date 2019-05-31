@@ -62,7 +62,7 @@ namespace Superpower.Model
         /// <summary>
         /// A position with no value.
         /// </summary>
-        public static Position Empty { get; } = default(Position);
+        public static Position Empty { get; } = default;
 
         /// <summary>
         /// True if the position has a value.
