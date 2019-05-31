@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
     <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
@@ -7,7 +7,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <Description>A parser combinator library for C#</Description>
-    <VersionPrefix>2.2.0</VersionPrefix>
+    <VersionPrefix>2.3.0</VersionPrefix>
     <Authors>Datalust;Superpower Contributors;Sprache Contributors</Authors>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

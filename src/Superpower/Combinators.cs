@@ -395,19 +395,19 @@ namespace Superpower
             return input =>
             {
                 var result = new List<T>();
-                var @from = input;
+                var from = input;
                 var r = parser(input);
                 while (r.HasValue)
                 {
-                    if (@from == r.Remainder) // Broken parser, not a failed parsing.
+                    if (from == r.Remainder) // Broken parser, not a failed parsing.
                         throw new ParseException($"Many() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.", r.ErrorPosition);
 
                     result.Add(r.Value);
-                    @from = r.Remainder;
+                    from = r.Remainder;
                     r = parser(r.Remainder);
                 }
 
-                if (!r.Backtrack && r.IsPartial(@from))
+                if (!r.Backtrack && r.IsPartial(from))
                     return TokenListParserResult.CastEmpty<TKind, T, T[]>(r);
 
                 return TokenListParserResult.Value(result.ToArray(), input, from);
@@ -1042,6 +1042,113 @@ namespace Superpower
                     return rt;
 
                 return Result.Empty<T>(input, "unsatisfied condition");
+            };
+        } 
+        
+        /// <summary>
+        /// Parse a sequence of operands connected by left-associative operators.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the leftmost operand and of the ultimate result.</typeparam>
+        /// <typeparam name="TOperator">The type of the operator.</typeparam>
+        /// <typeparam name="TOperand">The type of subsequent operands.</typeparam>
+        /// <param name="parser">The parser for the leftmost operand.</param>
+        /// <param name="operator">A parser matching operators.</param>
+        /// <param name="operand">A parser matching operands.</param>
+        /// <param name="apply">A function combining the operator, left operand, and right operand, into the result.</param>
+        /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
+        public static TextParser<TResult> Chain<TResult, TOperator, TOperand>(
+            this TextParser<TResult> parser,
+            TextParser<TOperator> @operator,
+            TextParser<TOperand> operand,
+            Func<TOperator, TResult, TOperand, TResult> apply)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (@operator == null) throw new ArgumentNullException(nameof(@operator));
+            if (operand == null) throw new ArgumentNullException(nameof(operand));
+            if (apply == null) throw new ArgumentNullException(nameof(apply));
+
+            return input =>
+            {
+                var parseResult = parser(input);
+                if (!parseResult.HasValue)
+                    return parseResult;
+
+                var result = parseResult.Value;
+                var operandRemainder = parseResult.Remainder;
+
+                var operatorResult = @operator(operandRemainder);
+                while (operatorResult.HasValue || operatorResult.IsPartial(operandRemainder))
+                {
+                    // If operator read any input, but failed to read complete input, we return error
+                    if (!operatorResult.HasValue)
+                        return Result.CastEmpty<TOperator, TResult>(operatorResult);
+
+                    var operandResult = operand(operatorResult.Remainder);
+                    operandRemainder = operandResult.Remainder;
+
+                    if (!operandResult.HasValue)
+                        return Result.CastEmpty<TOperand, TResult>(operandResult);
+
+                    result = apply(operatorResult.Value, result, operandResult.Value);
+
+                    operatorResult = @operator(operandRemainder);
+                }
+
+                return Result.Value(result, input, operandRemainder);
+            };
+        }
+
+        /// <summary>
+        /// Parse a sequence of operands connected by left-associative operators.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="TResult">The type of the leftmost operand and of the ultimate result.</typeparam>
+        /// <typeparam name="TOperator">The type of the operator.</typeparam>
+        /// <typeparam name="TOperand">The type of subsequent operands.</typeparam>
+        /// <param name="parser">The parser for the leftmost operand.</param>
+        /// <param name="operator">A parser matching operators.</param>
+        /// <param name="operand">A parser matching operands.</param>
+        /// <param name="apply">A function combining the operator, left operand, and right operand, into the result.</param>
+        /// <returns>The result of calling <paramref name="apply"/> successively on pairs of operands.</returns>
+        public static TokenListParser<TKind, TResult> Chain<TKind, TResult, TOperator, TOperand>(
+            this TokenListParser<TKind, TResult> parser,
+            TokenListParser<TKind, TOperator> @operator,
+            TokenListParser<TKind, TOperand> operand,
+            Func<TOperator, TResult, TOperand, TResult> apply)
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+            if (@operator == null) throw new ArgumentNullException(nameof(@operator));
+            if (operand == null) throw new ArgumentNullException(nameof(operand));
+            if (apply == null) throw new ArgumentNullException(nameof(apply));
+
+            return input =>
+            {
+                var parseResult = parser(input);
+                if (!parseResult.HasValue )
+                    return parseResult;
+
+                var result = parseResult.Value;
+                var operandRemainder = parseResult.Remainder;
+
+                var operatorResult = @operator(operandRemainder);
+                while (operatorResult.HasValue || operatorResult.IsPartial(operandRemainder))
+                {
+                    // If operator read any input, but failed to read complete input, we return error
+                    if (!operatorResult.HasValue) 
+                        return TokenListParserResult.CastEmpty<TKind, TOperator, TResult>(operatorResult);
+
+                    var operandResult = operand(operatorResult.Remainder);
+                    operandRemainder = operandResult.Remainder;
+
+                    if (!operandResult.HasValue)
+                        return TokenListParserResult.CastEmpty<TKind, TOperand, TResult>(operandResult);
+
+                    result = apply(operatorResult.Value, result, operandResult.Value);
+
+                    operatorResult = @operator(operandRemainder);
+                }
+
+                return TokenListParserResult.Value(result, input, operandRemainder);
             };
         }
     }
