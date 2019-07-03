@@ -60,7 +60,7 @@ namespace Superpower.Model
         /// <summary>
         /// A token with no value.
         /// </summary>
-        public static Token<TKind> Empty { get; } = default(Token<TKind>);
+        public static Token<TKind> Empty { get; } = default;
 
         /// <inheritdoc/>
         public override string ToString()

@@ -1,6 +1,6 @@
 ﻿namespace Superpower.Benchmarks.NumberListScenario
 {
-    enum NumberListToken
+    public enum NumberListToken
     {
         None,
         Number

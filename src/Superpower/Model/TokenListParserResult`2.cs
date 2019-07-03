@@ -111,7 +111,7 @@ namespace Superpower.Model
         {
             Location = location;
             Remainder = remainder;
-            _value = default(T);
+            _value = default;
             HasValue = false;
             SubTokenErrorPosition = errorPosition;
             ErrorMessage = errorMessage;
@@ -122,7 +122,7 @@ namespace Superpower.Model
         internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string errorMessage, string[] expectations, bool backtrack)
         {
             Location = Remainder = remainder;
-            _value = default(T);
+            _value = default;
             HasValue = false;
             SubTokenErrorPosition = errorPosition;
             ErrorMessage = errorMessage;
