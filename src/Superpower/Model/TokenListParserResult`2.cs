@@ -168,7 +168,10 @@ namespace Superpower.Model
             else
             {
                 var next = Remainder.ConsumeToken().Value;
-                var appearance = Presentation.FormatAppearance(next.Kind, next.ToStringValue());
+                var appearance = 
+                    next.Kind is Enum ?
+                        Presentation.FormatAppearance(next.Kind, next.ToStringValue())
+                        : next.Kind.ToString();
                 message = $"unexpected {appearance}";
             }
 
