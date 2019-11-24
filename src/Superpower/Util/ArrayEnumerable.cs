@@ -18,7 +18,9 @@ namespace Superpower.Util
 {
     static class ArrayEnumerable
     {
+#if !(NET35 || NET40)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static T[] Cons<T>(T first, T[] rest)
         {
             var all = new T[rest.Length + 1];
@@ -28,7 +30,9 @@ namespace Superpower.Util
             return all;
         }
 
+#if !(NET35 || NET40)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static T[] Concat<T>(T[] first, T[] rest)
         {
             var all = new T[first.Length + rest.Length];
@@ -40,7 +44,9 @@ namespace Superpower.Util
             return all;
         }
 
+#if !(NET35 || NET40)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static T[] Append<T>(T[] first, T last)
         {
             var all = new T[first.Length + 1];

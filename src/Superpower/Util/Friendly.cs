@@ -50,7 +50,7 @@ namespace Superpower.Util
             if (unique.Count == 1)
                 return unique.Single();
 
-            return $"{string.Join(", ", unique.Take(unique.Count - 1))} or {unique.Last()}";
+            return $"{string.Join(", ", unique.Take(unique.Count - 1).ToArray())} or {unique.Last()}";
         }
 
         public static string Clip(string value, int maxLength)
