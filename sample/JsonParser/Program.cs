@@ -99,7 +99,7 @@ namespace JsonParser
         //    drops the items that it matches.
         static TextParser<Unit> JsonStringToken { get; } =
             from open in Character.EqualTo('"')
-            from content in Span.EqualTo("\\\"").Value(Unit.Value).Try()
+            from content in Character.EqualTo('\\').IgnoreThen(Character.AnyChar).Value(Unit.Value).Try()
                 .Or(Character.Except('"').Value(Unit.Value))
                 .IgnoreMany()
             from close in Character.EqualTo('"')
