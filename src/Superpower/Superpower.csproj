@@ -21,6 +21,6 @@
     <DefineConstants>$(DefineConstants);CHECKED</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\..\assets\Superpower-White-400px.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="..\..\asset\Superpower-White-400px.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 </Project>
