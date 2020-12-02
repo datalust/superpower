@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>Superpower.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../../asset/Superpower.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -10,7 +10,6 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Superpower\Superpower.csproj" />
@@ -22,8 +21,5 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="xunit" Version="2.4.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 </Project>
