@@ -592,5 +592,53 @@ namespace Superpower
                 return Result.Value((rt.Value, ru.Value, rv.Value, rw.Value, rx.Value), input, rx.Remainder);
             };
         }
+        /// <summary>
+        /// Creates a parser which applies one of the specified parsers.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parsers">The parsers to try from left to right.</param>
+        /// <returns>A parser which applies one of the specified parsers.</returns>
+        public static TokenListParser<TKind, T> OneOf<TKind, T>(params TokenListParser<TKind, T>[] parsers)
+        {
+            if (parsers == null) throw new ArgumentNullException(nameof(parsers));
+
+            if (parsers.Length == 0)
+            {
+                return i => TokenListParserResult.Empty<TKind, T>(TokenList<TKind>.Empty);
+            }
+
+            TokenListParser<TKind, T> c = parsers[0];
+            for (int i = 1; i < parsers.Length; i++)
+            {
+                c = c.Or(parsers[i]);
+            }
+
+            return c;
+        }
+
+        /// <summary>
+        /// Creates a parser which applies one of the specified parsers.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parsers">The parser to try from left to right.</param>
+        /// <returns>A parser which applies one of the specified parsers.</returns>
+        public static TextParser<T> OneOf<T>(params TextParser<T>[] parsers)
+        {
+            if (parsers == null) throw new ArgumentNullException(nameof(parsers));
+
+            if (parsers.Length == 0)
+            {
+                return i => Result.Empty<T>(TextSpan.None);
+            }
+
+            TextParser<T> c = parsers[0];
+            for (int i = 1; i < parsers.Length; i++)
+            {
+                c = c.Or(parsers[i]);
+            }
+
+            return c;
+        }
     }
 }
