@@ -22,9 +22,9 @@ namespace Superpower.Model
     /// A list of <see cref="Token{TKind}"/>
     /// </summary>
     /// <typeparam name="TKind">The kind of tokens held in the list.</typeparam>
-    public struct TokenList<TKind> : IEquatable<TokenList<TKind>>, IEnumerable<Token<TKind>>
+    public readonly struct TokenList<TKind> : IEquatable<TokenList<TKind>>, IEnumerable<Token<TKind>>
     {
-        readonly Token<TKind>[] _tokens;
+        readonly Token<TKind>[]? _tokens;
 
         /// <summary>
         /// The position of the token list in the token stream.
@@ -65,7 +65,7 @@ namespace Superpower.Model
             get
             {
                 EnsureHasValue();
-                return Position == _tokens.Length;
+                return Position == _tokens!.Length;
             }
         }
 
@@ -86,7 +86,7 @@ namespace Superpower.Model
             if (IsAtEnd)
                 return TokenListParserResult.Empty<TKind, Token<TKind>>(this);
 
-            var token = _tokens[Position];
+            var token = _tokens![Position];
             return TokenListParserResult.Value(token, this, new TokenList<TKind>(_tokens, Position + 1));
         }
 
@@ -95,7 +95,7 @@ namespace Superpower.Model
         {
             EnsureHasValue();
 
-            for (var position = Position; position < _tokens.Length; ++position)
+            for (var position = Position; position < _tokens!.Length; ++position)
                 yield return _tokens[position];
         }
 
@@ -105,12 +105,12 @@ namespace Superpower.Model
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            if (!(obj is TokenList<TKind>))
+            if (!(obj is TokenList<TKind> other))
                 return false;
 
-            return Equals((TokenList<TKind>)obj);
+            return Equals(other);
         }
 
         /// <inheritdoc/>
@@ -168,13 +168,13 @@ namespace Superpower.Model
         {
             EnsureHasValue();
             
-            if (_tokens.Length == 0)
+            if (_tokens!.Length == 0)
                 return Model.Position.Zero;
 
             var lastSpan = _tokens[_tokens.Length - 1].Span;
             var source = lastSpan.Source;
             var position = lastSpan.Position;
-            for (var i = position.Absolute; i < source.Length; ++i)
+            for (var i = position.Absolute; i < source!.Length; ++i)
                 position = position.Advance(source[i]);
             return position;
         }

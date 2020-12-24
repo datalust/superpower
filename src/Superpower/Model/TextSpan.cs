@@ -19,12 +19,12 @@ namespace Superpower.Model
     /// <summary>
     /// A span of text within a larger string.
     /// </summary>
-    public struct TextSpan : IEquatable<TextSpan>
+    public readonly struct TextSpan : IEquatable<TextSpan>
     {
         /// <summary>
         /// The source string containing the span.
         /// </summary>
-        public string Source { get; }
+        public string? Source { get; }
 
         /// <summary>
         /// The position of the start of the span within the string.
@@ -105,17 +105,17 @@ namespace Superpower.Model
             if (IsAtEnd)
                 return Result.Empty<char>(this);
 
-            var ch = Source[Position.Absolute];
+            var ch = Source![Position.Absolute];
             return Result.Value(ch, this, new TextSpan(Source, Position.Advance(ch), Length - 1));
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            if (!(obj is TextSpan))
+            if (!(obj is TextSpan other))
                 return false;
 
-            return Equals((TextSpan)obj);
+            return Equals(other);
         }
 
         /// <inheritdoc/>
@@ -189,7 +189,7 @@ namespace Superpower.Model
                 throw new ArgumentOutOfRangeException(nameof(length), "Length exceeds the source span's length.");
 #endif
 
-            return new TextSpan(Source, Position, length);
+            return new TextSpan(Source!, Position, length);
         }
         
         /// <summary>
@@ -208,10 +208,10 @@ namespace Superpower.Model
             var p = Position;
             for (var i = 0; i < count; ++i)
             {
-                p = p.Advance(Source[p.Absolute]);
+                p = p.Advance(Source![p.Absolute]);
             }
 
-            return new TextSpan(Source, p, Length - count);
+            return new TextSpan(Source!, p, Length - count);
         }
 
         /// <inheritdoc/>
@@ -230,7 +230,7 @@ namespace Superpower.Model
         public string ToStringValue()
         {
             EnsureHasValue();
-            return Source.Substring(Position.Absolute, Length);
+            return Source!.Substring(Position.Absolute, Length);
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace Superpower.Model
                 return false;
             for (var i = 0; i < Length; ++i)
             {
-                if (Source[Position.Absolute + i] != otherValue[i])
+                if (Source![Position.Absolute + i] != otherValue[i])
                     return false;
             }
             return true;
@@ -265,7 +265,7 @@ namespace Superpower.Model
                 return false;
             for (var i = 0; i < Length; ++i)
             {
-                if (char.ToUpperInvariant(Source[Position.Absolute + i]) != char.ToUpperInvariant(otherValue[i]))
+                if (char.ToUpperInvariant(Source![Position.Absolute + i]) != char.ToUpperInvariant(otherValue[i]))
                     return false;
             }
             return true;

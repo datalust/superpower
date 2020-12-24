@@ -204,7 +204,7 @@ namespace Superpower.Parsers
         public static TextParser<TextSpan> Decimal { get; } =
             Integer
                 .Then(n => Character.EqualTo('.').IgnoreThen(Natural).OptionalOrDefault()
-                    .Select(f => f == TextSpan.None ? n : new TextSpan(n.Source, n.Position, n.Length + f.Length + 1)));
+                    .Select(f => f == TextSpan.None ? n : new TextSpan(n.Source!, n.Position, n.Length + f.Length + 1)));
 
         /// <summary>
         /// Matches decimal numbers, for example <code>-1.23</code>, converted into a <see cref="decimal"/>.
