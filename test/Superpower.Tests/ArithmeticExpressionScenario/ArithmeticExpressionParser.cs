@@ -23,7 +23,7 @@ namespace Superpower.Tests.ArithmeticExpressionScenario
 
         static readonly TokenListParser<ArithmeticExpressionToken, Expression> Factor =
             (from lparen in Token.EqualTo(ArithmeticExpressionToken.LParen)
-             from expr in Parse.Ref(() => Expr)
+             from expr in Parse.Ref(() => Expr!)
              from rparen in Token.EqualTo(ArithmeticExpressionToken.RParen)
              select expr)
             .Or(Constant);

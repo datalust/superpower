@@ -18,6 +18,8 @@ using Superpower.Display;
 using Superpower.Model;
 using Superpower.Util;
 
+// ReSharper disable MemberCanBePrivate.Global
+
 namespace Superpower
 {
     /// <summary>
@@ -209,7 +211,7 @@ namespace Superpower
             {
                 // Assuming we'll try the parser and fail quite often, allocating the result
                 // array lazily should save some allocs for not much effort here.
-                T[] result = null;
+                T[]? result = null;
                 var remainder = input;
                 for (var i = 0; i < count; ++i)
                 {
@@ -217,7 +219,7 @@ namespace Superpower
                     if (!r.HasValue)
                         return TokenListParserResult.CastEmpty<TKind, T, T[]>(r);
 
-                    result = result ?? new T[count];
+                    result ??= new T[count];
                     result[i] = r.Value;
                     remainder = r.Remainder;
                 }
@@ -242,7 +244,7 @@ namespace Superpower
             {
                 // Assuming we'll try the parser and fail quite often, allocating the result
                 // array lazily should save some allocs for not much effort here.
-                T[] result = null;
+                T[]? result = null;
                 var remainder = input;
                 for (var i = 0; i < count; ++i)
                 {
@@ -250,7 +252,7 @@ namespace Superpower
                     if (!r.HasValue)
                         return Result.CastEmpty<T, T[]>(r);
 
-                    result = result ?? new T[count];
+                    result ??= new T[count];
                     result[i] = r.Value;
                     remainder = r.Remainder;
                 }
@@ -494,7 +496,7 @@ namespace Superpower
         public static TokenListParser<TKind, T[]> ManyDelimitedBy<TKind, T, U>(
             this TokenListParser<TKind, T> parser,
             TokenListParser<TKind, U> delimiter,
-            TokenListParser<TKind, U> end = null)
+            TokenListParser<TKind, U>? end = null)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
@@ -661,7 +663,7 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Or(Parse.Return<TKind, T>(defaultValue));
+            return parser.Or(Parse.Return<TKind, T>(defaultValue!));
         }
 
         /// <summary>
@@ -676,7 +678,7 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser.Or(Parse.Return(defaultValue));
+            return parser.Or(Parse.Return(defaultValue!));
         }
 
         /// <summary>
@@ -815,6 +817,38 @@ namespace Superpower
 
             return parser.Select(rt => (U)rt);
         }
+        
+        /// <summary>
+        /// Convert a parser of a non-null class type to its nullable equivalent.
+        /// </summary>
+        /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TokenListParser<TKind, T?> AsNullable<TKind, T>(this TokenListParser<TKind, T> parser)
+            where T: class
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            // ReSharper disable once RedundantCast
+            return (TokenListParser<TKind, T?>)(object)parser;
+        }
+                
+        /// <summary>
+        /// Convert a parser of a non-null class type to its nullable equivalent.
+        /// </summary>
+        /// <typeparam name="T">The type of value being parsed.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TextParser<T?> AsNullable<T>(this TextParser<T> parser)
+            where T: class
+        {
+            if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+            // ReSharper disable once RedundantCast
+            return (TextParser<T?>)(object)parser;
+        }
+
 
         /// <summary>
         /// The LINQ query comprehension pattern.

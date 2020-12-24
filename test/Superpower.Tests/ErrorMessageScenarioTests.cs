@@ -154,9 +154,9 @@ namespace Superpower.Tests
 
             // Empty result represent expectations using nice string representation taken from
             // annotations of enum values of tokens
-            Assert.Equal(2, emptyParseResult.Expectations.Length);
-            Assert.Equal( "`*`", emptyParseResult.Expectations[0]);
-            Assert.Equal("`zero`", emptyParseResult.Expectations[1]);
+            Assert.Equal(2, emptyParseResult.Expectations!.Length);
+            Assert.Equal( "`*`", emptyParseResult.Expectations![0]);
+            Assert.Equal("`zero`", emptyParseResult.Expectations![1]);
         }
     }
 }

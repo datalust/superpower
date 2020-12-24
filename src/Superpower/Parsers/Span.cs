@@ -224,7 +224,7 @@ namespace Superpower.Parsers
 
             return i =>
             {
-                var m = re.Match(i.Source, i.Position.Absolute, i.Length);
+                var m = re.Match(i.Source!, i.Position.Absolute, i.Length);
                 if (!m.Success || m.Length == 0)
                     return Result.Empty<TextSpan>(i, expectations);
 

@@ -29,6 +29,7 @@ namespace Superpower.Parsers
         /// <typeparam name="TKind">The type of the token being matched.</typeparam>
         /// <param name="kind">The kind of token to match.</param>
         /// <returns>The matched token.</returns>
+        // ReSharper disable once MemberCanBePrivate.Global
         public static TokenListParser<TKind, Token<TKind>> EqualTo<TKind>(TKind kind)
         {
             var expectations = new[] { Presentation.FormatExpectation(kind) };
@@ -36,7 +37,7 @@ namespace Superpower.Parsers
             return input =>
             {
                 var next = input.ConsumeToken();
-                if (!next.HasValue || !next.Value.Kind.Equals(kind))
+                if (!next.HasValue || !next.Value.Kind!.Equals(kind))
                     return TokenListParserResult.Empty<TKind, Token<TKind>>(input, expectations);
 
                 return next;

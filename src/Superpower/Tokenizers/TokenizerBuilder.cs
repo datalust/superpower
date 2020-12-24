@@ -30,7 +30,7 @@ namespace Superpower.Tokenizers
     /// produce.</typeparam>
     public class TokenizerBuilder<TKind>
     {
-        struct Recognizer
+        readonly struct Recognizer
         {
             public TextParser<Unit> Parser { get; }
             public bool IsIgnored { get; }
@@ -80,7 +80,7 @@ namespace Superpower.Tokenizers
         {
             if (ignored == null) throw new ArgumentNullException(nameof(ignored));
             _recognizers.Add(new Recognizer(
-                ignored.Value(Unit.Value), true, default, true));
+                ignored.Value(Unit.Value), true, default!, true));
             return this;
         }
 
