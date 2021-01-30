@@ -83,7 +83,7 @@ var expression = "1 * (2 + 3)";
 
 // 1.
 var tokenizer = new ArithmeticExpressionTokenizer();
-var tokenList = tokenizer.Tokenize(expresssion);
+var tokenList = tokenizer.Tokenize(expression);
 
 // 2.
 var parser = ArithmeticExpressionParser.Lambda; // parser built with combinators
