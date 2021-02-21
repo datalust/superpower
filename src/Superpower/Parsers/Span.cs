@@ -258,5 +258,33 @@ namespace Superpower.Parsers
                     result.Remainder);
             };
         }
+
+        /// <summary>
+        /// Parse as much of the input as matches <paramref name="text" />.
+        /// </summary>
+        /// <param name="text">The text to match until. The text is not included in the result.</param>
+        /// <returns>A parser that will match everything until the text argument is matched.</returns>
+        /// <exception cref="ArgumentNullException">The text is null.</exception>
+        public static TextParser<TextSpan> Until(string text)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+
+            bool isWithinLength(TextSpan ts) => ts.Length >= text.Length;
+            bool isStopwordMatching(TextSpan ts) => ts.First(text.Length).EqualsValue(text);
+            bool isMatch(TextSpan ts) => isWithinLength(ts) && isStopwordMatching(ts);
+
+            return (TextSpan input) =>
+            {
+                TextSpan x = input;
+
+                while (!x.IsAtEnd)
+                {
+                    if (isMatch(x)) return Result.Value(input.Until(x), x, x);
+                    x = x.ConsumeChar().Remainder;
+                }
+
+                return Result.Empty<TextSpan>(input, $"Until expected {text}");
+            };
+        }
     }
 }

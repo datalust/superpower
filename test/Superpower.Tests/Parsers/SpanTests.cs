@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Superpower.Tests.Parsers
 {
+    using System;
     using System.Text.RegularExpressions;
 
     public class SpanTests
@@ -82,6 +83,34 @@ namespace Superpower.Tests.Parsers
             var input = new TextSpan("Foo");
             var r = parser(input);
             Assert.Equal("Foo", r.Value.ToStringValue());
+        }
+
+        [Theory]
+        [InlineData("", "")]
+        [InlineData("STOP", "")]
+        [InlineData("123STOP", "123")]
+        [InlineData("STOP123", "")]
+        [InlineData("123STOP123STOP123", "123")]
+        public void UntilMatches(string text, string expected)
+        {
+            var result = Span.Until("STOP").OptionalOrDefault(TextSpan.Empty).Parse(text);
+            Assert.Equal(expected, result.ToStringValue());
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("123")]
+        [InlineData("12345")]
+        public void UntilParseFails(string text)
+        {
+            Assert.Throws<ParseException>(() => Span.Until("STOP").Parse(text));
+        }
+
+        [Theory]
+        [InlineData(null)]
+        public void UntilArgumentFails(string text)
+        {
+            Assert.Throws<ArgumentNullException>(() => Span.Until(text).Parse(""));
         }
     }
 }
