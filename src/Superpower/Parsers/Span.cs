@@ -269,21 +269,26 @@ namespace Superpower.Parsers
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
 
-            bool isWithinLength(TextSpan ts) => ts.Length >= text.Length;
-            bool isStopwordMatching(TextSpan ts) => ts.First(text.Length).EqualsValue(text);
-            bool isMatch(TextSpan ts) => isWithinLength(ts) && isStopwordMatching(ts);
+            var expectation = $"Until expected '{text}'";
 
             return (TextSpan input) =>
             {
-                TextSpan x = input;
+                TextSpan remainder = input;
+                var matchIndex = 0;
 
-                while (!x.IsAtEnd)
+                while (remainder.Length>0)
                 {
-                    if (isMatch(x)) return Result.Value(input.Until(x), x, x);
-                    x = x.ConsumeChar().Remainder;
+                    var current = remainder.ConsumeChar();
+                    remainder = current.Remainder;
+                    if (current.Value != text[matchIndex++]) matchIndex = 0;
+                    if (matchIndex == text.Length)
+                    {
+                        var foundPosition = remainder.Position.Absolute - text.Length;
+                        return Result.Value(input.First(foundPosition), input.Skip(foundPosition), remainder);
+                    }
                 }
 
-                return Result.Empty<TextSpan>(input, $"Until expected {text}");
+                return Result.Empty<TextSpan>(input, expectation);
             };
         }
     }

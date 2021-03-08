@@ -86,29 +86,30 @@ namespace Superpower.Tests.Parsers
         }
 
         [Theory]
-        [InlineData("", "")]
         [InlineData("STOP", "")]
         [InlineData("123STOP", "123")]
         [InlineData("STOP123", "")]
-        [InlineData("123STOP123STOP123", "123")]
-        public void UntilMatches(string text, string expected)
+        [InlineData("123STOP456STOP789", "123")]
+        public void UntilMatchesWhenStopwordIsPresent(string text, string expected)
         {
-            var result = Span.Until("STOP").OptionalOrDefault(TextSpan.Empty).Parse(text);
+            var result = Span.Until("STOP").Parse(text);
             Assert.Equal(expected, result.ToStringValue());
         }
 
         [Theory]
-        [InlineData("")]
-        [InlineData("123")]
-        [InlineData("12345")]
-        public void UntilParseFails(string text)
+        [InlineData("", "Syntax error: Until expected 'STOP'.")]
+        [InlineData("123", "Syntax error (line 1, column 1): Until expected 'STOP'.")]
+        [InlineData("12345", "Syntax error (line 1, column 1): Until expected 'STOP'.")]
+        public void UntilFailsWhenStopwordIsNotPresent(string text, string expectedErrorMessage)
         {
-            Assert.Throws<ParseException>(() => Span.Until("STOP").Parse(text));
+            var parseException = Assert.Throws<ParseException>(() => Span.Until("STOP").Parse(text));
+            Assert.Equal(0, parseException.ErrorPosition.Absolute);
+            Assert.Equal(expectedErrorMessage, parseException.Message);
         }
 
         [Theory]
         [InlineData(null)]
-        public void UntilArgumentFails(string text)
+        public void UntilFailsWhenArgumentIsNull(string text)
         {
             Assert.Throws<ArgumentNullException>(() => Span.Until(text).Parse(""));
         }
