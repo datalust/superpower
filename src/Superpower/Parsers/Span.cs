@@ -283,8 +283,9 @@ namespace Superpower.Parsers
                     if (current.Value != text[matchIndex++]) matchIndex = 0;
                     if (matchIndex == text.Length)
                     {
-                        var foundPosition = remainder.Position.Absolute - text.Length;
-                        return Result.Value(input.First(foundPosition), input.Skip(foundPosition), remainder);
+                        var foundPosition = remainder.Position.Absolute - input.Position.Absolute - text.Length;
+                        var found = input.Skip(foundPosition);
+                        return Result.Value(input.Until(found), found, found);
                     }
                 }
 

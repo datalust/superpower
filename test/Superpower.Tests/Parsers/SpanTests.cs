@@ -113,5 +113,20 @@ namespace Superpower.Tests.Parsers
         {
             Assert.Throws<ArgumentNullException>(() => Span.Until(text).Parse(""));
         }
+
+        [Theory]
+        [InlineData("Begin123STOPEnd")]
+        public void UntilMatchesWhenTheInputAbsolutePositionIsNonZero(string text)
+        {
+            var test =
+                from begin in Span.EqualTo("Begin")
+                from value in Span.Until("STOP")
+                from stop in Span.EqualTo("STOP")
+                from end in Span.EqualTo("End")
+                select value;
+            var result = test.Parse(text).ToStringValue();
+
+            Assert.Equal("123", result);
+        }
     }
 }
