@@ -90,37 +90,26 @@ namespace Superpower.Tests.Parsers
         [InlineData("123STOP", "123")]
         [InlineData("STOP123", "")]
         [InlineData("123STOP456STOP789", "123")]
-        public void UntilMatchesWhenStopwordIsPresent(string text, string expected)
+        public void ExceptMatchesUntilStopwordIsPresent(string text, string expected)
         {
-            var result = Span.Until("STOP").Parse(text);
+            var result = Span.Except("STOP").Parse(text);
             Assert.Equal(expected, result.ToStringValue());
         }
 
         [Theory]
-        [InlineData("", "Syntax error: Until expected 'STOP'.")]
-        [InlineData("123", "Syntax error (line 1, column 1): Until expected 'STOP'.")]
-        [InlineData("12345", "Syntax error (line 1, column 1): Until expected 'STOP'.")]
-        public void UntilFailsWhenStopwordIsNotPresent(string text, string expectedErrorMessage)
-        {
-            var parseException = Assert.Throws<ParseException>(() => Span.Until("STOP").Parse(text));
-            Assert.Equal(0, parseException.ErrorPosition.Absolute);
-            Assert.Equal(expectedErrorMessage, parseException.Message);
-        }
-
-        [Theory]
         [InlineData(null)]
-        public void UntilFailsWhenArgumentIsNull(string text)
+        public void ExceptFailsWhenArgumentIsNull(string text)
         {
-            Assert.Throws<ArgumentNullException>(() => Span.Until(text).Parse(""));
+            Assert.Throws<ArgumentNullException>(() => Span.Except(text).Parse(""));
         }
 
         [Theory]
         [InlineData("Begin123STOPEnd")]
-        public void UntilMatchesWhenTheInputAbsolutePositionIsNonZero(string text)
+        public void ExceptMatchesWhenTheInputAbsolutePositionIsNonZero(string text)
         {
             var test =
                 from begin in Span.EqualTo("Begin")
-                from value in Span.Until("STOP")
+                from value in Span.Except("STOP")
                 from stop in Span.EqualTo("STOP")
                 from end in Span.EqualTo("End")
                 select value;

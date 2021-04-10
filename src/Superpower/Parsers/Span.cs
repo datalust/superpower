@@ -260,16 +260,14 @@ namespace Superpower.Parsers
         }
 
         /// <summary>
-        /// Parse as much of the input as matches <paramref name="text" />.
+        /// Parse input until the <paramref name="text"/> string is present.
         /// </summary>
-        /// <param name="text">The text to match until. The text is not included in the result.</param>
-        /// <returns>A parser that will match everything until the text argument is matched.</returns>
-        /// <exception cref="ArgumentNullException">The text is null.</exception>
-        public static TextParser<TextSpan> Until(string text)
+        /// <param name="text">The string to match until. The content of the <paramref name="text"/> is not included in the result.</param>
+        /// <returns>A parser that will match anything until the <paramref name="text"/> string argument is present in the Span.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="text"/> is null.</exception>
+        public static TextParser<TextSpan> Except(string text)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
-
-            var expectation = $"Until expected '{text}'";
 
             return (TextSpan input) =>
             {
@@ -289,7 +287,7 @@ namespace Superpower.Parsers
                     }
                 }
 
-                return Result.Empty<TextSpan>(input, expectation);
+                return Result.Empty<TextSpan>(input);
             };
         }
     }
