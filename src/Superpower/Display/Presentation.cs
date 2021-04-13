@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Reflection;
 using Superpower.Util;
 
@@ -24,6 +25,11 @@ namespace Superpower.Display
             return kind.ToString()!.ToLower();
         }
 
+        static TokenAttribute? TryGetTokenAttribute(Type type)
+        {
+            return type.GetTypeInfo().GetCustomAttribute<TokenAttribute>();
+        }
+
         static TokenAttribute? TryGetTokenAttribute<TKind>(TKind kind)
         {
             var kindTypeInfo = typeof(TKind).GetTypeInfo();
@@ -32,11 +38,11 @@ namespace Superpower.Display
                 var field = kindTypeInfo.GetDeclaredField(kind!.ToString()!);
                 if (field != null)
                 {
-                    return field.GetCustomAttribute<TokenAttribute>();
+                    return field.GetCustomAttribute<TokenAttribute>() ?? TryGetTokenAttribute(typeof(TKind));
                 }
             }
 
-            return null;
+            return TryGetTokenAttribute(typeof(TKind));
         }
 
         public static string FormatExpectation<TKind>(TKind kind)
