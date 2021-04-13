@@ -121,7 +121,7 @@ namespace Superpower.Tests.Parsers
         [Fact]
         public void ExceptFailsWhenArgumentIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => Span.Except(null).Parse("foo"));
+            Assert.Throws<ArgumentNullException>(() => Span.Except(null!).Parse("foo"));
         }
 
         [Fact]

@@ -659,7 +659,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="defaultValue">The default value</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenListParser<TKind, T> OptionalOrDefault<TKind, T>(this TokenListParser<TKind, T> parser, T defaultValue = default)
+        public static TokenListParser<TKind, T> OptionalOrDefault<TKind, T>(this TokenListParser<TKind, T> parser, T defaultValue = default!)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
@@ -674,7 +674,7 @@ namespace Superpower
         /// <param name="parser">The parser.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The resulting parser.</returns>
-        public static TextParser<T> OptionalOrDefault<T>(this TextParser<T> parser, T defaultValue = default)
+        public static TextParser<T> OptionalOrDefault<T>(this TextParser<T> parser, T defaultValue = default!)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
 
