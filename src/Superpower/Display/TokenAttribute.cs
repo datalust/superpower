@@ -21,7 +21,7 @@ namespace Superpower.Display
     /// <summary>
     /// Applied to enum members representing tokens to control how they are rendered.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field|AttributeTargets.Class)]
     public class TokenAttribute : Attribute
     {
         /// <summary>

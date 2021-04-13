@@ -3,6 +3,7 @@ using Superpower.Model;
 using Superpower.Parsers;
 using Superpower.Tests.ArithmeticExpressionScenario;
 using Superpower.Tests.SExpressionScenario;
+using Superpower.Tests.ComplexTokenScenario;
 using Superpower.Tests.Support;
 using Superpower.Tokenizers;
 using Xunit;
@@ -21,6 +22,17 @@ namespace Superpower.Tests
 
             AssertParser.FailsWithMessage(numbers, "123", new SExpressionTokenizer(),
                 "Syntax error (line 1, column 2): invalid number, unexpected `2`, expected `x`.");
+        }
+
+        [Fact]
+        public void ErrorMessageFromMatchedTokenProducesMeaningfulError()
+        {
+            var number = Token.Matching<SExpressionXToken>(x => x.Number < 100,"number less than `100`");
+
+            var numbers = number.AtEnd();
+
+            AssertParser.FailsWithMessage(numbers, "123", new SExpressionXTokenizer(),
+                "Syntax error (line 1, column 1): unexpected S-Expression Token `123`, expected number less than `100`.");
         }
 
         [Fact]
