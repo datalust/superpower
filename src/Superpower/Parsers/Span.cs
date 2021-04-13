@@ -224,7 +224,7 @@ namespace Superpower.Parsers
 
             return i =>
             {
-                var m = re.Match(i.Source, i.Position.Absolute, i.Length);
+                var m = re.Match(i.Source!, i.Position.Absolute, i.Length);
                 if (!m.Success || m.Length == 0)
                     return Result.Empty<TextSpan>(i, expectations);
 
@@ -281,7 +281,7 @@ namespace Superpower.Parsers
             
             return input =>
             {
-                var matchIndex = input.Source.IndexOf(text, input.Position.Absolute, comparison);
+                var matchIndex = input.Source!.IndexOf(text, input.Position.Absolute, comparison);
                 if (input.Length == 0 || matchIndex == input.Position.Absolute)
                     return Result.Empty<TextSpan>(input, expectations);
 

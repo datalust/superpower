@@ -181,8 +181,8 @@ namespace Superpower
                     if (current.HasValue)
                     {
                         var span = last.HasValue ?
-                            current.Value.Span.Source.Substring(current.Value.Position.Absolute, last.Value.Position.Absolute - current.Value.Position.Absolute) :
-                            current.Value.Span.Source.Substring(current.Value.Position.Absolute);
+                            current.Value.Span.Source!.Substring(current.Value.Position.Absolute, last.Value.Position.Absolute - current.Value.Position.Absolute) :
+                            current.Value.Span.Source!.Substring(current.Value.Position.Absolute);
                         return TokenListParserResult.Empty<TKind, Unit>(input, $"unexpected successful parsing of {Presentation.FormatLiteral(Friendly.Clip(span, 12))}");
                     }
 
@@ -204,7 +204,7 @@ namespace Superpower
         {
             if (reference == null) throw new ArgumentNullException(nameof(reference));
 
-            TextParser<T> parser = null;
+            TextParser<T>? parser = null;
 
             return i =>
             {
@@ -227,7 +227,7 @@ namespace Superpower
         {
             if (reference == null) throw new ArgumentNullException(nameof(reference));
 
-            TokenListParser<TKind, T> parser = null;
+            TokenListParser<TKind, T>? parser = null;
 
             return i =>
             {

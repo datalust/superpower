@@ -16,7 +16,7 @@ namespace Superpower.Tests.Support
             for (var i = 1; i < span.Length; ++i)
             {
                 Assert.NotNull(state.Previous);
-                Assert.Equal(i - 1, state.Previous.Value.Kind);
+                Assert.Equal(i - 1, state.Previous!.Value.Kind);
                 next = next.Remainder.ConsumeChar();
                 yield return Result.Value(i, next.Location, next.Remainder);
             }
