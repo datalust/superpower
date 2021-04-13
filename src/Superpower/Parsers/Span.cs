@@ -258,5 +258,37 @@ namespace Superpower.Parsers
                     result.Remainder);
             };
         }
+
+        /// <summary>
+        /// Parse input until the <paramref name="text"/> string is present.
+        /// </summary>
+        /// <param name="text">The string to match until. The content of the <paramref name="text"/> is not included in the result.</param>
+        /// <returns>A parser that will match anything until the <paramref name="text"/> string argument is present in the Span.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="text"/> is null.</exception>
+        public static TextParser<TextSpan> Except(string text)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+
+            return (TextSpan input) =>
+            {
+                TextSpan remainder = input;
+                var matchIndex = 0;
+
+                while (remainder.Length>0)
+                {
+                    var current = remainder.ConsumeChar();
+                    remainder = current.Remainder;
+                    if (current.Value != text[matchIndex++]) matchIndex = 0;
+                    if (matchIndex == text.Length)
+                    {
+                        var foundPosition = remainder.Position.Absolute - input.Position.Absolute - text.Length;
+                        var found = input.Skip(foundPosition);
+                        return Result.Value(input.Until(found), found, found);
+                    }
+                }
+
+                return Result.Empty<TextSpan>(input);
+            };
+        }
     }
 }
