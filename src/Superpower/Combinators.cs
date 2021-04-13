@@ -1034,8 +1034,9 @@ namespace Superpower
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="predicate">The predicate to apply.</param>
+        /// <param name="message">An optional error message when parsing fails.</param>
         /// <returns>The resulting parser.</returns>
-        public static TokenListParser<TKind, T> Where<TKind, T>(this TokenListParser<TKind, T> parser, Func<T, bool> predicate)
+        public static TokenListParser<TKind, T> Where<TKind, T>(this TokenListParser<TKind, T> parser, Func<T, bool> predicate, string message = "unsatisfied condition")
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -1049,7 +1050,7 @@ namespace Superpower
                 if (predicate(rt.Value))
                     return rt;
 
-                return TokenListParserResult.Empty<TKind, T>(input, "unsatisfied condition");
+                return TokenListParserResult.Empty<TKind, T>(input, message);
             };
         }
 
@@ -1060,8 +1061,9 @@ namespace Superpower
         /// <typeparam name="T">The type of value being parsed.</typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="predicate">The predicate to apply.</param>
+        /// <param name="message">An optional error message when parsing fails.</param>
         /// <returns>The resulting parser.</returns>
-        public static TextParser<T> Where<T>(this TextParser<T> parser, Func<T, bool> predicate)
+        public static TextParser<T> Where<T>(this TextParser<T> parser, Func<T, bool> predicate, string message = "unsatisfied condition")
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -1075,7 +1077,7 @@ namespace Superpower
                 if (predicate(rt.Value))
                     return rt;
 
-                return Result.Empty<T>(input, "unsatisfied condition");
+                return Result.Empty<T>(input, message);
             };
         } 
         
