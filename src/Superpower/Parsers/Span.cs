@@ -281,7 +281,7 @@ namespace Superpower.Parsers
             
             return input =>
             {
-                var matchIndex = input.Source.IndexOf(text, input.Position.Absolute, comparison);
+                var matchIndex = input.Source!.IndexOf(text, input.Position.Absolute, comparison);
                 if (input.Length == 0 || matchIndex == input.Position.Absolute)
                     return Result.Empty<TextSpan>(input, expectations);
 
