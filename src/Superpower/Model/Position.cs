@@ -19,7 +19,7 @@ namespace Superpower.Model
     /// <summary>
     /// A position within a stream of character input.
     /// </summary>
-    public struct Position
+    public readonly struct Position
     {
         /// <summary>
         /// The zero-based absolute index of the position.
