@@ -1040,6 +1040,7 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+            if (message == null) throw new ArgumentNullException(nameof(message));
 
             return input =>
             {
@@ -1067,6 +1068,7 @@ namespace Superpower
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+            if (message == null) throw new ArgumentNullException(nameof(message));
 
             return input =>
             {
