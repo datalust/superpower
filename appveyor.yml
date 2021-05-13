@@ -12,11 +12,11 @@ deploy:
     secure: h13+FoLtFJdwNtYdIUsr0xJZCtxwTBKsFKCp5jFjyx5DxqeZN4MwWZhgL+enTOJq
   skip_symbols: true
   on:
-    branch: /^(master|dev)$/
+    branch: /^(main|dev)$/
 - provider: GitHub
   auth_token:
     secure: hX+cZmW+9BCXy7vyH8myWsYdtQHyzzil9K5yvjJv7dK9XmyrGYYDj/DPzMqsXSjo
   artifact: /Superpower.*\.nupkg/
   tag: v$(appveyor_build_version)
   on:
-    branch: master
+    branch: main
