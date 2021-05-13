@@ -71,12 +71,12 @@ namespace Superpower.Model
         /// <summary>
         /// A provided error message, or null.
         /// </summary>
-        public string ErrorMessage { get; }
+        public string? ErrorMessage { get; }
 
         /// <summary>
         /// A list of expectations that were unmet, or null.
         /// </summary>
-        public string[] Expectations { get; }
+        public string[]? Expectations { get; }
 
         /// <summary>
         /// The parsed value.
@@ -107,11 +107,11 @@ namespace Superpower.Model
             Backtrack = backtrack;
         }
 
-        internal TokenListParserResult(TokenList<TKind> location, TokenList<TKind> remainder, Position errorPosition, string errorMessage, string[] expectations, bool backtrack)
+        internal TokenListParserResult(TokenList<TKind> location, TokenList<TKind> remainder, Position errorPosition, string? errorMessage, string[]? expectations, bool backtrack)
         {
             Location = location;
             Remainder = remainder;
-            _value = default;
+            _value = default!; // Default value is not observable.
             HasValue = false;
             SubTokenErrorPosition = errorPosition;
             ErrorMessage = errorMessage;
@@ -119,10 +119,10 @@ namespace Superpower.Model
             Backtrack = backtrack;
         }
         
-        internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string errorMessage, string[] expectations, bool backtrack)
+        internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string? errorMessage, string[]? expectations, bool backtrack)
         {
             Location = Remainder = remainder;
-            _value = default;
+            _value = default!; // Default value is not observable.
             HasValue = false;
             SubTokenErrorPosition = errorPosition;
             ErrorMessage = errorMessage;

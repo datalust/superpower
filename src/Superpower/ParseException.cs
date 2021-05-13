@@ -15,6 +15,8 @@
 using System;
 using Superpower.Model;
 
+// ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedAutoPropertyAccessor.Global
+
 namespace Superpower
 {
     /// <summary>
@@ -40,7 +42,7 @@ namespace Superpower
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="innerException">The exception that is the cause of the current exception.</param>
-        public ParseException(string message, Exception innerException) : this(message, Position.Empty, innerException)
+        public ParseException(string message, Exception? innerException) : this(message, Position.Empty, innerException)
         {
         }
 
@@ -57,7 +59,7 @@ namespace Superpower
         /// <param name="message">The message that describes the error.</param>
         /// <param name="errorPosition">The position of the error in the input text.</param>
         /// <param name="innerException">The exception that is the cause of the current exception.</param>
-        public ParseException(string message, Position errorPosition, Exception innerException) : base(message, innerException)
+        public ParseException(string message, Position errorPosition, Exception? innerException) : base(message, innerException)
         {
             ErrorPosition = errorPosition;
         }

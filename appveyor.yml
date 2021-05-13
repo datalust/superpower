@@ -1,7 +1,6 @@
 version: '{build}'
 skip_tags: true
-image: Visual Studio 2017
-configuration: Release
+image: Visual Studio 2019
 build_script:
 - ps: ./Build.ps1
 test: off
@@ -10,14 +9,14 @@ artifacts:
 deploy:
 - provider: NuGet
   api_key:
-    secure: Xi+qouQ6+cOJ85PMOQKEGy+MC1EKyYJCoF2YfuE9Rcj6lvNtm08TIZllTJCqId+M
+    secure: h13+FoLtFJdwNtYdIUsr0xJZCtxwTBKsFKCp5jFjyx5DxqeZN4MwWZhgL+enTOJq
   skip_symbols: true
   on:
-    branch: /^(master|dev)$/
+    branch: /^(main|dev)$/
 - provider: GitHub
   auth_token:
     secure: hX+cZmW+9BCXy7vyH8myWsYdtQHyzzil9K5yvjJv7dK9XmyrGYYDj/DPzMqsXSjo
   artifact: /Superpower.*\.nupkg/
   tag: v$(appveyor_build_version)
   on:
-    branch: master
+    branch: main

@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{66B005
 		Build.ps1 = Build.ps1
 		LICENSE = LICENSE
 		README.md = README.md
+		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2ED926D3-7AC8-4BFD-A16B-74D942602968}"
@@ -19,6 +20,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "asset", "asset", "{69238E6E-26AB-494B-8CBD-65F8C1F0696A}"
 	ProjectSection(SolutionItems) = preProject
 		asset\Superpower.snk = asset\Superpower.snk
+		asset\Superpower.svg = asset\Superpower.svg
+		asset\Superpower-Transparent-400px.png = asset\Superpower-Transparent-400px.png
+		asset\Superpower-White-200px.png = asset\Superpower-White-200px.png
+		asset\Superpower-White-400px.png = asset\Superpower-White-400px.png
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{7533E145-1C93-4348-A70D-E68746C5438C}"

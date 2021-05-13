@@ -97,7 +97,7 @@ namespace Superpower.Model
             if (expectations == null)
                 expectations = second.Expectations;
             else if (second.Expectations != null)
-                expectations = ArrayEnumerable.Concat(first.Expectations, second.Expectations);
+                expectations = ArrayEnumerable.Concat(first.Expectations!, second.Expectations);
 
             return new Result<T>(second.Remainder, second.ErrorMessage, expectations, second.Backtrack);
         }

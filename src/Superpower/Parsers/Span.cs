@@ -220,18 +220,15 @@ namespace Superpower.Parsers
         {
             if (regex == null) throw new ArgumentNullException(nameof(regex));
             var re = new Regex($"^{regex}", options);
-            var expectations = new[] { "match for `regex`" };
+            var expectations = new[] { $"a match for regular expression `{regex}`" };
 
             return i =>
             {
-                var m = re.Match(i.Source, i.Position.Absolute, i.Length);
+                var m = re.Match(i.Source!, i.Position.Absolute, i.Length);
                 if (!m.Success || m.Length == 0)
                     return Result.Empty<TextSpan>(i, expectations);
 
-                var remainder = i;
-                for (var skip = 0; skip < m.Length; skip++)
-                    remainder = remainder.ConsumeChar().Remainder;
-
+                var remainder = i.Skip(m.Length);
                 return Result.Value(i.First(m.Length), i, remainder);
             };
         }
@@ -256,6 +253,41 @@ namespace Superpower.Parsers
                     i.Until(result.Remainder),
                     i,
                     result.Remainder);
+            };
+        }
+
+        /// <summary>
+        /// Parse input until the <paramref name="text"/> string is present.
+        /// </summary>
+        /// <param name="text">The string to match until. The content of the <paramref name="text"/> is not included in the result.</param>
+        /// <returns>A parser that will match anything until the <paramref name="text"/> value is found or end-of-input is reached.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="text"/> is null.</exception>
+        public static TextParser<TextSpan> Except(string text) => Except(text, StringComparison.Ordinal);
+
+        /// <summary>
+        /// Parse input until the <paramref name="text"/> string is present, ignoring character case.
+        /// </summary>
+        /// <param name="text">The string to match until. The content of the <paramref name="text"/> is not included in the result.</param>
+        /// <returns>A parser that will match anything until the <paramref name="text"/> value is found or end-of-input is reached.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="text"/> is null.</exception>
+        public static TextParser<TextSpan> ExceptIgnoreCase(string text) => Except(text, StringComparison.OrdinalIgnoreCase);
+        
+        static TextParser<TextSpan> Except(string text, StringComparison comparison)
+        {
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (text.Length == 0) throw new ArgumentOutOfRangeException(nameof(text), "A non-empty string is required.");
+
+            var expectations = new[] { $"a non-empty span without `{text}`" };
+            
+            return input =>
+            {
+                var matchIndex = input.Source!.IndexOf(text, input.Position.Absolute, comparison);
+                if (input.Length == 0 || matchIndex == input.Position.Absolute)
+                    return Result.Empty<TextSpan>(input, expectations);
+
+                var matchLength = matchIndex == -1 ? input.Length : matchIndex - input.Position.Absolute;
+                var remainder = input.Skip(matchLength);
+                return Result.Value(input.First(matchLength), input, remainder);
             };
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Superpower;
 using Superpower.Display;
 using Superpower.Model;
@@ -99,7 +100,7 @@ namespace JsonParser
         //    drops the items that it matches.
         static TextParser<Unit> JsonStringToken { get; } =
             from open in Character.EqualTo('"')
-            from content in Span.EqualTo("\\\"").Value(Unit.Value).Try()
+            from content in Character.EqualTo('\\').IgnoreThen(Character.AnyChar).Value(Unit.Value).Try()
                 .Or(Character.Except('"').Value(Unit.Value))
                 .IgnoreMany()
             from close in Character.EqualTo('"')
@@ -257,7 +258,7 @@ namespace JsonParser
             from properties in JsonString
                 .Named("property name")
                 .Then(name => Token.EqualTo(JsonToken.Colon)
-                    .IgnoreThen(Parse.Ref(() => JsonValue)
+                    .IgnoreThen(Parse.Ref(() => JsonValue!)
                     .Select(value => KeyValuePair.Create((string)name, value))))    
                 .ManyDelimitedBy(Token.EqualTo(JsonToken.Comma),
                     end: Token.EqualTo(JsonToken.RBracket))
@@ -268,7 +269,7 @@ namespace JsonParser
         // expectations like "expected (item) or (close delimiter)" when no content matches.
         static TokenListParser<JsonToken, object> JsonArray { get; } =
             from begin in Token.EqualTo(JsonToken.LSquareBracket)
-            from values in Parse.Ref(() => JsonValue)
+            from values in Parse.Ref(() => JsonValue!)
                 .ManyDelimitedBy(Token.EqualTo(JsonToken.Comma),
                     end: Token.EqualTo(JsonToken.RSquareBracket))
             select (object)values;
@@ -279,26 +280,26 @@ namespace JsonParser
         static TokenListParser<JsonToken, object> JsonFalse { get; } =
             Token.EqualToValue(JsonToken.Identifier, "false").Value((object)false);    
 
-        static TokenListParser<JsonToken, object> JsonNull { get; } =
-            Token.EqualToValue(JsonToken.Identifier, "null").Value((object)null);
+        static TokenListParser<JsonToken, object?> JsonNull { get; } =
+            Token.EqualToValue(JsonToken.Identifier, "null").Value((object?)null);
 
-        static TokenListParser<JsonToken, object> JsonValue { get; } =
-            JsonString
-                .Or(JsonNumber)
-                .Or(JsonObject)
-                .Or(JsonArray)
-                .Or(JsonTrue)
-                .Or(JsonFalse)
+        static TokenListParser<JsonToken, object?> JsonValue { get; } =
+            JsonString.AsNullable()
+                .Or(JsonNumber.AsNullable())
+                .Or(JsonObject.AsNullable())
+                .Or(JsonArray.AsNullable())
+                .Or(JsonTrue.AsNullable())
+                .Or(JsonFalse.AsNullable())
                 .Or(JsonNull)
                 .Named("JSON value");
 
-        static TokenListParser<JsonToken, object> JsonDocument { get; } = JsonValue.AtEnd();
+        static TokenListParser<JsonToken, object?> JsonDocument { get; } = JsonValue.AtEnd();
 
         // `TryParse` is just a helper method. It's useful to write one of these, where
         // the tokenization and parsing phases remain distinct, because it's often very
         // handy to place a breakpoint between the two steps to check out what the
         // token list looks like.
-        public static bool TryParse(string json, out object value, out string error, out Position errorPosition)
+        public static bool TryParse(string json, out object? value, [MaybeNullWhen(true)] out string error, out Position errorPosition)
         {
             var tokens = JsonTokenizer.Instance.TryTokenize(json);
             if (!tokens.HasValue)
@@ -357,7 +358,7 @@ namespace JsonParser
             }
         }
 
-        static void Print(object value, int indent = 0)
+        static void Print(object? value, int indent = 0)
         {
             switch (value)
             {

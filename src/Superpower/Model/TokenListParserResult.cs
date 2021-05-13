@@ -134,10 +134,10 @@ namespace Superpower.Model
                 expectations = second.Expectations;
             else if (second.Expectations != null)
             {
-                expectations = new string[first.Expectations.Length + second.Expectations.Length];
+                expectations = new string[first.Expectations!.Length + second.Expectations.Length];
                 var i = 0;
-                for (; i < first.Expectations.Length; ++i)
-                    expectations[i] = first.Expectations[i];
+                for (; i < first.Expectations!.Length; ++i)
+                    expectations[i] = first.Expectations![i];
                 for (var j = 0; j < second.Expectations.Length; ++i, ++j)
                     expectations[i] = second.Expectations[j];
             }

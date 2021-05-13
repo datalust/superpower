@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using Xunit;
-using Superpower;
 using Superpower.Model;
 using System.Linq;
 

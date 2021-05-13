@@ -83,7 +83,7 @@ var expression = "1 * (2 + 3)";
 
 // 1.
 var tokenizer = new ArithmeticExpressionTokenizer();
-var tokenList = tokenizer.Tokenize(expresssion);
+var tokenList = tokenizer.Tokenize(expression);
 
 // 2.
 var parser = ArithmeticExpressionParser.Lambda; // parser built with combinators
@@ -245,7 +245,8 @@ Superpower is introduced, with a worked example, in [this blog post](https://nbl
 **Real-world** projects built with Superpower:
 
 * [_Serilog.Filters.Expressions_](https://github.com/serilog/serilog-filters-expressions) uses Superpower to implement a filtering language for structured log events
-* The query language of [Seq](https://getseq.net) is implemented using Superpower
+* The query language of [Seq](https://datalust.co/seq) is implemented using Superpower
+* `seqcli` [extraction patterns](https://github.com/datalust/seqcli#extraction-patterns) use Superpower for plain-text log parsing
 
 _Have an example we can add to this list? [Let us know](https://github.com/datalust/superpower/issues/new)._
 

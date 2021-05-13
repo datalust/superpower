@@ -49,12 +49,12 @@ namespace Superpower.Model
         /// <summary>
         /// A provided error message, or null.
         /// </summary>
-        public string ErrorMessage { get; }
+        public string? ErrorMessage { get; }
 
         /// <summary>
         /// A list of expectations that were unmet, or null.
         /// </summary>
-        public string[] Expectations { get; }
+        public string[]? Expectations { get; }
 
         internal bool IsPartial(TextSpan from) => from != Remainder;
 
@@ -84,21 +84,21 @@ namespace Superpower.Model
             Backtrack = backtrack;
         }
 
-        internal Result(TextSpan location, TextSpan remainder, string errorMessage, string[] expectations, bool backtrack)
+        internal Result(TextSpan location, TextSpan remainder, string? errorMessage, string[]? expectations, bool backtrack)
         {
             Location = location;
             Remainder = remainder;
-            _value = default;
+            _value = default!; // Default value is not observable.
             HasValue = false;
             Expectations = expectations;
             ErrorMessage = errorMessage;
             Backtrack = backtrack;
         }
 
-        internal Result(TextSpan remainder, string errorMessage, string[] expectations, bool backtrack)
+        internal Result(TextSpan remainder, string? errorMessage, string[]? expectations, bool backtrack)
         {
             Location = Remainder = remainder;
-            _value = default;
+            _value = default!; // Default value is not observable.
             HasValue = false;
             Expectations = expectations;
             ErrorMessage = errorMessage;

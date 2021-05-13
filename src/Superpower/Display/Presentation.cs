@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Reflection;
 using Superpower.Util;
 
@@ -21,22 +22,27 @@ namespace Superpower.Display
     {
         static string FormatKind(object kind)
         {
-            return kind.ToString().ToLower();
+            return kind.ToString()!.ToLower();
         }
 
-        static TokenAttribute TryGetTokenAttribute<TKind>(TKind kind)
+        static TokenAttribute? TryGetTokenAttribute(Type type)
+        {
+            return type.GetTypeInfo().GetCustomAttribute<TokenAttribute>();
+        }
+
+        static TokenAttribute? TryGetTokenAttribute<TKind>(TKind kind)
         {
             var kindTypeInfo = typeof(TKind).GetTypeInfo();
             if (kindTypeInfo.IsEnum)
             {
-                var field = kindTypeInfo.GetDeclaredField(kind.ToString());
+                var field = kindTypeInfo.GetDeclaredField(kind!.ToString()!);
                 if (field != null)
                 {
-                    return field.GetCustomAttribute<TokenAttribute>();
+                    return field.GetCustomAttribute<TokenAttribute>() ?? TryGetTokenAttribute(typeof(TKind));
                 }
             }
 
-            return null;
+            return TryGetTokenAttribute(typeof(TKind));
         }
 
         public static string FormatExpectation<TKind>(TKind kind)
@@ -50,7 +56,7 @@ namespace Superpower.Display
                     return FormatLiteral(description.Example);
             }
 
-            return FormatKind(kind);
+            return FormatKind(kind!);
         }
 
         public static string FormatAppearance<TKind>(TKind kind, string value)
@@ -67,7 +73,7 @@ namespace Superpower.Display
                     return clipped;
             }
 
-            return $"{FormatKind(kind)} {clipped}";
+            return $"{FormatKind(kind!)} {clipped}";
         }
         public static string FormatLiteral(char literal)
         {

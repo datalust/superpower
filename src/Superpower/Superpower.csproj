@@ -1,40 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
-    <TargetFrameworks>netstandard1.0;netstandard2.0</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' "> 
-    <TargetFrameworks>net45;netstandard1.0;netstandard2.0</TargetFrameworks>
-  </PropertyGroup>
   <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     <Description>A parser combinator library for C#</Description>
-    <VersionPrefix>2.3.0</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
     <Authors>Datalust;Superpower Contributors;Sprache Contributors</Authors>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Superpower</AssemblyName>
     <AssemblyOriginatorKeyFile>../../asset/Superpower.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Superpower</PackageId>
     <PackageTags>superpower;parser</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/datalust/superpower/dev/asset/Superpower-White-400px.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/datalust/superpower</PackageProjectUrl>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <PackageIcon>Superpower-White-400px.png</PackageIcon>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/datalust/superpower</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>$(DefineConstants);CHECKED</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\asset\Superpower-White-400px.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
 </Project>
