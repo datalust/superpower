@@ -50,7 +50,6 @@ namespace Superpower
         public static TokenListParserResult<TKind, T> TryParse<TKind, T>(this TokenListParser<TKind, T> parser, TokenList<TKind> input)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
-            if (input == null) throw new ArgumentNullException(nameof(input));
 
             return parser(input);
         }
@@ -90,7 +89,6 @@ namespace Superpower
         public static T Parse<TKind, T>(this TokenListParser<TKind, T> parser, TokenList<TKind> input)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
-            if (input == null) throw new ArgumentNullException(nameof(input));
 
             var result = parser.TryParse(input);
 

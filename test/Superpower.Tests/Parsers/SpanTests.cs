@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Superpower.Tests.Parsers
 {
+    using System;
     using System.Text.RegularExpressions;
 
     public class SpanTests
@@ -82,6 +83,66 @@ namespace Superpower.Tests.Parsers
             var input = new TextSpan("Foo");
             var r = parser(input);
             Assert.Equal("Foo", r.Value.ToStringValue());
+        }
+
+        [Theory]
+        [InlineData("123STOP", "123")]
+        [InlineData("123stopSTOP", "123stop")]
+        [InlineData("123STSTOP", "123ST")]
+        [InlineData("123STOP456STOP789", "123")]
+        [InlineData("123", "123")]
+        public void ExceptMatchesUntilStopwordIsPresent(string text, string expected)
+        {
+            var result = Span.Except("STOP").Parse(text);
+            Assert.Equal(expected, result.ToStringValue());
+        }
+        
+        [Theory]
+        [InlineData("123STOP", "123")]
+        [InlineData("123stopSTOP", "123")]
+        [InlineData("123STSToP", "123ST")]
+        [InlineData("123stop456STOP789", "123")]
+        [InlineData("123", "123")]
+        public void ExceptIgnoreCaseMatchesUntilStopwordIsPresent(string text, string expected)
+        {
+            var result = Span.ExceptIgnoreCase("STOP").Parse(text);
+            Assert.Equal(expected, result.ToStringValue());
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("STOP")]
+        [InlineData("STOP123")]
+        public void ExceptDoesNotProduceZeroLengthMatches(string text)
+        {
+            Assert.False(Span.Except("STOP").TryParse(text).HasValue);
+        }
+
+        [Fact]
+        public void ExceptFailsWhenArgumentIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => Span.Except(null!).Parse("foo"));
+        }
+
+        [Fact]
+        public void ExceptFailsWhenArgumentIsEmpty()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Span.Except("").Parse("foo"));
+        }
+
+        [Theory]
+        [InlineData("Begin123STOPEnd")]
+        public void ExceptMatchesWhenTheInputAbsolutePositionIsNonZero(string text)
+        {
+            var test =
+                from begin in Span.EqualTo("Begin")
+                from value in Span.Except("STOP")
+                from stop in Span.EqualTo("STOP")
+                from end in Span.EqualTo("End")
+                select value;
+            var result = test.Parse(text).ToStringValue();
+
+            Assert.Equal("123", result);
         }
     }
 }
