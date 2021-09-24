@@ -244,7 +244,7 @@ Superpower is introduced, with a worked example, in [this blog post](https://nbl
 
 **Real-world** projects built with Superpower:
 
-* [_Serilog.Filters.Expressions_](https://github.com/serilog/serilog-filters-expressions) uses Superpower to implement a filtering language for structured log events
+* [_Serilog.Expressions_](https://github.com/serilog/serilog-expressions) uses Superpower to implement an expression and templating language for structured log events
 * The query language of [Seq](https://datalust.co/seq) is implemented using Superpower
 * `seqcli` [extraction patterns](https://github.com/datalust/seqcli#extraction-patterns) use Superpower for plain-text log parsing
 
