@@ -170,8 +170,8 @@ class ArithmeticExpressionParser
     static readonly TokenListParser<ArithmeticExpressionToken, Expression> Expr =
         Parse.Chain(Add.Or(Subtract), Term, Expression.MakeBinary);
 
-    public static readonly TokenListParser<ArithmeticExpressionToken, Expression<Func<int>>> Lambda =
-        Expr.AtEnd().Select(body => Expression.Lambda<Func<int>>(body));
+    public static readonly TokenListParser<ArithmeticExpressionToken, Expression<Func<int>>>
+        Lambda = Expr.AtEnd().Select(body => Expression.Lambda<Func<int>>(body));
 }
 ```
 
@@ -247,6 +247,7 @@ Superpower is introduced, with a worked example, in [this blog post](https://nbl
 * [_Serilog.Expressions_](https://github.com/serilog/serilog-expressions) uses Superpower to implement an expression and templating language for structured log events
 * The query language of [Seq](https://datalust.co/seq) is implemented using Superpower
 * `seqcli` [extraction patterns](https://github.com/datalust/seqcli#extraction-patterns) use Superpower for plain-text log parsing
+* [_PromQL.Parser](https://github.com/djluck/PromQL.Parser) is a parser for the Prometheus Query Language
 
 _Have an example we can add to this list? [Let us know](https://github.com/datalust/superpower/issues/new)._
 
