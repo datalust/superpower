@@ -253,6 +253,6 @@ _Have an example we can add to this list? [Let us know](https://github.com/datal
 
 ### Getting help
 
-Please post issues [to the issue tracker](https://github.com/datalust/superpower/issues), visit our [Gitter chat](https://gitter.im/datalust/superpower), or tag your [question on StackOverflow](http://stackoverflow.com/questions/tagged/superpower) with `superpower`.
+Please post issues [to the issue tracker](https://github.com/datalust/superpower/issues), or tag your [question on StackOverflow](http://stackoverflow.com/questions/tagged/superpower) with `superpower`.
 
 _The repository's title arose out of a talk_ "Parsing Text: the Programming Superpower You Need at Your Fingertips" _given at [DDD Brisbane](http://dddbrisbane.com/) 2015._
