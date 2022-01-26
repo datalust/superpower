@@ -224,7 +224,7 @@ namespace Superpower
                     remainder = r.Remainder;
                 }
 
-                return TokenListParserResult.Value(result ?? new T[0], input, remainder);
+                return TokenListParserResult.Value(result ?? Array.Empty<T>(), input, remainder);
             };
         }
 
@@ -257,7 +257,7 @@ namespace Superpower
                     remainder = r.Remainder;
                 }
 
-                return Result.Value(result ?? new T[0], input, remainder);
+                return Result.Value(result ?? Array.Empty<T>(), input, remainder);
             };
         }
 
@@ -507,11 +507,11 @@ namespace Superpower
                 return parser
                     .AtLeastOnceDelimitedBy(delimiter)
                     .Then(p => end.Value(p))
-                    .Or(end.Value(new T[0]));
+                    .Or(end.Value(Array.Empty<T>()));
 
             return parser
                 .Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
-                .OptionalOrDefault(new T[0]);
+                .OptionalOrDefault(Array.Empty<T>());
         }
 
         /// <summary>
@@ -528,7 +528,7 @@ namespace Superpower
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
             return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
-                .OptionalOrDefault(new T[0]);
+                .OptionalOrDefault(Array.Empty<T>());
         }
 
         /// <summary>
