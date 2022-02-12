@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 namespace Superpower.Model
 {
     /// <summary>
     /// A token.
     /// </summary>
     /// <typeparam name="TKind">The type of the token's kind.</typeparam>
-    public struct Token<TKind>
+    public struct Token<TKind> : IEquatable<Token<TKind>>
     {
         /// <summary>
         /// The kind of the token.
@@ -70,5 +73,57 @@ namespace Superpower.Model
 
             return $"{Kind}@{Position}: {Span}";
         }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.
+        /// </returns>
+        public bool Equals(Token<TKind> other) => EqualityComparer<TKind>.Default.Equals(Kind, other.Kind) && Span.Equals(other.Span);
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns>
+        /// true if <paramref name="obj">obj</paramref> and this instance are the same type and represent the same value; otherwise, false.
+        /// </returns>
+        public override bool Equals(object? obj) => obj is Token<TKind> other && Equals(other);
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (EqualityComparer<TKind>.Default.GetHashCode(Kind!) * 397) ^ Span.GetHashCode();
+            }
+        }
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(Token<TKind> left, Token<TKind> right) => left.Equals(right);
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator !=(Token<TKind> left, Token<TKind> right) => !left.Equals(right);
     }
 }

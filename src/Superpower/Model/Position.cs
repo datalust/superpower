@@ -19,7 +19,7 @@ namespace Superpower.Model
     /// <summary>
     /// A position within a stream of character input.
     /// </summary>
-    public readonly struct Position
+    public readonly struct Position : IEquatable<Position>
     {
         /// <summary>
         /// The zero-based absolute index of the position.
@@ -88,5 +88,60 @@ namespace Superpower.Model
         {
             return $"{Absolute} (line {Line}, column {Column})";
         }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.
+        /// </returns>
+        public bool Equals(Position other) => Absolute == other.Absolute && Line == other.Line && Column == other.Column;
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns>
+        /// true if <paramref name="obj">obj</paramref> and this instance are the same type and represent the same value; otherwise, false.
+        /// </returns>
+        public override bool Equals(object? obj) => obj is Position other && Equals(other);
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Absolute;
+                hashCode = (hashCode * 397) ^ Line;
+                hashCode = (hashCode * 397) ^ Column;
+                return hashCode;
+            }
+        }
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(Position left, Position right) => left.Equals(right);
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator !=(Position left, Position right) => !left.Equals(right);
     }
 }
