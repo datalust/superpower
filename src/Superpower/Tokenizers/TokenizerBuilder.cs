@@ -30,7 +30,7 @@ namespace Superpower.Tokenizers
     /// produce.</typeparam>
     public class TokenizerBuilder<TKind>
     {
-        readonly struct Recognizer
+        readonly struct Recognizer : IEquatable<Recognizer>
         {
             public TextParser<Unit> Parser { get; }
             public bool IsIgnored { get; }
@@ -44,8 +44,34 @@ namespace Superpower.Tokenizers
                 Kind = kind;
                 IsDelimiter = isDelimiter;
             }
+
+            public bool Equals(Recognizer other)
+            {
+                return Parser.Equals(other.Parser) &&
+                       IsIgnored == other.IsIgnored &&
+                       EqualityComparer<TKind>.Default.Equals(Kind, other.Kind) &&
+                       IsDelimiter == other.IsDelimiter;
+            }
+
+            public override bool Equals(object? obj) => obj is Recognizer other && Equals(other);
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    var hashCode = Parser.GetHashCode();
+                    hashCode = (hashCode * 397) ^ IsIgnored.GetHashCode();
+                    hashCode = (hashCode * 397) ^ EqualityComparer<TKind>.Default.GetHashCode(Kind!);
+                    hashCode = (hashCode * 397) ^ IsDelimiter.GetHashCode();
+                    return hashCode;
+                }
+            }
+
+            public static bool operator ==(Recognizer left, Recognizer right) => left.Equals(right);
+
+            public static bool operator !=(Recognizer left, Recognizer right) => !left.Equals(right);
         }
-        
+
         readonly List<Recognizer> _recognizers = new List<Recognizer>();
         
         /// <summary>

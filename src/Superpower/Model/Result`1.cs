@@ -14,6 +14,7 @@
 
 using Superpower.Util;
 using System;
+using System.Collections.Generic;
 
 namespace Superpower.Model
 {
@@ -21,7 +22,7 @@ namespace Superpower.Model
     /// The result of parsing from a text span.
     /// </summary>
     /// <typeparam name="T">The type of the value being parsed.</typeparam>
-    public struct Result<T>
+    public struct Result<T> : IEquatable<Result<T>>
     {
         readonly T _value;
 
@@ -123,6 +124,74 @@ namespace Superpower.Model
 
             return $"Syntax error{location}: {message}.";
         }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.
+        /// </returns>
+        public bool Equals(Result<T> other)
+        {
+            return EqualityComparer<T>.Default.Equals(_value, other._value) &&
+                   Location.Equals(other.Location) &&
+                   Remainder.Equals(other.Remainder) &&
+                   HasValue == other.HasValue &&
+                   ErrorMessage == other.ErrorMessage &&
+                   Equals(Expectations, other.Expectations) &&
+                   Backtrack == other.Backtrack;
+        }
+
+        /// <summary>
+        /// Indicates whether this instance and a specified object are equal.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns>
+        /// true if <paramref name="obj">obj</paramref> and this instance are the same type and represent the same value; otherwise, false.
+        /// </returns>
+        public override bool Equals(object? obj) => obj is Result<T> other && Equals(other);
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = EqualityComparer<T>.Default.GetHashCode(_value!);
+                hashCode = (hashCode * 397) ^ Location.GetHashCode();
+                hashCode = (hashCode * 397) ^ Remainder.GetHashCode();
+                hashCode = (hashCode * 397) ^ HasValue.GetHashCode();
+                hashCode = (hashCode * 397) ^ (ErrorMessage != null ? ErrorMessage.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Expectations != null ? Expectations.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ Backtrack.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static bool operator !=(Result<T> left, Result<T> right) => !left.Equals(right);
 
         /// <summary>
         /// If the result is empty, format the fragment of text describing the error.
