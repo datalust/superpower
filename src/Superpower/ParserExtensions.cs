@@ -146,14 +146,14 @@ namespace Superpower
         /// <summary>
         /// Attempts the parser and invokes the exceptionHandler if the parser throws TException.
         /// </summary>
-        /// <typeparam name="TException">The type of exception caught and handled by <see cref="Catch{TException, TKind, T}(TokenListParser{TKind, T}, Func{TException, TokenListParserResult{TKind, T}})"/></typeparam>
         /// <typeparam name="TKind">The type of tokens consumed by the parser.</typeparam>
         /// <typeparam name="T">The type of the result.</typeparam>
+        /// <typeparam name="TException">The type of exception caught and handled by <see cref="Catch{TKind, T, TException}(TokenListParser{TKind, T}, Func{TException, TokenListParserResult{TKind, T}})"/></typeparam>
         /// <param name="parser">The parser.</param>
         /// <param name="exceptionHandler">A function that handles TException and returns a <see cref="TokenListParserResult{TKind, T}"/>.</param>
         /// <returns>A parser that calls the first parser and handles TException by calling the exception handler.</returns>
         /// <exception cref="ArgumentNullException">Thrown if either the parser or the exceptionHandler is null.</exception>
-        public static TokenListParser<TKind, T> Catch<TException, TKind, T>(
+        public static TokenListParser<TKind, T> Catch<TKind, T, TException>(
             this TokenListParser<TKind, T> parser,
             Func<TException, TokenListParserResult<TKind, T>> exceptionHandler)
             where TException : Exception
