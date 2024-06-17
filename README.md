@@ -71,7 +71,7 @@ public enum ArithmeticExpressionToken
 ```
 
 A major benefit of driving parsing from tokens, instead of individual characters, is that errors can be reported in
-terms of tokens - _unexpected identifier \`frm\`, expected keyword \`from\`_ - instead of the cryptic _unexpected `m`_.
+terms of tokens - _unexpected identifier \`frm\`, expected keyword \`from\`_ - instead of the cryptic _unexpected \`m\`_.
 
 Token-driven parsing takes place in two distinct steps:
 
