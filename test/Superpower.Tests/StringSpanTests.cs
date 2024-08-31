@@ -90,5 +90,38 @@ namespace Superpower.Tests
             var span = new TextSpan(str, new Position(offset, 1, offset + 1), length);
             Assert.False(span.EqualsValue(value));
         }
+
+        [Theory]
+        [InlineData("Hello", 0, 5)]
+        [InlineData("Hello", 0, 3)]
+        [InlineData("Hello", 1, 3)]
+        public void SliceWithLengthExtractsCorrectCharacters(string input, int index, int end)
+        {
+            var inputSpan = new TextSpan(input, new Position(0, 1, 1), input.Length);
+            var slice = inputSpan[index..end];
+            Assert.Equal(expected: input[index..end], actual: slice.ToStringValue());
+        }
+        
+        [Theory]
+        [InlineData("Hello", 0)]
+        [InlineData("Hello", 2)]
+        [InlineData("Hello", 5)]
+        public void SliceWithoutLengthExtractsCorrectCharacters(string input, int index)
+        {
+            var inputSpan = new TextSpan(input, new Position(0, 1, 1), input.Length);
+            var slice = inputSpan[index..];
+            Assert.Equal(expected: input[index..], actual: slice.ToStringValue());
+        }
+        
+        [Theory]
+        [InlineData("Hello", 0)]
+        [InlineData("Hello", 2)]
+        [InlineData("Hello", 4)]
+        public void IndexerExtractsCorrectCharacter(string input, int index)
+        {
+            var inputSpan = new TextSpan(input, new Position(0, 1, 1), input.Length);
+            var ch = inputSpan[index];
+            Assert.Equal(expected: input[index], actual: ch);
+        }
     }
 }
