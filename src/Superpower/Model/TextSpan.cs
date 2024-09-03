@@ -271,7 +271,6 @@ namespace Superpower.Model
             return true;
         }
 
-
         /// <summary>
         /// Gets the character at the specified index in the text span.
         /// </summary>
