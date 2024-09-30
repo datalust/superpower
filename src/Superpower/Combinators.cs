@@ -532,6 +532,14 @@ namespace Superpower
         }
 
         /// <summary>
+        /// Constructs a parser that converts a char[]-parser to a string-parser.
+        /// </summary>
+        /// <param name="parser">The parser.</param>
+        /// <returns>The resulting parser.</returns>
+        public static TextParser<string> Text(this TextParser<char[]> parser)
+            => parser.Select(chars => new string(chars));
+
+        /// <summary>
         /// Construct a parser that fails with error message <paramref name="errorMessage"/> when <paramref name="parser"/> fails.
         /// </summary>
         /// <typeparam name="TKind">The kind of the tokens being parsed.</typeparam>
