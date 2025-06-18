@@ -1,4 +1,4 @@
-# Superpower [![Build status](https://ci.appveyor.com/api/projects/status/7bj6if6tyc68urpy?svg=true)](https://ci.appveyor.com/project/datalust/superpower)  [![Join the chat at https://gitter.im/datalust/superpower](https://img.shields.io/gitter/room/datalust/superpower.svg)](https://gitter.im/datalust/superpower) [![NuGet Version](https://img.shields.io/nuget/vpre/Superpower.svg?style=flat)](https://www.nuget.org/packages/Superpower/) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-superpower-orange.svg)](http://stackoverflow.com/questions/tagged/superpower)
+# Superpower [![Build status](https://ci.appveyor.com/api/projects/status/7bj6if6tyc68urpy?svg=true)](https://ci.appveyor.com/project/datalust/superpower) [![NuGet Version](https://img.shields.io/nuget/vpre/Superpower.svg?style=flat)](https://www.nuget.org/packages/Superpower/) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-superpower-orange.svg)](http://stackoverflow.com/questions/tagged/superpower)
 
 A [parser combinator](https://en.wikipedia.org/wiki/Parser_combinator) library based on
 [Sprache](https://github.com/sprache/Sprache). Superpower generates friendlier error messages through its support for
@@ -71,7 +71,7 @@ public enum ArithmeticExpressionToken
 ```
 
 A major benefit of driving parsing from tokens, instead of individual characters, is that errors can be reported in
-terms of tokens - _unexpected identifier \`frm\`, expected keyword \`from\`_ - instead of the cryptic _unexpected `m`_.
+terms of tokens - _unexpected identifier \`frm\`, expected keyword \`from\`_ - instead of the cryptic _unexpected \`m\`_.
 
 Token-driven parsing takes place in two distinct steps:
 
@@ -170,8 +170,8 @@ class ArithmeticExpressionParser
     static readonly TokenListParser<ArithmeticExpressionToken, Expression> Expr =
         Parse.Chain(Add.Or(Subtract), Term, Expression.MakeBinary);
 
-    public static readonly TokenListParser<ArithmeticExpressionToken, Expression<Func<int>>> Lambda =
-        Expr.AtEnd().Select(body => Expression.Lambda<Func<int>>(body));
+    public static readonly TokenListParser<ArithmeticExpressionToken, Expression<Func<int>>>
+        Lambda = Expr.AtEnd().Select(body => Expression.Lambda<Func<int>>(body));
 }
 ```
 
@@ -244,14 +244,15 @@ Superpower is introduced, with a worked example, in [this blog post](https://nbl
 
 **Real-world** projects built with Superpower:
 
-* [_Serilog.Filters.Expressions_](https://github.com/serilog/serilog-filters-expressions) uses Superpower to implement a filtering language for structured log events
+* [_Serilog.Expressions_](https://github.com/serilog/serilog-expressions) uses Superpower to implement an expression and templating language for structured log events
 * The query language of [Seq](https://datalust.co/seq) is implemented using Superpower
 * `seqcli` [extraction patterns](https://github.com/datalust/seqcli#extraction-patterns) use Superpower for plain-text log parsing
+* [_PromQL.Parser_](https://github.com/djluck/PromQL.Parser) is a parser for the Prometheus Query Language
 
 _Have an example we can add to this list? [Let us know](https://github.com/datalust/superpower/issues/new)._
 
 ### Getting help
 
-Please post issues [to the issue tracker](https://github.com/datalust/superpower/issues), visit our [Gitter chat](https://gitter.im/datalust/superpower), or tag your [question on StackOverflow](http://stackoverflow.com/questions/tagged/superpower) with `superpower`.
+Please post issues [to the issue tracker](https://github.com/datalust/superpower/issues), or tag your [question on StackOverflow](http://stackoverflow.com/questions/tagged/superpower) with `superpower`.
 
 _The repository's title arose out of a talk_ "Parsing Text: the Programming Superpower You Need at Your Fingertips" _given at [DDD Brisbane](http://dddbrisbane.com/) 2015._

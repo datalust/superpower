@@ -18,7 +18,7 @@ namespace IntCalc
         [Token(Category = "operator", Example = "*")]
         Times,
 
-        [Token(Category = "operator", Example = "-")]
+        [Token(Category = "operator", Example = "/")]
         Divide,
 
         [Token(Example = "(")]

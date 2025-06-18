@@ -270,5 +270,52 @@ namespace Superpower.Model
             }
             return true;
         }
+
+        /// <summary>
+        /// Gets the character at the specified index in the text span.
+        /// </summary>
+        /// <param name="index">
+        /// The zero-based index of the character to get.
+        /// </param>
+        /// <returns>
+        /// The character at the specified index in the text span.
+        /// </returns>
+        public char this[int index]
+        {
+            get
+            {
+                this.EnsureHasValue();
+#if CHECKED
+                if ((uint)index >= (uint)Length)
+                    throw new ArgumentOutOfRangeException(nameof(index), index, "Index exceeds the source span's length.");
+#endif
+                return Source![Position.Absolute + index];
+            }
+        }
+        
+        /// <summary>
+        /// Forms a slice out of the current text span starting at the specified index.
+        /// </summary>
+        /// <param name="index">
+        /// The index at which to begin the slice.
+        /// </param>
+        /// <returns>
+        /// An text span that consists of all elements of the current array segment from <paramref name="index"/> to the end of the text span.
+        /// </returns>
+        public TextSpan Slice(int index)
+        {
+            return Skip(index);
+        }
+ 
+        /// <summary>
+        /// Forms a slice of the specified length out of the current text span starting at the specified index.
+        /// </summary>
+        /// <param name="index">The index at which to begin the slice.</param>
+        /// <param name="count">The desired length of the slice.</param>
+        /// <returns>An text span of <paramref name="count"/> elements starting at <paramref name="index"/>.</returns>
+        public TextSpan Slice(int index, int count)
+        {
+            return Skip(index).First(count);
+        }
     }
 }

@@ -1,6 +1,6 @@
 version: '{build}'
 skip_tags: true
-image: Visual Studio 2019
+image: Visual Studio 2022
 build_script:
 - ps: ./Build.ps1
 test: off
@@ -9,7 +9,7 @@ artifacts:
 deploy:
 - provider: NuGet
   api_key:
-    secure: YSrfzuVFe7i8NCMaPan+MN6TJ3nSU7vUG5jsXwy1gvvPtFQvPkYSdfYK8bCuftgE
+    secure: wW4TJY85P9BSN53XNfB0IE2WqskPu0RdsWelB1tQco1wql3g8ov5yhmk5v8dXy81
   skip_symbols: true
   on:
     branch: /^(main|dev)$/
