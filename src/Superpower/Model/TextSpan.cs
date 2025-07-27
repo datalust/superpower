@@ -301,6 +301,24 @@ public readonly record struct TextSpan
 	}
 
 	/// <summary>
+	/// Converts this text span to a <see cref="StringSegment"/>.
+	/// </summary>
+	/// <returns>
+	/// A <see cref="StringSegment"/> representing the same span of text, or the default value if the source is null.
+	/// </returns>
+	public StringSegment AsSegment()
+		=> Source is null ? default : new(Source, Position.Absolute, Length);
+
+	/// <summary>
+	/// Converts this text span to a <see cref="ReadOnlySpan{Char}"/>.
+	/// </summary>
+	/// <returns>
+	/// A <see cref="ReadOnlySpan{Char}"/> representing the same span of text, or the default value if the source is null.
+	/// </returns>
+	public ReadOnlySpan<char> AsSpan()
+		=> Source is null ? default : Source.AsSpan(Position.Absolute, Length);
+
+	/// <summary>
 	/// Implicitly converts a <see cref="TextSpan"/> to a <see cref="StringSegment"/>.
 	/// </summary>
 	/// <param name="span">The <see cref="TextSpan"/> to convert.</param>
@@ -308,7 +326,7 @@ public readonly record struct TextSpan
 	/// A <see cref="StringSegment"/> representing the same span of text, or the default value if the source is null.
 	/// </returns>
 	public static implicit operator StringSegment(TextSpan span)
-		=> span.Source is null ? default : new(span.Source, span.Position.Absolute, span.Length);
+		=> span.AsSegment();
 
 	/// <summary>
 	/// Implicitly converts a <see cref="TextSpan"/> to a <see cref="ReadOnlySpan{Char}"/>.
@@ -318,5 +336,5 @@ public readonly record struct TextSpan
 	/// A <see cref="ReadOnlySpan{Char}"/> representing the same span of text, or the default value if the source is null.
 	/// </returns>
 	public static implicit operator ReadOnlySpan<char>(TextSpan span)
-		=> span.Source is null ? default : span.Source.AsSpan(span.Position.Absolute, span.Length);
+		=> span.AsSpan();
 }
