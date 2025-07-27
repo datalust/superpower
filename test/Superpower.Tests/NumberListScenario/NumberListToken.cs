@@ -1,8 +1,7 @@
-﻿namespace Superpower.Tests.NumberListScenario
+namespace Superpower.Tests.NumberListScenario;
+
+enum NumberListToken
 {
-    enum NumberListToken
-    {
-        None,
-        Number
-    }
+	None,
+	Number
 }

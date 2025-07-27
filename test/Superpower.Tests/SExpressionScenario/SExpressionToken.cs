@@ -1,18 +1,16 @@
-﻿using Superpower.Display;
-using Superpower.Model;
+using Superpower.Display;
 
-namespace Superpower.Tests.SExpressionScenario
+namespace Superpower.Tests.SExpressionScenario;
+
+enum SExpressionToken
 {
-    enum SExpressionToken
-    {
-        None,
-        Atom,
-        Number,
+	None,
+	Atom,
+	Number,
 
-        [Token(Description = "open parenthesis")]
-        LParen,
+	[Token(Description = "open parenthesis")]
+	LParen,
 
-        [Token(Description = "closing parenthesis")]
-        RParen
-    }
+	[Token(Description = "closing parenthesis")]
+	RParen
 }

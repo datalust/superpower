@@ -1,39 +1,37 @@
-﻿using Superpower.Display;
-using Superpower.Model;
+using Superpower.Display;
 
-namespace Superpower.Tests.ArithmeticExpressionScenario
+namespace Superpower.Tests.ArithmeticExpressionScenario;
+
+public enum ArithmeticExpressionToken
 {
-    public enum ArithmeticExpressionToken
-    {
-        None,
+	None,
 
-        Number,
+	Number,
 
-        [Token(Category = "operator", Example = "+")]
-        Plus,
+	[Token(Category = "operator", Example = "+")]
+	Plus,
 
-        [Token(Category = "operator", Example = "-")]
-        Minus,
+	[Token(Category = "operator", Example = "-")]
+	Minus,
 
-        [Token(Category = "operator", Example = "*")]
-        Times,
+	[Token(Category = "operator", Example = "*")]
+	Times,
 
-        [Token(Category = "operator", Example = "-")]
-        Divide,
+	[Token(Category = "operator", Example = "-")]
+	Divide,
 
-        [Token(Example = "(")]
-        LParen,
+	[Token(Example = "(")]
+	LParen,
 
-        [Token(Example = ")")]
-        RParen,
+	[Token(Example = ")")]
+	RParen,
 
-        [Token(Category = "keyword", Example = "zero")]
-        Zero,
+	[Token(Category = "keyword", Example = "zero")]
+	Zero,
 
-        [Token(Category = "keyword", Description = "literal one")]
-        One,
+	[Token(Category = "keyword", Description = "literal one")]
+	One,
 
-        [Token(Description = "literal two")]
-        Two
-    }
+	[Token(Description = "literal two")]
+	Two
 }

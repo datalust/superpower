@@ -1,48 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using Superpower.Model;
-using Superpower.Parsers;
+namespace Superpower.Tests.NumberListScenario;
 
-namespace Superpower.Tests.NumberListScenario
+class NumberListTokenizer(bool useCustomErrors = false) : Tokenizer<NumberListToken>
 {
-    class NumberListTokenizer : Tokenizer<NumberListToken>
-    {
-        readonly bool _useCustomErrors;
+	protected override IEnumerable<Result<NumberListToken>> Tokenize(TextSpan span)
+	{
+		var next = SkipWhiteSpace(span);
+		if (!next.HasValue)
+			yield break;
 
-        public NumberListTokenizer(bool useCustomErrors = false)
-        {
-            _useCustomErrors = useCustomErrors;
-        }
+		do
+		{
+			var ch = next.Value;
+			if (ch is >= '0' and <= '9')
+			{
+				var integer = Numerics.Integer(next.Location);
+				next = integer.Remainder.ConsumeChar();
+				yield return Result.Value(NumberListToken.Number, integer.Location, integer.Remainder);
+			}
+			else
+			{
+				yield return useCustomErrors
+					? Result.Empty<NumberListToken>(next.Location, "list must contain only numbers")
+					: Result.Empty<NumberListToken>(next.Location, ["digit"]);
+			}
 
-        protected override IEnumerable<Result<NumberListToken>> Tokenize(TextSpan span)
-        {
-            var next = SkipWhiteSpace(span);
-            if (!next.HasValue)
-                yield break;
-
-            do
-            {
-                var ch = next.Value;
-                if (ch >= '0' && ch <= '9')
-                {
-                    var integer = Numerics.Integer(next.Location);
-                    next = integer.Remainder.ConsumeChar();
-                    yield return Result.Value(NumberListToken.Number, integer.Location, integer.Remainder);
-                }
-                else
-                {
-                    if (_useCustomErrors)
-                    {
-                        yield return Result.Empty<NumberListToken>(next.Location, "list must contain only numbers");
-                    }
-                    else
-                    {
-                        yield return Result.Empty<NumberListToken>(next.Location, new[] { "digit" });
-                    }
-                }
-
-                next = SkipWhiteSpace(next.Location);
-            } while (next.HasValue);
-        }
-    }
+			next = SkipWhiteSpace(next.Location);
+		}
+		while (next.HasValue);
+	}
 }

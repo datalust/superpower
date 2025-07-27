@@ -14,14 +14,13 @@
 
 using Superpower.Model;
 
-namespace Superpower
-{
-    /// <summary>
-    /// A parser that consumes elements from a list of tokens.
-    /// </summary>
-    /// <typeparam name="T">The type of values produced by the parser.</typeparam>
-    /// <typeparam name="TKind">The type of tokens being parsed.</typeparam>
-    /// <param name="input">The list of tokens to parse.</param>
-    /// <returns>A result with a parsed value, or an empty result indicating error.</returns>
-    public delegate TokenListParserResult<TKind, T> TokenListParser<TKind, T>(TokenList<TKind> input);
-}
+namespace Superpower;
+
+/// <summary>
+/// A parser that consumes elements from a list of tokens.
+/// </summary>
+/// <typeparam name="T">The type of values produced by the parser.</typeparam>
+/// <typeparam name="TKind">The type of tokens being parsed.</typeparam>
+/// <param name="input">The list of tokens to parse.</param>
+/// <returns>A result with a parsed value, or an empty result indicating error.</returns>
+public delegate TokenListParserResult<TKind, T> TokenListParser<TKind, T>(TokenList<TKind> input);

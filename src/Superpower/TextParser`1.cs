@@ -14,13 +14,12 @@
 
 using Superpower.Model;
 
-namespace Superpower
-{
-    /// <summary>
-    /// A parser that consumes text from a string span.
-    /// </summary>
-    /// <typeparam name="T">The type of values produced by the parser.</typeparam>
-    /// <param name="input">The span of text to parse.</param>
-    /// <returns>A result with a parsed value, or an empty result indicating error.</returns>
-    public delegate Result<T> TextParser<T>(TextSpan input);
-}
+namespace Superpower;
+
+/// <summary>
+/// A parser that consumes text from a string span.
+/// </summary>
+/// <typeparam name="T">The type of values produced by the parser.</typeparam>
+/// <param name="input">The span of text to parse.</param>
+/// <returns>A result with a parsed value, or an empty result indicating error.</returns>
+public delegate Result<T> TextParser<T>(TextSpan input);

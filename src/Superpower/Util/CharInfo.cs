@@ -1,4 +1,4 @@
-﻿// Copyright 2018 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2018 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Superpower.Util
+namespace Superpower.Util;
+
+static class CharInfo
 {
-    static class CharInfo
-    {
-        public static bool IsLatinDigit(char ch)
-        {
-            return ch >= '0' && ch <= '9';
-        }
+	public static bool IsLatinDigit(char ch)
+	{
+		return ch is >= '0' and <= '9';
+	}
 
-        public static bool IsHexDigit(char ch)
-        {
-            return IsLatinDigit(ch) || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F';
-        }
+	public static bool IsHexDigit(char ch)
+	{
+		return IsLatinDigit(ch) || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F';
+	}
 
-        public static int HexValue(char ch)
-        {
-            if (IsLatinDigit(ch))
-                return ch - '0';
+	public static int HexValue(char ch)
+	{
+		if (IsLatinDigit(ch))
+			return ch - '0';
 
-            if (ch >= 'a' && ch <= 'f')
-                return 15 + ch - 'f';
+		if (ch is >= 'a' and <= 'f')
+			return 15 + ch - 'f';
 
-            return 15 + ch - 'F';
-        }
-    }
+		return 15 + ch - 'F';
+	}
 }

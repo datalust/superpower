@@ -1,4 +1,4 @@
-﻿// Copyright 2018 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2018 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
 
 using Superpower.Model;
 
-namespace Superpower.Parsers
+namespace Superpower.Parsers;
+
+/// <summary>
+/// Parsers for matching date and time formats.
+/// </summary>
+public static class Instant
 {
-    /// <summary>
-    /// Parsers for matching date and time formats.
-    /// </summary>
-    public static class Instant
-    {
-        /// <summary>
-        /// Matches ISO-8601 datetimes.
-        /// </summary>
-        public static TextParser<TextSpan> Iso8601DateTime { get; } =
-            Span.Regex("\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?(([+-]\\d\\d:\\d\\d)|Z)?");
-    }
+	/// <summary>
+	/// Matches ISO-8601 datetimes.
+	/// </summary>
+	public static TextParser<TextSpan> Iso8601DateTime { get; } =
+		Span.Regex("\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d(\\.\\d+)?(([+-]\\d\\d:\\d\\d)|Z)?");
 }

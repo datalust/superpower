@@ -1,4 +1,4 @@
-﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Superpower.Model
+namespace Superpower.Model;
+
+/// <summary>
+/// A structure with no information.
+/// </summary>
+public readonly record struct Unit
 {
-    /// <summary>
-    /// A structure with no information.
-    /// </summary>
-    public struct Unit
-    {
-        /// <summary>
-        /// The singleton value of the struct, with no value.
-        /// </summary>
-        public static Unit Value { get; } = default;
-    }
+	/// <summary>
+	/// The singleton value of the struct, with no value.
+	/// </summary>
+	public static Unit Value { get; } = default;
 }

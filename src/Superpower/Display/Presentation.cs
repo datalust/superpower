@@ -1,4 +1,4 @@
-﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,140 +12,131 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Reflection;
 using Superpower.Util;
+using System.Reflection;
 
-namespace Superpower.Display
+namespace Superpower.Display;
+
+static class Presentation
 {
-    static class Presentation
-    {
-        static string FormatKind(object kind)
-        {
-            return kind.ToString()!.ToLower();
-        }
+	static string FormatKind(object kind)
+	{
+		return kind.ToString()!.ToLower();
+	}
 
-        static TokenAttribute? TryGetTokenAttribute(Type type)
-        {
-            return type.GetTypeInfo().GetCustomAttribute<TokenAttribute>();
-        }
+	static TokenAttribute? TryGetTokenAttribute(Type type)
+	{
+		return type.GetTypeInfo().GetCustomAttribute<TokenAttribute>();
+	}
 
-        static TokenAttribute? TryGetTokenAttribute<TKind>(TKind kind)
-        {
-            var kindTypeInfo = typeof(TKind).GetTypeInfo();
-            if (kindTypeInfo.IsEnum)
-            {
-                var field = kindTypeInfo.GetDeclaredField(kind!.ToString()!);
-                if (field != null)
-                {
-                    return field.GetCustomAttribute<TokenAttribute>() ?? TryGetTokenAttribute(typeof(TKind));
-                }
-            }
+	static TokenAttribute? TryGetTokenAttribute<TKind>(TKind kind)
+	{
+		var kindTypeInfo = typeof(TKind).GetTypeInfo();
+		if (kindTypeInfo.IsEnum)
+		{
+			var field = kindTypeInfo.GetDeclaredField(kind!.ToString()!);
+			if (field != null)
+			{
+				return field.GetCustomAttribute<TokenAttribute>() ?? TryGetTokenAttribute(typeof(TKind));
+			}
+		}
 
-            return TryGetTokenAttribute(typeof(TKind));
-        }
+		return TryGetTokenAttribute(typeof(TKind));
+	}
 
-        public static string FormatExpectation<TKind>(TKind kind)
-        {
-            var description = TryGetTokenAttribute(kind);
-            if (description != null)
-            {
-                if (description.Description != null)
-                    return description.Description;
-                if (description.Example != null)
-                    return FormatLiteral(description.Example);
-            }
+	public static string FormatExpectation<TKind>(TKind kind)
+	{
+		var description = TryGetTokenAttribute(kind);
+		if (description != null)
+		{
+			if (description.Description != null)
+				return description.Description;
+			if (description.Example != null)
+				return FormatLiteral(description.Example);
+		}
 
-            return FormatKind(kind!);
-        }
+		return FormatKind(kind!);
+	}
 
-        public static string FormatAppearance<TKind>(TKind kind, string value)
-        {
-            var clipped = FormatLiteral(Friendly.Clip(value, 12));
+	public static string FormatAppearance<TKind>(TKind kind, string value)
+	{
+		var clipped = FormatLiteral(Friendly.Clip(value, 12));
 
-            var description = TryGetTokenAttribute(kind);
-            if (description != null)
-            {
-                if (description.Category != null)
-                    return $"{description.Category} {clipped}";
+		var description = TryGetTokenAttribute(kind);
+		if (description != null)
+		{
+			if (description.Category != null)
+				return $"{description.Category} {clipped}";
 
-                if (description.Example != null)
-                    return clipped;
-            }
+			if (description.Example != null)
+				return clipped;
+		}
 
-            return $"{FormatKind(kind!)} {clipped}";
-        }
-        public static string FormatLiteral(char literal)
-        {
-            switch (literal)
-            {
-                //Unicode Category: Space Separators
-                case '\x00A0': return "U+00A0 no-break space";
-                case '\x1680': return "U+1680 ogham space mark";
-                case '\x2000': return "U+2000 en quad";
-                case '\x2001': return "U+2001 em quad";
-                case '\x2002': return "U+2002 en space";
-                case '\x2003': return "U+2003 em space";
-                case '\x2004': return "U+2004 three-per-em space";
-                case '\x2005': return "U+2005 four-per-em space";
-                case '\x2006': return "U+2006 six-per-em space";
-                case '\x2007': return "U+2007 figure space";
-                case '\x2008': return "U+2008 punctuation space";
-                case '\x2009': return "U+2009 thin space";
-                case '\x200A': return "U+200A hair space";
-                case '\x202F': return "U+202F narrow no-break space";
-                case '\x205F': return "U+205F medium mathematical space";
-                case '\x3000': return "U+3000 ideographic space";
+		return $"{FormatKind(kind!)} {clipped}";
+	}
+	public static string FormatLiteral(char literal) => literal switch
+	{
+		//Unicode Category: Space Separators
+		'\x00A0' => "U+00A0 no-break space",
+		'\x1680' => "U+1680 ogham space mark",
+		'\x2000' => "U+2000 en quad",
+		'\x2001' => "U+2001 em quad",
+		'\x2002' => "U+2002 en space",
+		'\x2003' => "U+2003 em space",
+		'\x2004' => "U+2004 three-per-em space",
+		'\x2005' => "U+2005 four-per-em space",
+		'\x2006' => "U+2006 six-per-em space",
+		'\x2007' => "U+2007 figure space",
+		'\x2008' => "U+2008 punctuation space",
+		'\x2009' => "U+2009 thin space",
+		'\x200A' => "U+200A hair space",
+		'\x202F' => "U+202F narrow no-break space",
+		'\x205F' => "U+205F medium mathematical space",
+		'\x3000' => "U+3000 ideographic space",
+		//Line Separator
+		'\x2028' => "U+2028 line separator",
+		//Paragraph Separator
+		'\x2029' => "U+2029 paragraph separator",
+		//Unicode C0 Control Codes (ASCII equivalent) 
+		'\x0000' => "NUL",//\0
+		'\x0001' => "U+0001 start of heading",
+		'\x0002' => "U+0002 start of text",
+		'\x0003' => "U+0003 end of text",
+		'\x0004' => "U+0004 end of transmission",
+		'\x0005' => "U+0005 enquiry",
+		'\x0006' => "U+0006 acknowledge",
+		'\x0007' => "U+0007 bell",
+		'\x0008' => "U+0008 backspace",
+		'\x0009' => "tab",//\t
+		'\x000A' => "line feed",//\n
+		'\x000B' => "U+000B vertical tab",
+		'\x000C' => "U+000C form feed",
+		'\x000D' => "carriage return",//\r
+		'\x000E' => "U+000E shift in",
+		'\x000F' => "U+000F shift out",
+		'\x0010' => "U+0010 data link escape",
+		'\x0011' => "U+0011 device ctrl 1",
+		'\x0012' => "U+0012 device ctrl 2",
+		'\x0013' => "U+0013 device ctrl 3",
+		'\x0014' => "U+0014 device ctrl 4",
+		'\x0015' => "U+0015 not acknowledge",
+		'\x0016' => "U+0016 synchronous idle",
+		'\x0017' => "U+0017 end transmission block",
+		'\x0018' => "U+0018 cancel",
+		'\x0019' => "U+0019 end of medium",
+		'\x0020' => "space",
+		'\x001A' => "U+001A substitute",
+		'\x001B' => "U+001B escape",
+		'\x001C' => "U+001C file separator",
+		'\x001D' => "U+001D group separator",
+		'\x001E' => "U+001E record separator",
+		'\x001F' => "U+001F unit separator",
+		'\x007F' => "U+007F delete",
+		_ => "`" + literal + "`",
+	};
 
-                //Line Separator
-                case '\x2028': return "U+2028 line separator";
-
-                //Paragraph Separator
-                case '\x2029': return "U+2029 paragraph separator";
-                
-                //Unicode C0 Control Codes (ASCII equivalent) 
-                case '\x0000': return "NUL"; //\0
-                case '\x0001': return "U+0001 start of heading";
-                case '\x0002': return "U+0002 start of text";
-                case '\x0003': return "U+0003 end of text";
-                case '\x0004': return "U+0004 end of transmission";
-                case '\x0005': return "U+0005 enquiry";
-                case '\x0006': return "U+0006 acknowledge";
-                case '\x0007': return "U+0007 bell";
-                case '\x0008': return "U+0008 backspace";
-                case '\x0009': return "tab"; //\t
-                case '\x000A': return "line feed"; //\n
-                case '\x000B': return "U+000B vertical tab";
-                case '\x000C': return "U+000C form feed";
-                case '\x000D': return "carriage return"; //\r
-                case '\x000E': return "U+000E shift in";
-                case '\x000F': return "U+000F shift out";
-                case '\x0010': return "U+0010 data link escape";
-                case '\x0011': return "U+0011 device ctrl 1";
-                case '\x0012': return "U+0012 device ctrl 2";
-                case '\x0013': return "U+0013 device ctrl 3";
-                case '\x0014': return "U+0014 device ctrl 4";
-                case '\x0015': return "U+0015 not acknowledge";
-                case '\x0016': return "U+0016 synchronous idle";
-                case '\x0017': return "U+0017 end transmission block";
-                case '\x0018': return "U+0018 cancel";
-                case '\x0019': return "U+0019 end of medium";
-                case '\x0020': return "space";
-                case '\x001A': return "U+001A substitute";
-                case '\x001B': return "U+001B escape";
-                case '\x001C': return "U+001C file separator";
-                case '\x001D': return "U+001D group separator";
-                case '\x001E': return "U+001E record separator";
-                case '\x001F': return "U+001F unit separator";
-                case '\x007F': return "U+007F delete";
-
-                default: return "`" + literal + "`";
-            }
-        }
-
-        public static string FormatLiteral(string literal)
-        {        
-            return "`" + literal + "`";
-        }
-    }
+	public static string FormatLiteral(string literal)
+	{
+		return $"`{literal}`";
+	}
 }

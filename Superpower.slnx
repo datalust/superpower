@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Superpower/Superpower.csproj" />
+  <Project Path="test/Superpower.Benchmarks/Superpower.Benchmarks.csproj" />
+  <Project Path="test/Superpower.Tests/Superpower.Tests.csproj" />
+</Solution>

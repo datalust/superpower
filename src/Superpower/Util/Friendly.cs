@@ -1,4 +1,4 @@
-﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,52 +12,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace Superpower.Util;
 
-namespace Superpower.Util
+static class Friendly
 {
-    static class Friendly
-    {
-        public static string Pluralize(string noun, int count)
-        {
-            if (noun == null) throw new ArgumentNullException(nameof(noun));
+	public static string Pluralize(string noun, int count)
+	{
+		if (noun == null) throw new ArgumentNullException(nameof(noun));
 
-            if (count == 1)
-                return noun;
+		if (count == 1)
+			return noun;
 
-            return noun + "s";
-        }
+		return noun + "s";
+	}
 
-        public static string List(IEnumerable<string> items)
-        {
-            if (items == null) throw new ArgumentNullException(nameof(items));
+	public static string List(IEnumerable<string> items)
+	{
+		if (items == null) throw new ArgumentNullException(nameof(items));
 
-            // Keep the order stable
-            var seen = new HashSet<string>();
-            var unique = new List<string>();
-            foreach (var item in items)
-            {
-                if (seen.Contains(item)) continue;
-                seen.Add(item);
-                unique.Add(item);
-            }
+		// Keep the order stable
+		var seen = new HashSet<string>();
+		var unique = new List<string>();
+		foreach (var item in items)
+		{
+			if (seen.Contains(item)) continue;
+			seen.Add(item);
+			unique.Add(item);
+		}
 
-            if (unique.Count == 0)
-                throw new ArgumentException("Friendly list formatting requires at least one element.", nameof(items));
+		if (unique.Count == 0)
+			throw new ArgumentException("Friendly list formatting requires at least one element.", nameof(items));
 
-            if (unique.Count == 1)
-                return unique.Single();
+		if (unique.Count == 1)
+			return unique.Single();
 
-            return $"{string.Join(", ", unique.Take(unique.Count - 1))} or {unique.Last()}";
-        }
+		return $"{string.Join(", ", unique.Take(unique.Count - 1))} or {unique.Last()}";
+	}
 
-        public static string Clip(string value, int maxLength)
-        {
-            if (value.Length > maxLength)
-                return value.Substring(0, maxLength - 3) + "...";
-            return value;
-        }
-    }
+	public static string Clip(string value, int maxLength)
+	{
+		return value.Length > maxLength
+#if NET8_0_OR_GREATER
+			? $"{value.AsSpan(0, maxLength - 3)}..."
+#else
+			? $"{value.Substring(0, maxLength - 3)}..." // You could make this work with span, but not worth it right now.
+#endif
+			: value;
+	}
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,173 +12,169 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Superpower.Display;
 using Superpower.Util;
 
-namespace Superpower.Model
+namespace Superpower.Model;
+
+/// <summary>
+/// The result of parsing from a token list.
+/// </summary>
+/// <typeparam name="T">The type of the value being parsed.</typeparam>
+/// <typeparam name="TKind">The kind of token being parsed.</typeparam>
+public struct TokenListParserResult<TKind, T>
 {
-    /// <summary>
-    /// The result of parsing from a token list.
-    /// </summary>
-    /// <typeparam name="T">The type of the value being parsed.</typeparam>
-    /// <typeparam name="TKind">The kind of token being parsed.</typeparam>
-    public struct TokenListParserResult<TKind, T>
-    {
-        readonly T _value;
+	/// <summary>
+	/// If the result has a value, this carries the location of the value in the token
+	/// list. If the result is an error, it's the location of the error.
+	/// </summary>
+	public TokenList<TKind> Location { get; }
 
-        /// <summary>
-        /// If the result has a value, this carries the location of the value in the token
-        /// list. If the result is an error, it's the location of the error.
-        /// </summary>
-        public TokenList<TKind> Location { get; }
+	/// <summary>
+	/// The first un-parsed location in the list.
+	/// </summary>
+	public TokenList<TKind> Remainder { get; }
 
-        /// <summary>
-        /// The first un-parsed location in the list.
-        /// </summary>
-        public TokenList<TKind> Remainder { get; }
+	/// <summary>
+	/// True if the result carries a successfully-parsed value; otherwise, false.
+	/// </summary>
+	public bool HasValue { get; }
 
-        /// <summary>
-        /// True if the result carries a successfully-parsed value; otherwise, false.
-        /// </summary>
-        public bool HasValue { get; }
+	/// <summary>
+	/// If the result is an error, the source-level position of the error; otherwise, <see cref="Position.Empty"/>.
+	/// </summary>
+	public readonly Position ErrorPosition
+	{
+		get
+		{
+			if (HasValue)
+				return Position.Empty;
 
-        /// <summary>
-        /// If the result is an error, the source-level position of the error; otherwise, <see cref="Position.Empty"/>.
-        /// </summary>
-        public Position ErrorPosition
-        {
-            get
-            {
-                if (HasValue)
-                    return Position.Empty;
-                
-                if (SubTokenErrorPosition.HasValue)
-                    return SubTokenErrorPosition;
-                
-                if (!Remainder.IsAtEnd)
-                    return Remainder.ConsumeToken().Value.Position;
+			if (SubTokenErrorPosition.HasValue)
+				return SubTokenErrorPosition;
 
-                return Location.ComputeEndOfInputPosition();
-            }
-        }
+			if (!Remainder.IsAtEnd)
+				return Remainder.ConsumeToken().Value.Position;
 
-        /// <summary>
-        /// If the result is an error, the source-level position of the error; otherwise, <see cref="Position.Empty"/>.
-        /// </summary>
-        public Position SubTokenErrorPosition { get; }
+			return Location.ComputeEndOfInputPosition();
+		}
+	}
 
-        /// <summary>
-        /// A provided error message, or null.
-        /// </summary>
-        public string? ErrorMessage { get; }
+	/// <summary>
+	/// If the result is an error, the source-level position of the error; otherwise, <see cref="Position.Empty"/>.
+	/// </summary>
+	public Position SubTokenErrorPosition { get; }
 
-        /// <summary>
-        /// A list of expectations that were unmet, or null.
-        /// </summary>
-        public string[]? Expectations { get; }
+	/// <summary>
+	/// A provided error message, or null.
+	/// </summary>
+	public string? ErrorMessage { get; }
 
-        /// <summary>
-        /// The parsed value.
-        /// </summary>
-        public T Value
-        {
-            get
-            {
-                if (!HasValue)
-                    throw new InvalidOperationException($"{nameof(TokenListParserResult)} has no value.");
-                return _value;
-            }
-        }
+	/// <summary>
+	/// A list of expectations that were unmet, or null.
+	/// </summary>
+	public string[]? Expectations { get; }
 
-        internal bool IsPartial(TokenList<TKind> from) => SubTokenErrorPosition.HasValue || from != Remainder;
+	/// <summary>
+	/// The parsed value.
+	/// </summary>
+	public readonly T Value
+	{
+		get
+		{
+			if (!HasValue)
+				throw new InvalidOperationException($"{nameof(TokenListParserResult)} has no value.");
+			return field;
+		}
+	}
 
-        internal bool Backtrack { get; set; }
+	internal readonly bool IsPartial(TokenList<TKind> from) => SubTokenErrorPosition.HasValue || from != Remainder;
 
-        internal TokenListParserResult(T value, TokenList<TKind> location, TokenList<TKind> remainder, bool backtrack)
-        {
-            Location = location;
-            Remainder = remainder;
-            _value = value;
-            HasValue = true;
-            SubTokenErrorPosition = Position.Empty;
-            ErrorMessage = null;
-            Expectations = null;
-            Backtrack = backtrack;
-        }
+	internal bool Backtrack { get; set; }
 
-        internal TokenListParserResult(TokenList<TKind> location, TokenList<TKind> remainder, Position errorPosition, string? errorMessage, string[]? expectations, bool backtrack)
-        {
-            Location = location;
-            Remainder = remainder;
-            _value = default!; // Default value is not observable.
-            HasValue = false;
-            SubTokenErrorPosition = errorPosition;
-            ErrorMessage = errorMessage;
-            Expectations = expectations;
-            Backtrack = backtrack;
-        }
-        
-        internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string? errorMessage, string[]? expectations, bool backtrack)
-        {
-            Location = Remainder = remainder;
-            _value = default!; // Default value is not observable.
-            HasValue = false;
-            SubTokenErrorPosition = errorPosition;
-            ErrorMessage = errorMessage;
-            Expectations = expectations;
-            Backtrack = backtrack;
-        }
+	internal TokenListParserResult(T value, TokenList<TKind> location, TokenList<TKind> remainder, bool backtrack)
+	{
+		Location = location;
+		Remainder = remainder;
+		Value = value;
+		HasValue = true;
+		SubTokenErrorPosition = Position.Empty;
+		ErrorMessage = null;
+		Expectations = null;
+		Backtrack = backtrack;
+	}
 
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            if (Remainder == TokenList<TKind>.Empty)
-                return "(Empty result.)";
+	internal TokenListParserResult(TokenList<TKind> location, TokenList<TKind> remainder, Position errorPosition, string? errorMessage, string[]? expectations, bool backtrack)
+	{
+		Location = location;
+		Remainder = remainder;
+		Value = default!; // Default value is not observable.
+		HasValue = false;
+		SubTokenErrorPosition = errorPosition;
+		ErrorMessage = errorMessage;
+		Expectations = expectations;
+		Backtrack = backtrack;
+	}
 
-            if (HasValue)
-                return $"Successful parsing of {Value}.";
+	internal TokenListParserResult(TokenList<TKind> remainder, Position errorPosition, string? errorMessage, string[]? expectations, bool backtrack)
+	{
+		Location = Remainder = remainder;
+		Value = default!; // Default value is not observable.
+		HasValue = false;
+		SubTokenErrorPosition = errorPosition;
+		ErrorMessage = errorMessage;
+		Expectations = expectations;
+		Backtrack = backtrack;
+	}
 
-            var message = FormatErrorMessageFragment();
-            var location = "";
-            if (!Remainder.IsAtEnd)
-            {
-                // Since the message notes `end of input`, don't report line/column here.
-                var sourcePosition = SubTokenErrorPosition.HasValue ? SubTokenErrorPosition : Remainder.ConsumeToken().Value.Position;
-                location = $" (line {sourcePosition.Line}, column {sourcePosition.Column})";
-            }
+	/// <inheritdoc />
+	public override readonly string ToString()
+	{
+		if (Remainder == TokenList<TKind>.Empty)
+			return "(Empty result.)";
 
-            return $"Syntax error{location}: {message}.";
-        }
+		if (HasValue)
+			return $"Successful parsing of {Value}.";
 
-        /// <summary>
-        /// If the result is empty, format the fragment of text describing the error.
-        /// </summary>
-        /// <returns>The error fragment.</returns>
-        public string FormatErrorMessageFragment()
-        {
-            if (ErrorMessage != null)
-                return ErrorMessage;
+		var message = FormatErrorMessageFragment();
+		var location = "";
+		if (!Remainder.IsAtEnd)
+		{
+			// Since the message notes `end of input`, don't report line/column here.
+			var sourcePosition = SubTokenErrorPosition.HasValue ? SubTokenErrorPosition : Remainder.ConsumeToken().Value.Position;
+			location = $" (line {sourcePosition.Line}, column {sourcePosition.Column})";
+		}
 
-            string message;
-            if (Remainder.IsAtEnd)
-            {
-                message = "unexpected end of input";
-            }
-            else
-            {
-                var next = Remainder.ConsumeToken().Value;
-                var appearance = Presentation.FormatAppearance(next.Kind, next.ToStringValue());
-                message = $"unexpected {appearance}";
-            }
+		return $"Syntax error{location}: {message}.";
+	}
 
-            if (Expectations != null)
-            {
-                var expected = Friendly.List(Expectations);
-                message += $", expected {expected}";
-            }
+	/// <summary>
+	/// If the result is empty, format the fragment of text describing the error.
+	/// </summary>
+	/// <returns>The error fragment.</returns>
+	public readonly string FormatErrorMessageFragment()
+	{
+		if (ErrorMessage != null)
+			return ErrorMessage;
 
-            return message;
-        }
-    }
+		string message;
+		if (Remainder.IsAtEnd)
+		{
+			message = "unexpected end of input";
+		}
+		else
+		{
+			var next = Remainder.ConsumeToken().Value;
+			var appearance = Presentation.FormatAppearance(next.Kind, next.ToStringValue());
+			message = $"unexpected {appearance}";
+		}
+
+		if (Expectations != null)
+		{
+			var expected = Friendly.List(Expectations);
+			message += $", expected {expected}";
+		}
+
+		return message;
+	}
 }

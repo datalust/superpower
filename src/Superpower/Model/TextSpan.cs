@@ -12,310 +12,311 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Microsoft.Extensions.Primitives;
+using System.Runtime.CompilerServices;
 
-namespace Superpower.Model
+namespace Superpower.Model;
+
+/// <summary>
+/// A span of text within a larger string.
+/// </summary>
+public readonly record struct TextSpan
 {
-    /// <summary>
-    /// A span of text within a larger string.
-    /// </summary>
-    public readonly struct TextSpan : IEquatable<TextSpan>
-    {
-        /// <summary>
-        /// The source string containing the span.
-        /// </summary>
-        public string? Source { get; }
+	/// <summary>
+	/// The source string containing the span.
+	/// </summary>
+	public string? Source { get; }
 
-        /// <summary>
-        /// The position of the start of the span within the string.
-        /// </summary>
-        public Position Position { get; }
+	/// <summary>
+	/// The position of the start of the span within the string.
+	/// </summary>
+	public Position Position { get; }
 
-        /// <summary>
-        /// The length of the span.
-        /// </summary>
-        public int Length { get; }
+	/// <summary>
+	/// The length of the span.
+	/// </summary>
+	public int Length { get; }
 
-        /// <summary>
-        /// Construct a span encompassing an entire string.
-        /// </summary>
-        /// <param name="source">The source string.</param>
-        public TextSpan(string source)
-            : this(source, Position.Zero, source.Length)
-        {
-        }
+	/// <summary>
+	/// Construct a span encompassing an entire string.
+	/// </summary>
+	/// <param name="source">The source string.</param>
+	public TextSpan(string source)
+		: this(source, Position.Zero, source.Length)
+	{
+	}
 
-        /// <summary>
-        /// Construct a string span for a substring of <paramref name="source"/>.
-        /// </summary>
-        /// <param name="source">The source string.</param>
-        /// <param name="position">The start of the span.</param>
-        /// <param name="length">The length of the span.</param>
-        public TextSpan(string source, Position position, int length)
-        {
+	/// <summary>
+	/// Construct a string span for a substring of <paramref name="source"/>.
+	/// </summary>
+	/// <param name="source">The source string.</param>
+	/// <param name="position">The start of the span.</param>
+	/// <param name="length">The length of the span.</param>
+	public TextSpan(string source, Position position, int length)
+	{
 #if CHECKED
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), "The length must be non-negative.");
-            if (source.Length < position.Absolute + length)
-                throw new ArgumentOutOfRangeException(nameof(length), "The token extends beyond the end of the input.");
+		if (source == null) throw new ArgumentNullException(nameof(source));
+		if (length < 0)
+			throw new ArgumentOutOfRangeException(nameof(length), "The length must be non-negative.");
+		if (source.Length < position.Absolute + length)
+			throw new ArgumentOutOfRangeException(nameof(length), "The token extends beyond the end of the input.");
 #endif
 
-            Source = source;
-            Position = position;
-            Length = length;
-        }
+		Source = source;
+		Position = position;
+		Length = length;
+	}
 
-        /// <summary>
-        /// A span with no value.
-        /// </summary>
-        public static TextSpan None { get; } = default;
+	/// <summary>
+	/// A span with no value.
+	/// </summary>
+	public static TextSpan None { get; } = default;
 
-        /// <summary>
-        /// A span corresponding to the empty string.
-        /// </summary>
-        public static TextSpan Empty { get; } = new TextSpan(string.Empty, Position.Zero, 0);
+	/// <summary>
+	/// A span corresponding to the empty string.
+	/// </summary>
+	public static TextSpan Empty { get; } = new TextSpan(string.Empty, Position.Zero, 0);
 
-        /// <summary>
-        /// True if the span has no content.
-        /// </summary>
-        public bool IsAtEnd
-        {
-            get
-            {
-                EnsureHasValue();
-                return Length == 0;
-            }
-        }
+	/// <summary>
+	/// True if the span has no content.
+	/// </summary>
+	public bool IsAtEnd
+	{
+		get
+		{
+			EnsureHasValue();
+			return Length == 0;
+		}
+	}
 
-        void EnsureHasValue()
-        {
-            if (Source == null)
-                throw new InvalidOperationException("String span has no value.");
-        }
+	void EnsureHasValue()
+	{
+		if (Source == null)
+			throw new InvalidOperationException("String span has no value.");
+	}
 
-        /// <summary>
-        /// Consume a character from the start of the span.
-        /// </summary>
-        /// <returns>A result with the character and remainder.</returns>
-        public Result<char> ConsumeChar()
-        {
-            EnsureHasValue();
+	/// <summary>
+	/// Consume a character from the start of the span.
+	/// </summary>
+	/// <returns>A result with the character and remainder.</returns>
+	public Result<char> ConsumeChar()
+	{
+		EnsureHasValue();
 
-            if (IsAtEnd)
-                return Result.Empty<char>(this);
+		if (IsAtEnd)
+			return Result.Empty<char>(this);
 
-            var ch = Source![Position.Absolute];
-            return Result.Value(ch, this, new TextSpan(Source, Position.Advance(ch), Length - 1));
-        }
+		var ch = Source![Position.Absolute];
+		return Result.Value(ch, this, new TextSpan(Source, Position.Advance(ch), Length - 1));
+	}
 
-        /// <inheritdoc/>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is TextSpan other))
-                return false;
-
-            return Equals(other);
-        }
-
-        /// <inheritdoc/>
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((Source?.GetHashCode() ?? 0) * 397) ^ Position.Absolute;
-            }
-        }
-
-        /// <summary>
-        /// Compare a string span with another using source identity
-        /// semantics - same source, same position, same length.
-        /// </summary>
-        /// <param name="other">The other span.</param>
-        /// <returns>True if the spans are the same.</returns>
-        public bool Equals(TextSpan other)
-        {
-            return ReferenceEquals(Source, other.Source) &&
-                   Position.Absolute == other.Position.Absolute &&
-                   Length == other.Length;
-        }
-
-        /// <summary>
-        /// Compare two spans using source identity semantics.
-        /// </summary>
-        /// <param name="lhs">One span.</param>
-        /// <param name="rhs">Another span.</param>
-        /// <returns>True if the spans are the same.</returns>
-        public static bool operator ==(TextSpan lhs, TextSpan rhs)
-        {
-            return lhs.Equals(rhs);
-        }
-
-        /// <summary>
-        /// Compare two spans using source identity semantics.
-        /// </summary>
-        /// <param name="lhs">One span.</param>
-        /// <param name="rhs">Another span.</param>
-        /// <returns>True if the spans are the different.</returns>
-        public static bool operator !=(TextSpan lhs, TextSpan rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        /// <summary>
-        /// Return a new span from the start of this span to the beginning of another.
-        /// </summary>
-        /// <param name="next">The next span.</param>
-        /// <returns>A sub-span.</returns>
-        public TextSpan Until(TextSpan next)
-        {
+	/// <summary>
+	/// Return a new span from the start of this span to the beginning of another.
+	/// </summary>
+	/// <param name="next">The next span.</param>
+	/// <returns>A sub-span.</returns>
+	public TextSpan Until(TextSpan next)
+	{
 #if CHECKED
-            next.EnsureHasValue();
-            if (next.Source != Source) throw new ArgumentException("The spans are on different source strings.", nameof(next));
+		next.EnsureHasValue();
+		if (next.Source != Source) throw new ArgumentException("The spans are on different source strings.", nameof(next));
 #endif
-            var charCount = next.Position.Absolute - Position.Absolute;
-            return First(charCount);
-        }
+		var charCount = next.Position.Absolute - Position.Absolute;
+		return First(charCount);
+	}
 
-        /// <summary>
-        /// Return a span comprising the first <paramref name="length"/> characters of this span.
-        /// </summary>
-        /// <param name="length">The number of characters to return.</param>
-        /// <returns>The sub-span.</returns>
-        public TextSpan First(int length)
-        {
+	/// <summary>
+	/// Return a span comprising the first <paramref name="length"/> characters of this span.
+	/// </summary>
+	/// <param name="length">The number of characters to return.</param>
+	/// <returns>The sub-span.</returns>
+	public TextSpan First(int length)
+	{
 #if CHECKED
-            if (length > Length)
-                throw new ArgumentOutOfRangeException(nameof(length), "Length exceeds the source span's length.");
+		if (length > Length)
+			throw new ArgumentOutOfRangeException(nameof(length), "Length exceeds the source span's length.");
 #endif
 
-            return new TextSpan(Source!, Position, length);
-        }
-        
-        /// <summary>
-        /// Skip a specified number of characters. Note, this is an O(count) operation.
-        /// </summary>
-        /// <param name="count"></param>
-        public TextSpan Skip(int count)
-        {
-            EnsureHasValue();
-            
+		return new TextSpan(Source!, Position, length);
+	}
+
+	/// <summary>
+	/// Skip a specified number of characters. Note, this is an O(count) operation.
+	/// </summary>
+	/// <param name="count"></param>
+	public TextSpan Skip(int count)
+	{
+		EnsureHasValue();
+
 #if CHECKED
-            if (count > Length)
-                throw new ArgumentOutOfRangeException(nameof(count), "Count exceeds the source span's length.");
+		if (count > Length)
+			throw new ArgumentOutOfRangeException(nameof(count), "Count exceeds the source span's length.");
 #endif
 
-            var p = Position;
-            for (var i = 0; i < count; ++i)
-            {
-                p = p.Advance(Source![p.Absolute]);
-            }
+		var p = Position;
+		for (var i = 0; i < count; ++i)
+		{
+			p = p.Advance(Source![p.Absolute]);
+		}
 
-            return new TextSpan(Source!, p, Length - count);
-        }
+		return new TextSpan(Source!, p, Length - count);
+	}
 
-        /// <inheritdoc/>
-        public override string ToString()
-        {
-            if (Source == null)
-                return "(empty source span)";
+	/// <inheritdoc/>
+	public override string ToString()
+	{
+		if (Source == null)
+			return "(empty source span)";
 
-            return ToStringValue();
-        }
+		return ToStringValue();
+	}
 
-        /// <summary>
-        /// Compute the string value of this span.
-        /// </summary>
-        /// <returns>A string with the value of this span.</returns>
-        public string ToStringValue()
-        {
-            EnsureHasValue();
-            return Source!.Substring(Position.Absolute, Length);
-        }
+	/// <summary>
+	/// Compute the string value of this span.
+	/// </summary>
+	/// <returns>A string with the value of this span.</returns>
+	public string ToStringValue()
+	{
+		EnsureHasValue();
+		return Source!.Substring(Position.Absolute, Length);
+	}
 
-        /// <summary>
-        /// Compare the contents of this span with <paramref name="otherValue"/>.
-        /// </summary>
-        /// <param name="otherValue">The string value to compare.</param>
-        /// <returns>True if the values are the same.</returns>
-        public bool EqualsValue(string otherValue)
-        {
-            if (otherValue == null) throw new ArgumentNullException(nameof(otherValue));
-            EnsureHasValue();
-            if (Length != otherValue.Length)
-                return false;
-            for (var i = 0; i < Length; ++i)
-            {
-                if (Source![Position.Absolute + i] != otherValue[i])
-                    return false;
-            }
-            return true;
-        }
+	/// <summary>
+	/// Compare a string span with another using source identity
+	/// semantics - same source, same position, same length.
+	/// </summary>
+	/// <param name="other">The other span.</param>
+	/// <returns>True if the spans are the same.</returns>
+	public bool Equals(TextSpan other)
+		=> ReferenceEquals(Source, other.Source)
+		&& Position.Absolute == other.Position.Absolute
+		&& Length == other.Length;
 
-        /// <summary>
-        /// Compare the contents of this span with <paramref name="otherValue"/>, ignoring invariant character case.
-        /// </summary>
-        /// <param name="otherValue">The string value to compare.</param>
-        /// <returns>True if the values are the same ignoring case.</returns>
-        public bool EqualsValueIgnoreCase(string otherValue)
-        {
-            if (otherValue == null) throw new ArgumentNullException(nameof(otherValue));
-            EnsureHasValue();
-            if (Length != otherValue.Length)
-                return false;
-            for (var i = 0; i < Length; ++i)
-            {
-                if (char.ToUpperInvariant(Source![Position.Absolute + i]) != char.ToUpperInvariant(otherValue[i]))
-                    return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Gets the character at the specified index in the text span.
-        /// </summary>
-        /// <param name="index">
-        /// The zero-based index of the character to get.
-        /// </param>
-        /// <returns>
-        /// The character at the specified index in the text span.
-        /// </returns>
-        public char this[int index]
-        {
-            get
-            {
-                this.EnsureHasValue();
-#if CHECKED
-                if ((uint)index >= (uint)Length)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, "Index exceeds the source span's length.");
+	/// <inheritdoc/>
+#if NETSTANDARD2_0
+	public override int GetHashCode()
+	{
+		unchecked
+		{
+			int hash = 17;
+			hash = hash * 23 + (Source == null ? 0 : System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(Source));
+			hash = hash * 23 + Position.GetHashCode();
+			hash = hash * 23 + Length.GetHashCode();
+			return hash;
+		}
+	}
+#else
+	public override int GetHashCode()
+		=> HashCode.Combine(
+			Source is null ? 0 : RuntimeHelpers.GetHashCode(Source),
+			Position,
+			Length);
 #endif
-                return Source![Position.Absolute + index];
-            }
-        }
-        
-        /// <summary>
-        /// Forms a slice out of the current text span starting at the specified index.
-        /// </summary>
-        /// <param name="index">
-        /// The index at which to begin the slice.
-        /// </param>
-        /// <returns>
-        /// An text span that consists of all elements of the current array segment from <paramref name="index"/> to the end of the text span.
-        /// </returns>
-        public TextSpan Slice(int index)
-        {
-            return Skip(index);
-        }
- 
-        /// <summary>
-        /// Forms a slice of the specified length out of the current text span starting at the specified index.
-        /// </summary>
-        /// <param name="index">The index at which to begin the slice.</param>
-        /// <param name="count">The desired length of the slice.</param>
-        /// <returns>An text span of <paramref name="count"/> elements starting at <paramref name="index"/>.</returns>
-        public TextSpan Slice(int index, int count)
-        {
-            return Skip(index).First(count);
-        }
-    }
+
+	/// <summary>
+	/// Compare the contents of this span with <paramref name="otherValue"/>.
+	/// </summary>
+	/// <param name="otherValue">The string value to compare.</param>
+	/// <returns>True if the values are the same.</returns>
+	public bool EqualsValue(string otherValue)
+	{
+		if (otherValue == null) throw new ArgumentNullException(nameof(otherValue));
+		EnsureHasValue();
+		if (Length != otherValue.Length)
+			return false;
+		for (var i = 0; i < Length; ++i)
+		{
+			if (Source![Position.Absolute + i] != otherValue[i])
+				return false;
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// Compare the contents of this span with <paramref name="otherValue"/>, ignoring invariant character case.
+	/// </summary>
+	/// <param name="otherValue">The string value to compare.</param>
+	/// <returns>True if the values are the same ignoring case.</returns>
+	public bool EqualsValueIgnoreCase(string otherValue)
+	{
+		if (otherValue == null) throw new ArgumentNullException(nameof(otherValue));
+		EnsureHasValue();
+		if (Length != otherValue.Length)
+			return false;
+		for (var i = 0; i < Length; ++i)
+		{
+			if (char.ToUpperInvariant(Source![Position.Absolute + i]) != char.ToUpperInvariant(otherValue[i]))
+				return false;
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// Gets the character at the specified index in the text span.
+	/// </summary>
+	/// <param name="index">
+	/// The zero-based index of the character to get.
+	/// </param>
+	/// <returns>
+	/// The character at the specified index in the text span.
+	/// </returns>
+	public char this[int index]
+	{
+		get
+		{
+			EnsureHasValue();
+#if CHECKED
+			if ((uint)index >= (uint)Length)
+				throw new ArgumentOutOfRangeException(nameof(index), index, "Index exceeds the source span's length.");
+#endif
+			return Source![Position.Absolute + index];
+		}
+	}
+
+	/// <summary>
+	/// Forms a slice out of the current text span starting at the specified index.
+	/// </summary>
+	/// <param name="index">
+	/// The index at which to begin the slice.
+	/// </param>
+	/// <returns>
+	/// An text span that consists of all elements of the current array segment from <paramref name="index"/> to the end of the text span.
+	/// </returns>
+	public TextSpan Slice(int index)
+	{
+		return Skip(index);
+	}
+
+	/// <summary>
+	/// Forms a slice of the specified length out of the current text span starting at the specified index.
+	/// </summary>
+	/// <param name="index">The index at which to begin the slice.</param>
+	/// <param name="count">The desired length of the slice.</param>
+	/// <returns>An text span of <paramref name="count"/> elements starting at <paramref name="index"/>.</returns>
+	public TextSpan Slice(int index, int count)
+	{
+		return Skip(index).First(count);
+	}
+
+	/// <summary>
+	/// Implicitly converts a <see cref="TextSpan"/> to a <see cref="StringSegment"/>.
+	/// </summary>
+	/// <param name="span">The <see cref="TextSpan"/> to convert.</param>
+	/// <returns>
+	/// A <see cref="StringSegment"/> representing the same span of text, or the default value if the source is null.
+	/// </returns>
+	public static implicit operator StringSegment(TextSpan span)
+		=> span.Source is null ? default : new(span.Source, span.Position.Absolute, span.Length);
+
+	/// <summary>
+	/// Implicitly converts a <see cref="TextSpan"/> to a <see cref="ReadOnlySpan{Char}"/>.
+	/// </summary>
+	/// <param name="span">The <see cref="TextSpan"/> to convert.</param>
+	/// <returns>
+	/// A <see cref="ReadOnlySpan{Char}"/> representing the same span of text, or the default value if the source is null.
+	/// </returns>
+	public static implicit operator ReadOnlySpan<char>(TextSpan span)
+		=> span.Source is null ? default : span.Source.AsSpan(span.Position.Absolute, span.Length);
 }

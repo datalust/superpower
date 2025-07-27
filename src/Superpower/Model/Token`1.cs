@@ -12,63 +12,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Superpower.Model
+namespace Superpower.Model;
+
+/// <summary>
+/// A token.
+/// </summary>
+/// <typeparam name="TKind">The type of the token's kind.</typeparam>
+public readonly record struct Token<TKind>
 {
-    /// <summary>
-    /// A token.
-    /// </summary>
-    /// <typeparam name="TKind">The type of the token's kind.</typeparam>
-    public struct Token<TKind>
-    {
-        /// <summary>
-        /// The kind of the token.
-        /// </summary>
-        public TKind Kind { get; }
+	/// <summary>
+	/// The kind of the token.
+	/// </summary>
+	public TKind Kind { get; }
 
-        /// <summary>
-        /// The string span containing the value of the token.
-        /// </summary>
-        public TextSpan Span { get; }
+	/// <summary>
+	/// The string span containing the value of the token.
+	/// </summary>
+	public TextSpan Span { get; }
 
-        /// <summary>
-        /// Get the string value of the token.
-        /// </summary>
-        /// <returns>The token as a string.</returns>
-        public string ToStringValue() => Span.ToStringValue();
+	/// <summary>
+	/// Get the string value of the token.
+	/// </summary>
+	/// <returns>The token as a string.</returns>
+	public string ToStringValue() => Span.ToStringValue();
 
-        /// <summary>
-        /// The position of the token within the source string.
-        /// </summary>
-        public Position Position => Span.Position;
+	/// <summary>
+	/// The position of the token within the source string.
+	/// </summary>
+	public Position Position => Span.Position;
 
-        /// <summary>
-        /// True if the token has a value.
-        /// </summary>
-        public bool HasValue => Span != TextSpan.None;
+	/// <summary>
+	/// True if the token has a value.
+	/// </summary>
+	public bool HasValue => Span != TextSpan.None;
 
-        /// <summary>
-        /// Construct a token.
-        /// </summary>
-        /// <param name="kind">The kind of the token.</param>
-        /// <param name="span">The span holding the token's value.</param>
-        public Token(TKind kind, TextSpan span)
-        {
-            Kind = kind;
-            Span = span;
-        }
+	/// <summary>
+	/// Construct a token.
+	/// </summary>
+	/// <param name="kind">The kind of the token.</param>
+	/// <param name="span">The span holding the token's value.</param>
+	public Token(TKind kind, TextSpan span)
+	{
+		Kind = kind;
+		Span = span;
+	}
 
-        /// <summary>
-        /// A token with no value.
-        /// </summary>
-        public static Token<TKind> Empty { get; } = default;
+	/// <summary>
+	/// A token with no value.
+	/// </summary>
+	public static Token<TKind> Empty { get; } = default;
 
-        /// <inheritdoc/>
-        public override string ToString()
-        {
-            if (!HasValue)
-                return "(empty token)";
+	/// <inheritdoc/>
+	public override string ToString()
+	{
+		if (!HasValue)
+			return "(empty token)";
 
-            return $"{Kind}@{Position}: {Span}";
-        }
-    }
+		return $"{Kind}@{Position}: {Span}";
+	}
 }

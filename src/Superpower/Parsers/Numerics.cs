@@ -1,4 +1,4 @@
-﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,260 +12,259 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
 using Superpower.Model;
 using Superpower.Util;
+using System.Globalization;
 
-namespace Superpower.Parsers
+namespace Superpower.Parsers;
+
+/// <summary>
+/// Parsers for numeric patterns.
+/// </summary>
+//* Fairly large amount of duplication/repetition here, due to the lack
+//* of generics over numbers in C#.
+public static class Numerics
 {
-    /// <summary>
-    /// Parsers for numeric patterns.
-    /// </summary>
-    //* Fairly large amount of duplication/repetition here, due to the lack
-    //* of generics over numbers in C#.
-    public static class Numerics
-    {
-        static readonly string[] ExpectedDigit = { "digit" };
-        static readonly string[] ExpectedSignOrDigit = { "sign", "digit" };
-        static readonly string[] ExpectedHexDigit = { "hex digit" };
+	static readonly string[] ExpectedDigit = ["digit"];
+	static readonly string[] ExpectedSignOrDigit = ["sign", "digit"];
+	static readonly string[] ExpectedHexDigit = ["hex digit"];
 
-        /// <summary>
-        /// A string of digits.
-        /// </summary>
-        public static TextParser<TextSpan> Natural { get; } = input =>
-        {
-            var next = input.ConsumeChar();
-            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
-                return Result.Empty<TextSpan>(input, ExpectedDigit);
+	/// <summary>
+	/// A string of digits.
+	/// </summary>
+	public static TextParser<TextSpan> Natural { get; } = input =>
+	{
+		var next = input.ConsumeChar();
+		if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
+			return Result.Empty<TextSpan>(input, ExpectedDigit);
 
-            TextSpan remainder;
-            do
-            {
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
+		TextSpan remainder;
+		do
+		{
+			remainder = next.Remainder;
+			next = remainder.ConsumeChar();
+		} while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
-            return Result.Value(input.Until(remainder), input, remainder);
-        };
+		return Result.Value(input.Until(remainder), input, remainder);
+	};
 
-        /// <summary>
-        /// A string of digits, converted into a <see cref="uint"/>.
-        /// </summary>
-        public static TextParser<uint> NaturalUInt32 { get; } = input =>
-        {
-            var next = input.ConsumeChar();
-            
-            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
-                return Result.Empty<uint>(input, ExpectedDigit);
+	/// <summary>
+	/// A string of digits, converted into a <see cref="uint"/>.
+	/// </summary>
+	public static TextParser<uint> NaturalUInt32 { get; } = input =>
+	{
+		var next = input.ConsumeChar();
 
-            TextSpan remainder;
-            var val = 0u;
-            do
-            {
-                val = 10 * val + (uint)(next.Value - '0');
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
-            
-            return Result.Value(val, input, remainder);
-        };
+		if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
+			return Result.Empty<uint>(input, ExpectedDigit);
 
-        /// <summary>
-        /// A string of digits, converted into a <see cref="ulong"/>.
-        /// </summary>
-        public static TextParser<ulong> NaturalUInt64 { get; } = input =>
-        {
-            var next = input.ConsumeChar();
-            
-            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
-                return Result.Empty<ulong>(input, ExpectedDigit);
+		TextSpan remainder;
+		var val = 0u;
+		do
+		{
+			val = 10 * val + (uint)(next.Value - '0');
+			remainder = next.Remainder;
+			next = remainder.ConsumeChar();
+		} while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
-            TextSpan remainder;
-            var val = 0ul;
-            do
-            {
-                val = 10 * val + (ulong)(next.Value - '0');
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
-            
-            return Result.Value(val, input, remainder);
-        };
+		return Result.Value(val, input, remainder);
+	};
 
-        /// <summary>
-        /// A string of digits with an optional +/- sign.
-        /// </summary>
-        public static TextParser<TextSpan> Integer { get; } = input =>
-        {
-            var next = input.ConsumeChar();
-            
-            if (!next.HasValue)
-                return Result.Empty<TextSpan>(input, ExpectedSignOrDigit);
-            
-            if (next.Value == '-' || next.Value == '+')
-                next = next.Remainder.ConsumeChar();
+	/// <summary>
+	/// A string of digits, converted into a <see cref="ulong"/>.
+	/// </summary>
+	public static TextParser<ulong> NaturalUInt64 { get; } = input =>
+	{
+		var next = input.ConsumeChar();
 
-            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
-                return Result.Empty<TextSpan>(input, ExpectedDigit);
+		if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
+			return Result.Empty<ulong>(input, ExpectedDigit);
 
-            TextSpan remainder;
-            do
-            {
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
+		TextSpan remainder;
+		var val = 0ul;
+		do
+		{
+			val = 10 * val + (ulong)(next.Value - '0');
+			remainder = next.Remainder;
+			next = remainder.ConsumeChar();
+		} while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
-            return Result.Value(input.Until(remainder), input, remainder);
-        };
+		return Result.Value(val, input, remainder);
+	};
 
-        /// <summary>
-        /// A string of digits with an optional +/- sign, converted into an <see cref="int"/>.
-        /// </summary>
-        public static TextParser<int> IntegerInt32 { get; } = input =>
-        {
-            var negative = false;
-            
-            var next = input.ConsumeChar();
+	/// <summary>
+	/// A string of digits with an optional +/- sign.
+	/// </summary>
+	public static TextParser<TextSpan> Integer { get; } = input =>
+	{
+		var next = input.ConsumeChar();
 
-            if (!next.HasValue)
-                return Result.Empty<int>(input, ExpectedSignOrDigit);
-            
-            if (next.Value == '-')
-            {
-                negative = true;
-                next = next.Remainder.ConsumeChar();
-            }
-            else if (next.Value == '+')
-            {
-                next = next.Remainder.ConsumeChar();
-            }
-            
-            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
-                return Result.Empty<int>(input, ExpectedDigit);
+		if (!next.HasValue)
+			return Result.Empty<TextSpan>(input, ExpectedSignOrDigit);
 
-            TextSpan remainder;
-            var val = 0;
-            do
-            {
-                val = 10 * val + (next.Value - '0');
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
+		if (next.Value is '-' or '+')
+			next = next.Remainder.ConsumeChar();
 
-            if (negative)
-                val = -val;
-            
-            return Result.Value(val, input, remainder);
-        };
+		if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
+			return Result.Empty<TextSpan>(input, ExpectedDigit);
 
-        /// <summary>
-        /// A string of digits with an optional +/- sign, converted into an <see cref="long"/>.
-        /// </summary>
-        public static TextParser<long> IntegerInt64 { get; } = input =>
-        {
-            var negative = false;
-            
-            var next = input.ConsumeChar();
+		TextSpan remainder;
+		do
+		{
+			remainder = next.Remainder;
+			next = remainder.ConsumeChar();
+		} while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
-            if (!next.HasValue)
-                return Result.Empty<long>(input, ExpectedSignOrDigit);
-            
-            if (next.Value == '-')
-            {
-                negative = true;
-                next = next.Remainder.ConsumeChar();
-            }
-            else if (next.Value == '+')
-            {
-                next = next.Remainder.ConsumeChar();
-            }
-            
-            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
-                return Result.Empty<long>(input, ExpectedDigit);
+		return Result.Value(input.Until(remainder), input, remainder);
+	};
 
-            TextSpan remainder;
-            var val = 0L;
-            do
-            {
-                val = 10 * val + (next.Value - '0');
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
+	/// <summary>
+	/// A string of digits with an optional +/- sign, converted into an <see cref="int"/>.
+	/// </summary>
+	public static TextParser<int> IntegerInt32 { get; } = input =>
+	{
+		var negative = false;
 
-            if (negative)
-                val = -val;
-            
-            return Result.Value(val, input, remainder);
-        };
-        
-        /// <summary>
-        /// Matches decimal numbers, for example <code>-1.23</code>.
-        /// </summary>
-        public static TextParser<TextSpan> Decimal { get; } =
-            Integer
-                .Then(n => Character.EqualTo('.').IgnoreThen(Natural).OptionalOrDefault()
-                    .Select(f => f == TextSpan.None ? n : new TextSpan(n.Source!, n.Position, n.Length + f.Length + 1)));
+		var next = input.ConsumeChar();
 
-        /// <summary>
-        /// Matches decimal numbers, for example <code>-1.23</code>, converted into a <see cref="decimal"/>.
-        /// </summary>
-        public static TextParser<decimal> DecimalDecimal { get; } =
-            Decimal.Select(span => decimal.Parse(span.ToStringValue(), CultureInfo.InvariantCulture));
+		if (!next.HasValue)
+			return Result.Empty<int>(input, ExpectedSignOrDigit);
 
-        /// <summary>
-        /// Matches decimal numbers, for example <code>-1.23</code>, converted into a <see cref="double"/>.
-        /// </summary>
-        public static TextParser<double> DecimalDouble { get; } =
-            Decimal.Select(span => double.Parse(span.ToStringValue(), CultureInfo.InvariantCulture));
+		if (next.Value == '-')
+		{
+			negative = true;
+			next = next.Remainder.ConsumeChar();
+		}
+		else if (next.Value == '+')
+		{
+			next = next.Remainder.ConsumeChar();
+		}
 
-        /// <summary>
-        /// Matches hexadecimal numbers.
-        /// </summary>
-        public static TextParser<TextSpan> HexDigits { get; } =
-            Span.MatchedBy(Character.HexDigit.AtLeastOnce());  
-        
-        /// <summary>
-        /// A string of hexadecimal digits, converted into a <see cref="uint"/>.
-        /// </summary>
-        public static TextParser<uint> HexDigitsUInt32 { get; } = input =>
-        {
-            var next = input.ConsumeChar();
-            
-            if (!next.HasValue || !CharInfo.IsHexDigit(next.Value))
-                return Result.Empty<uint>(input, ExpectedHexDigit);
+		if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
+			return Result.Empty<int>(input, ExpectedDigit);
 
-            TextSpan remainder;
-            var val = 0u;
-            do
-            {
-                val = 16 * val + (uint)CharInfo.HexValue(next.Value);
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsHexDigit(next.Value));
-            
-            return Result.Value(val, input, remainder);
-        };
-                
-        /// <summary>
-        /// A string of hexadecimal digits, converted into a <see cref="ulong"/>.
-        /// </summary>
-        public static TextParser<ulong> HexDigitsUInt64 { get; } = input =>
-        {
-            var next = input.ConsumeChar();
-            
-            if (!next.HasValue || !CharInfo.IsHexDigit(next.Value))
-                return Result.Empty<ulong>(input, ExpectedHexDigit);
+		TextSpan remainder;
+		var val = 0;
+		do
+		{
+			val = 10 * val + (next.Value - '0');
+			remainder = next.Remainder;
+			next = remainder.ConsumeChar();
+		} while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
-            TextSpan remainder;
-            var val = 0ul;
-            do
-            {
-                val = 16 * val + (ulong)CharInfo.HexValue(next.Value);
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsHexDigit(next.Value));
-            
-            return Result.Value(val, input, remainder);
-        };
-    }
+		if (negative)
+			val = -val;
+
+		return Result.Value(val, input, remainder);
+	};
+
+	/// <summary>
+	/// A string of digits with an optional +/- sign, converted into an <see cref="long"/>.
+	/// </summary>
+	public static TextParser<long> IntegerInt64 { get; } = input =>
+	{
+		var negative = false;
+
+		var next = input.ConsumeChar();
+
+		if (!next.HasValue)
+			return Result.Empty<long>(input, ExpectedSignOrDigit);
+
+		if (next.Value == '-')
+		{
+			negative = true;
+			next = next.Remainder.ConsumeChar();
+		}
+		else if (next.Value == '+')
+		{
+			next = next.Remainder.ConsumeChar();
+		}
+
+		if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
+			return Result.Empty<long>(input, ExpectedDigit);
+
+		TextSpan remainder;
+		var val = 0L;
+		do
+		{
+			val = 10 * val + (next.Value - '0');
+			remainder = next.Remainder;
+			next = remainder.ConsumeChar();
+		} while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
+
+		if (negative)
+			val = -val;
+
+		return Result.Value(val, input, remainder);
+	};
+
+	/// <summary>
+	/// Matches decimal numbers, for example <code>-1.23</code>.
+	/// </summary>
+	public static TextParser<TextSpan> Decimal { get; } =
+		Integer
+			.Then(n => Character.EqualTo('.').IgnoreThen(Natural).OptionalOrDefault()
+				.Select(f => f == TextSpan.None ? n : new TextSpan(n.Source!, n.Position, n.Length + f.Length + 1)));
+
+	/// <summary>
+	/// Matches decimal numbers, for example <code>-1.23</code>, converted into a <see cref="decimal"/>.
+	/// </summary>
+	public static TextParser<decimal> DecimalDecimal { get; } =
+		Decimal.Select(span => decimal.Parse(span.ToStringValue(), CultureInfo.InvariantCulture));
+
+	/// <summary>
+	/// Matches decimal numbers, for example <code>-1.23</code>, converted into a <see cref="double"/>.
+	/// </summary>
+	public static TextParser<double> DecimalDouble { get; } =
+		Decimal.Select(span => double.Parse(span.ToStringValue(), CultureInfo.InvariantCulture));
+
+	/// <summary>
+	/// Matches hexadecimal numbers.
+	/// </summary>
+	public static TextParser<TextSpan> HexDigits { get; } =
+		Span.MatchedBy(Character.HexDigit.AtLeastOnce());
+
+	/// <summary>
+	/// A string of hexadecimal digits, converted into a <see cref="uint"/>.
+	/// </summary>
+	public static TextParser<uint> HexDigitsUInt32 { get; } = input =>
+	{
+		var next = input.ConsumeChar();
+
+		if (!next.HasValue || !CharInfo.IsHexDigit(next.Value))
+			return Result.Empty<uint>(input, ExpectedHexDigit);
+
+		TextSpan remainder;
+		var val = 0u;
+		do
+		{
+			val = 16 * val + (uint)CharInfo.HexValue(next.Value);
+			remainder = next.Remainder;
+			next = remainder.ConsumeChar();
+		} while (next.HasValue && CharInfo.IsHexDigit(next.Value));
+
+		return Result.Value(val, input, remainder);
+	};
+
+	/// <summary>
+	/// A string of hexadecimal digits, converted into a <see cref="ulong"/>.
+	/// </summary>
+	public static TextParser<ulong> HexDigitsUInt64 { get; } = input =>
+	{
+		var next = input.ConsumeChar();
+
+		if (!next.HasValue || !CharInfo.IsHexDigit(next.Value))
+			return Result.Empty<ulong>(input, ExpectedHexDigit);
+
+		TextSpan remainder;
+		var val = 0ul;
+		do
+		{
+			val = 16 * val + (ulong)CharInfo.HexValue(next.Value);
+			remainder = next.Remainder;
+			next = remainder.ConsumeChar();
+		} while (next.HasValue && CharInfo.IsHexDigit(next.Value));
+
+		return Result.Value(val, input, remainder);
+	};
 }

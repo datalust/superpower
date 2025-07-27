@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Superpower.Model
+namespace Superpower.Model;
+
+/// <summary>
+/// Represents the progress of a single tokenization operation.
+/// </summary>
+/// <typeparam name="TKind">The kind of token being produced.</typeparam>
+public class TokenizationState<TKind>
 {
-    /// <summary>
-    /// Represents the progress of a single tokenization operation.
-    /// </summary>
-    /// <typeparam name="TKind">The kind of token being produced.</typeparam>
-    public class TokenizationState<TKind>
-    {
-        /// <summary>
-        /// The last produced token.
-        /// </summary>
-        public Token<TKind>? Previous { get; set; }
-    }
+	/// <summary>
+	/// The last produced token.
+	/// </summary>
+	public Token<TKind>? Previous { get; set; }
 }

@@ -1,28 +1,27 @@
-﻿using Superpower.Display;
+using Superpower.Display;
 
-namespace Superpower.Benchmarks.ArithmeticExpressionScenario
+namespace Superpower.Benchmarks.ArithmeticExpressionScenario;
+
+public enum ArithmeticExpressionToken
 {
-    public enum ArithmeticExpressionToken
-    {
-        None,
+	None,
 
-        Number,
-        [Token(Category = "operator", Example = "+")]
-        Plus,
+	Number,
+	[Token(Category = "operator", Example = "+")]
+	Plus,
 
-        [Token(Category = "operator", Example = "-")]
-        Minus,
+	[Token(Category = "operator", Example = "-")]
+	Minus,
 
-        [Token(Category = "operator", Example = "*")]
-        Times,
+	[Token(Category = "operator", Example = "*")]
+	Times,
 
-        [Token(Category = "operator", Example = "-")]
-        Divide,
+	[Token(Category = "operator", Example = "-")]
+	Divide,
 
-        [Token(Example = "(")]
-        LParen,
+	[Token(Example = "(")]
+	LParen,
 
-        [Token(Example = ")")]
-        RParen
-    }
+	[Token(Example = ")")]
+	RParen
 }

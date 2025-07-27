@@ -1,30 +1,28 @@
-﻿using Superpower.Display;
-using Superpower.Model;
+using Superpower.Display;
 
-namespace IntCalc
+namespace IntCalc;
+
+enum ArithmeticExpressionToken
 {
-    enum ArithmeticExpressionToken
-    {
-        None,
+	None,
 
-        Number,
+	Number,
 
-        [Token(Category="operator", Example = "+")]
-        Plus,
+	[Token(Category = "operator", Example = "+")]
+	Plus,
 
-        [Token(Category = "operator", Example = "-")]
-        Minus,
+	[Token(Category = "operator", Example = "-")]
+	Minus,
 
-        [Token(Category = "operator", Example = "*")]
-        Times,
+	[Token(Category = "operator", Example = "*")]
+	Times,
 
-        [Token(Category = "operator", Example = "/")]
-        Divide,
+	[Token(Category = "operator", Example = "/")]
+	Divide,
 
-        [Token(Example = "(")]
-        LParen,
+	[Token(Example = "(")]
+	LParen,
 
-        [Token(Example = ")")]
-        RParen
-    }
+	[Token(Example = ")")]
+	RParen
 }

@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+  
+	<PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0</TargetFrameworks>
     <Description>A parser combinator library for C#</Description>
     <VersionPrefix>3.1.1</VersionPrefix>
     <Authors>Datalust;Superpower Contributors;Sprache Contributors</Authors>
@@ -17,12 +18,34 @@
     <RepositoryUrl>https://github.com/datalust/superpower</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>$(DefineConstants);CHECKED</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
+  
+	<ItemGroup>
     <None Include="..\..\asset\Superpower-White-400px.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' ">
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.*" />
+		<PackageReference Include="System.Memory" Version="4.6.3" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0' ">
+		<PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' != 'net6.0' ">
+	  <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.7" />
+	</ItemGroup>
+
+	<!-- Disable the nullable warnings when compiling for .NET Standard 2.0 -->
+	<PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<NoWarn>$(NoWarn);nullable</NoWarn>
+	</PropertyGroup>
+	
 </Project>
