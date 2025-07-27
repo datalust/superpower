@@ -1005,8 +1005,7 @@ public static class Combinators
 			if (rt.HasValue)
 				return rt;
 
-			rt.Backtrack = true;
-			return rt;
+			return rt.WithBacktrack(true);
 		};
 	}
 
@@ -1202,6 +1201,36 @@ public static class Combinators
 			}
 
 			return TokenListParserResult.Value(result, input, operandRemainder);
+		};
+	}
+
+	/// <summary>
+	/// Construct a parser that matches <paramref name="parser"/> zero or more times,
+	/// returning the span that covers all matches without creating intermediate arrays.
+	/// </summary>
+	public static TextParser<TextSpan> ManyAsSpan<T>(this TextParser<T> parser)
+	{
+		if (parser == null) throw new ArgumentNullException(nameof(parser));
+
+		return input =>
+		{
+			var start = input;
+			var from = input;
+			var r = parser(input);
+
+			while (r.HasValue)
+			{
+				if (from == r.Remainder) // Broken parser, not a failed parsing.
+					throw new ParseException($"ManyAsSpan() cannot be applied to zero-width parsers; value {r.Value} at position {r.Location.Position}.", r.Location.Position);
+
+				from = r.Remainder;
+				r = parser(r.Remainder);
+			}
+
+			if (!r.Backtrack && r.IsPartial(from))
+				return Result.CastEmpty<T, TextSpan>(r);
+
+			return Result.Value(start.Until(from), input, from);
 		};
 	}
 }

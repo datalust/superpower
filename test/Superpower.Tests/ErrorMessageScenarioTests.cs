@@ -72,7 +72,7 @@ public class ErrorMessageScenarioTests
 	{
 		var data = new TheoryData<Tokenizer<ArithmeticExpressionToken>>
 		{
-			new ArithmeticExpressionTokenizer(),
+			(TheoryDataRow<Tokenizer<ArithmeticExpressionToken>>)new ArithmeticExpressionTokenizer(),
 			new TokenizerBuilder<ArithmeticExpressionToken>()
 				.Ignore(Span.WhiteSpace)
 				.Match(Character.EqualTo('+'), ArithmeticExpressionToken.Plus)

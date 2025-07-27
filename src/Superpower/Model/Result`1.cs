@@ -20,7 +20,7 @@ namespace Superpower.Model;
 /// The result of parsing from a text span.
 /// </summary>
 /// <typeparam name="T">The type of the value being parsed.</typeparam>
-public struct Result<T>
+public readonly record struct Result<T>
 {
 	/// <summary>
 	/// If the result is a value, the location in the input corresponding to the
@@ -55,7 +55,21 @@ public struct Result<T>
 
 	internal readonly bool IsPartial(TextSpan from) => from != Remainder;
 
-	internal bool Backtrack { get; set; }
+	internal bool Backtrack { get; }
+
+	/// <summary>
+	/// Returns a new <see cref="Result{T}"/> instance with the specified backtrack setting.
+	/// </summary>
+	/// <param name="backtrack">A boolean value indicating whether backtracking is enabled.  If <see langword="true"/>, backtracking is enabled;
+	/// otherwise, it is disabled.</param>
+	/// <returns>A new <see cref="Result{T}"/> instance with the updated backtrack setting,  or the current instance if the
+	/// backtrack setting is unchanged.</returns>
+	public Result<T> WithBacktrack(bool backtrack)
+	{
+		if (backtrack == Backtrack)
+			return this;
+		return new Result<T>(Location, Remainder, ErrorMessage, Expectations, backtrack);
+	}
 
 	/// <summary>
 	/// The parsed value.
