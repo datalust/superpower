@@ -101,5 +101,44 @@ namespace Superpower.Tests.Parsers
             var parsed = Numerics.DecimalDouble.Parse("-123.456");
             Assert.Equal(-123.456, parsed);
         }
+
+        [Theory]
+        [InlineData("1", false)]
+        [InlineData("1e0", true)]
+        [InlineData("1E0", true)]
+        [InlineData("1e+0", true)]
+        [InlineData("1e-0", true)]
+        [InlineData("1E+0", true)]
+        [InlineData("1E-0", true)]
+        [InlineData("+1e+0", true)]
+        [InlineData("-1e-0", true)]
+        [InlineData("1.23e45", true)]
+        [InlineData("1.23e+45", true)]
+        [InlineData("1.23e-45", true)]
+        [InlineData("+1.23e+45", true)]
+        [InlineData("-1.23e-45", true)]
+        [InlineData("1+e1", false)]
+        [InlineData("1e+.1", false)]
+        [InlineData("e+1", false)]
+        public void ExponentialNumbersAreRecognized(string input, bool isMatch)
+        {
+            AssertParser.FitsTheory(Numerics.Exponential, input, isMatch);
+        }
+
+
+        [Fact]
+        public void ExponentialDecimalAreParsed()
+        {
+            var parsed = Numerics.ExponentialDecimal.Parse("-1.23e-45");
+            Assert.Equal(-1.23e-45m, parsed);
+        }
+
+        [Fact]
+        public void ExponentialDoubleAreParsed()
+        {
+            var parsed = Numerics.ExponentialDouble.Parse("-1.23e-45");
+            Assert.Equal(-1.23e-45, parsed);
+        }
+
     }
 }
