@@ -267,5 +267,53 @@ namespace Superpower.Parsers
             
             return Result.Value(val, input, remainder);
         };
+
+        /// <summary>
+        /// Matches exponential numbers.
+        /// </summary>
+        public static TextParser<TextSpan> Exponential { get; } = static input =>
+        {
+            var frac = Decimal(input);
+            if (!frac.HasValue)
+            {
+                return frac;
+            }
+            var separator = Character.EqualTo('e').Or(Character.EqualTo('E'))(frac.Remainder);
+            if (!separator.HasValue)
+            {
+                return Result.CastEmpty<char, TextSpan>(separator);
+            }
+            var exponent = Integer(separator.Remainder);
+            if (!exponent.HasValue)
+            {
+            }
+            return Result.Value(input.Until(exponent.Remainder), input, exponent.Remainder);
+        };
+
+        /// <summary>
+        /// A string of exponential numbers, converted into a<see cref="double"/>.
+        /// </summary>
+        public static TextParser<double> ExponentialDouble { get; } =
+            Exponential.Select(span => double.Parse(
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+                span.AsReadOnlySpan(),
+#else
+                span.ToStringValue(),
+#endif
+                NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture));
+
+        /// <summary>
+        /// A string of exponential numbers, converted into a<see cref="decimal"/>.
+        /// </summary>
+        public static TextParser<decimal> ExponentialDecimal { get; } =
+            Exponential.Select(span => decimal.Parse(
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1_OR_GREATER
+                span.AsReadOnlySpan(),
+#else
+                span.ToStringValue(),
+#endif
+                NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture));
     }
 }
