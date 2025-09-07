@@ -234,6 +234,16 @@ namespace Superpower.Model
         }
 
         /// <summary>
+        /// Compute the string value of this span and return the view of source directly.
+        /// </summary>
+        /// <returns>A view of string with the value of this span.</returns>
+        public ReadOnlySpan<char> AsReadOnlySpan()
+        {
+            EnsureHasValue();
+            return Source!.AsSpan(Position.Absolute, Length);
+        }
+
+        /// <summary>
         /// Compare the contents of this span with <paramref name="otherValue"/>.
         /// </summary>
         /// <param name="otherValue">The string value to compare.</param>
