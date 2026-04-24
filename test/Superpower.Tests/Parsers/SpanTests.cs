@@ -18,7 +18,7 @@ namespace Superpower.Tests.Parsers
         public void RegularExpressionParsersAreApplied(
             string input, 
             string regex, 
-            string match, 
+            string? match, 
             int start = 0,
             int length = -1)
         {

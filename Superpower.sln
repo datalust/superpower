@@ -7,7 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AC295EEA-D31
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{66B005E9-A083-41E8-BD89-4D6E753CD8BF}"
 	ProjectSection(SolutionItems) = preProject
-		appveyor.yml = appveyor.yml
 		Benchmark.ps1 = Benchmark.ps1
 		Build.ps1 = Build.ps1
 		LICENSE = LICENSE
