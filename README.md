@@ -1,4 +1,4 @@
-# Superpower [![Build status](https://ci.appveyor.com/api/projects/status/7bj6if6tyc68urpy?svg=true)](https://ci.appveyor.com/project/datalust/superpower) [![NuGet Version](https://img.shields.io/nuget/vpre/Superpower.svg?style=flat)](https://www.nuget.org/packages/Superpower/) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-superpower-orange.svg)](http://stackoverflow.com/questions/tagged/superpower)
+# Superpower [![NuGet Version](https://img.shields.io/nuget/vpre/Superpower.svg?style=flat)](https://www.nuget.org/packages/Superpower/)
 
 A [parser combinator](https://en.wikipedia.org/wiki/Parser_combinator) library based on
 [Sprache](https://github.com/sprache/Sprache). Superpower generates friendlier error messages through its support for
