@@ -1,0 +1,17 @@
+<Project>
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <VersionPrefix>3.1.0</VersionPrefix>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!-- The condition is required to support BenchmarkDotNet -->
+        <SignAssembly Condition="Exists('../../assets/SerilogTracing.snk')">true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../../assets/SerilogTracing.snk</AssemblyOriginatorKeyFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <NoWarn>NETSDK1138</NoWarn>
+    </PropertyGroup>
+</Project>
