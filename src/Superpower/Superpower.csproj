@@ -2,27 +2,19 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
     <Description>A parser combinator library for C#</Description>
-    <VersionPrefix>3.1.0</VersionPrefix>
     <Authors>Datalust;Superpower Contributors;Sprache Contributors</Authors>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyOriginatorKeyFile>../../asset/Superpower.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageTags>superpower;parser</PackageTags>
     <PackageProjectUrl>https://github.com/datalust/superpower</PackageProjectUrl>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <PackageIcon>Superpower-White-400px.png</PackageIcon>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/datalust/superpower</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>$(DefineConstants);CHECKED</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\asset\Superpower-White-400px.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
 </Project>
