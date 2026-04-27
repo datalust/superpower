@@ -8,8 +8,9 @@
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <!-- The condition is required to support BenchmarkDotNet -->
-        <SignAssembly Condition="Exists('../../assets/SerilogTracing.snk')">true</SignAssembly>
-        <AssemblyOriginatorKeyFile>../../assets/SerilogTracing.snk</AssemblyOriginatorKeyFile>
+        <SignAssembly Condition="Exists('../../asset/Superpower.snk')">true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../../asset/Superpower.snk</AssemblyOriginatorKeyFile>
+        <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <NoWarn>NETSDK1138</NoWarn>
