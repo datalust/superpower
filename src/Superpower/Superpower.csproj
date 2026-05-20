@@ -7,12 +7,14 @@
     <PackageProjectUrl>https://github.com/datalust/superpower</PackageProjectUrl>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <PackageIcon>Superpower-White-400px.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>$(DefineConstants);CHECKED</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\..\asset\Superpower-White-400px.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="../../asset/Superpower-White-400px.png" Pack="true" Visible="false" PackagePath="/" />
+    <None Include="../../README.md" Pack="true" Visible="false" PackagePath="/" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="System.Memory" Version="4.6.3" />
